@@ -1,0 +1,140 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-06 13:23+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Martin Fors\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: sv_SE\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: esc_html__;esc_html_e;esc_attr__;esc_attr_e;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: ..\n"
+
+#: ../include/classes.php:176
+msgid "Display Calendar"
+msgstr "Visa kalender"
+
+#: ../include/classes.php:181
+#: ../include/functions.php:6
+#: ../include/functions.php:7
+#: ../include/functions.php:8
+#: ../include/functions.php:49
+#: ../include/functions.php:52
+#: ../include/functions.php:108
+#: ../include/functions.php:202
+#: ../include/functions.php:317
+msgid "Calendar"
+msgstr "Kalender"
+
+#: ../include/classes.php:311
+msgid "I could not find any events at the moment. Sorry!"
+msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"
+
+#: ../include/classes.php:343
+msgid "Heading"
+msgstr "Rubrik"
+
+#: ../include/classes.php:346
+msgid "Feeds"
+msgstr "Flöden"
+
+#: ../include/classes.php:349
+msgid "Show Events"
+msgstr "Visa händelser"
+
+#: ../include/functions.php:25
+#: ../include/functions.php:55
+msgid "Events"
+msgstr "Händelser"
+
+#: ../include/functions.php:26
+#: ../include/functions.php:27
+msgid "Event"
+msgstr "Händelse"
+
+#: ../include/functions.php:58
+msgid "Add New"
+msgstr "Skapa ny"
+
+#: ../include/functions.php:94
+msgid "Google Calendar API key"
+msgstr ""
+
+#: ../include/functions.php:116
+#, php-format
+msgid "Go to %s and log in"
+msgstr "Gå till %s och logga in"
+
+#: ../include/functions.php:117
+msgid "Create a new project"
+msgstr "Skapa ett nytt projekt"
+
+#: ../include/functions.php:118
+#, php-format
+msgid "Choose '%s', '%s', '%s' and '%s'"
+msgstr "Välj '%s', '%s', '%s' och '%s'"
+
+#: ../include/functions.php:132
+msgid "Account"
+msgstr "Konto"
+
+#: ../include/functions.php:133
+msgid "Amount"
+msgstr "Antal"
+
+#: ../include/functions.php:180
+msgid "I got an error when accessing the calendar"
+msgstr "Jag fick ett fel när jag hämtade kalendern"
+
+#: ../include/functions.php:186
+msgid "I am waiting to get access to the calendar"
+msgstr "Jag väntar på att få tillgång till kalendern"
+
+#: ../include/functions.php:199
+msgid "Title"
+msgstr "Titel"
+
+#: ../include/functions.php:200
+#: ../include/functions.php:323
+msgid "Location"
+msgstr "Plats"
+
+#: ../include/functions.php:201
+msgid "Date"
+msgstr "Datum"
+
+#: ../include/functions.php:224
+msgid "Recover"
+msgstr "Återställ"
+
+#: ../include/functions.php:231
+msgid "Edit"
+msgstr "Redigera"
+
+#: ../include/functions.php:234
+msgid "Delete"
+msgstr "Radera"
+
+#: ../include/functions.php:293
+#: ../include/functions.php:311
+msgid "Settings"
+msgstr "Inställningar"
+
+#: ../include/functions.php:299
+msgid "Calendar ID"
+msgstr "Kalender-ID"
+
+#: ../include/functions.php:328
+msgid "Start"
+msgstr "Start"
+
+#: ../include/functions.php:333
+msgid "End"
+msgstr "Slut"
+
