@@ -25,6 +25,10 @@ echo "@media all
 
 			.widget.calendar li
 			{
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: -webkit-flex;
+				display: flex;
 				overflow: hidden;
 			}
 
@@ -43,44 +47,60 @@ echo "@media all
 						margin-top: .5em;
 					}
 
-				.widget.calendar li > p
+				/*.widget.calendar li > div
+				{
+					-webkit-box-flex: 1 1 0;
+					-webkit-flex: 1 1 0;
+					-ms-flex: 1 1 0;
+					flex: 1 1 0;
+				}*/
+
+				.widget.calendar li > div
+				{
+					-webkit-box-flex: initial;
+					-webkit-flex: initial;
+					-ms-flex: initial;
+					flex: initial;
+				}
+
+				.widget.calendar li .date p
 				{
 					background: ".$setting_calendar_date_color.";
 					border-radius: .3em;
 					color: #fff;
-					float: left;
+					/*float: left;*/
 					font-size: 1.5em;
 					padding: .4em .5em;
 				}
 
-				.widget.calendar li > div
+				.widget.calendar li .content
 				{
-					float: left;
+					/*float: left;*/
 					margin-left: 2%;
-					min-width: 70%;
+					/*min-width: 70%;*/
 				}
 
-					.widget.calendar li > div span
+					.widget.calendar li .content span
 					{
 						font-weight: bold;
 					}
 
-					.widget.calendar li > div p
+					.widget.calendar li .content p
 					{
 						margin: .2em 0 0;
 					}
 
-						.widget.calendar li > div p > .fa
+						.widget.calendar li .content p > .fa
 						{
 							margin-left: .4em;
 						}
 
-					.widget.calendar li > div .toggle_container
+					.widget.calendar li .content .toggle_container
 					{
 						margin: 1em 0;
 					}
 
-						.widget.calendar li > div .toggle_container p
+						.widget.calendar li .content .toggle_container p
 						{
 							font-size: .8em;
 							margin-bottom: .5em;

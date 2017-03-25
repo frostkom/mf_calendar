@@ -252,7 +252,7 @@ class widget_calendar extends WP_Widget
 				$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
 			}
 			
-			$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
+			$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
 
 			if($wpdb->num_rows > 0)
 			{
@@ -267,6 +267,7 @@ class widget_calendar extends WP_Widget
 					$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
 					$post_start = get_post_meta($post_id, $this->meta_prefix.'start', true);
 					$post_end = get_post_meta($post_id, $this->meta_prefix.'end', true);
+					$post_uid = get_post_meta($post_id, $this->meta_prefix.'uid', true);
 
 					if(!($post_end > $post_start))
 					{
@@ -279,6 +280,7 @@ class widget_calendar extends WP_Widget
 						'location' => $post_location,
 						'start' => $post_start,
 						'end' => $post_end,
+						'uid' => $post_uid,
 					);
 				}
 
@@ -332,22 +334,25 @@ class widget_calendar extends WP_Widget
 										$more_content .= "<p>".$event['content']."</p>";
 									}
 
-									if(is_plugin_active("mf_maps/index.php"))
+									if($event['location'] != '')
 									{
-										$more_content .= get_map(array('input' => $event['location'])); //, 'coords' => $profile_search_coords
-									}
+										if(is_plugin_active("mf_maps/index.php"))
+										{
+											$more_content .= get_map(array('input' => $event['location'])); //, 'coords' => $profile_search_coords
+										}
 
-									else
-									{
-										$more_content .= $obj_calendar->get_map_link($event['location']);
+										else
+										{
+											$more_content .= $obj_calendar->get_map_link($event['location']);
+										}
 									}
 
 								$more_content .= "</div>";
 							}
 
 							echo "<li>
-								<p>".$post_start_day."</p>
-								<div>
+								<div class='date'><p>".$post_start_day."</p></div>
+								<div class='content'>
 									<span>";
 
 										if($post_start_date == $post_end_date)
@@ -365,7 +370,10 @@ class widget_calendar extends WP_Widget
 
 										else
 										{
-											$post_end_date = filter_end_date($post_end_date);
+											if($event['uid'] != '')
+											{
+												$post_end_date = filter_end_date($post_end_date);
+											}
 
 											if($post_start_date != $post_end_date)
 											{

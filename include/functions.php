@@ -93,12 +93,7 @@ function settings_calendar()
 	$arr_settings['setting_google_calendar_api_key'] = __("Google Calendar API key", 'lang_calendar');
 	$arr_settings['setting_calendar_date_color'] = __("Date Color", 'lang_calendar');
 
-	foreach($arr_settings as $handle => $text)
-	{
-		add_settings_field($handle, $text, $handle."_callback", BASE_OPTIONS_PAGE, $options_area);
-
-		register_setting(BASE_OPTIONS_PAGE, $handle);
-	}
+	show_settings_fields(array('area' => $options_area, 'settings' => $arr_settings));
 }
 
 function settings_calendar_callback()
@@ -373,6 +368,23 @@ function meta_boxes_calendar($meta_boxes)
 	$arr_data = array();
 	get_post_children(array('post_type' => 'mf_calendar', 'add_choose_here' => true), $arr_data);
 
+	$default_calendar = '';
+
+	/*if($default_calendar == '')
+	{
+		$default_calendar = check_var('list_id', 'int');
+	}*/
+
+	if($default_calendar == '')
+	{
+		$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".$wpdb->postmeta." WHERE meta_key = %s ORDER BY meta_id DESC LIMIT 0, 1", $meta_prefix.'calendar'));
+	}
+
+	if($default_calendar == '')
+	{
+		$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", 'mf_calendar', 'publish'));
+	}
+
 	$meta_boxes[] = array(
 		'id' => $meta_prefix.'settings',
 		'title' => __("Settings", 'lang_calendar'),
@@ -385,6 +397,7 @@ function meta_boxes_calendar($meta_boxes)
 				'id' => $meta_prefix.'calendar',
 				'type' => 'select',
 				'options' => $arr_data,
+				'std' => $default_calendar,
 			),
 			array(
 				'name' => __("Location", 'lang_calendar'),
