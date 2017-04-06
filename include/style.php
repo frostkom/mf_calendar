@@ -37,23 +37,12 @@ echo "@media all
 					margin-top: .5em;
 				}
 
-				.widget.calendar li > h4
-				{
-					font-weight: normal;
-				}
+				.widget.calendar li > h4{}
 
 					.widget.calendar li + li > h4
 					{
 						margin-top: .5em;
 					}
-
-				/*.widget.calendar li > div
-				{
-					-webkit-box-flex: 1 1 0;
-					-webkit-flex: 1 1 0;
-					-ms-flex: 1 1 0;
-					flex: 1 1 0;
-				}*/
 
 				.widget.calendar li > div
 				{
@@ -68,16 +57,13 @@ echo "@media all
 					background: ".$setting_calendar_date_color.";
 					border-radius: .3em;
 					color: #fff;
-					/*float: left;*/
 					font-size: 1.5em;
 					padding: .4em .5em;
 				}
 
 				.widget.calendar li .content
 				{
-					/*float: left;*/
 					margin-left: 2%;
-					/*min-width: 70%;*/
 				}
 
 					.widget.calendar li .content span
@@ -95,9 +81,15 @@ echo "@media all
 							margin-left: .4em;
 						}
 
+					.widget.calendar li .content .toggler
+					{
+						padding: 0;
+					}
+
 					.widget.calendar li .content .toggle_container
 					{
 						margin: 1em 0;
+						padding: 0;
 					}
 
 						.widget.calendar li .content .toggle_container p

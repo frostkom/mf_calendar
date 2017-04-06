@@ -112,7 +112,7 @@ function setting_google_calendar_api_key_callback()
 	."2. ".__("Create a new project", 'lang_social_feed')."<br>"
 	."3. ".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_social_feed'), "Google Calendar API", "Web server", "Application data", "No");
 
-	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description, 'xtra' => " class='widefat'"));
+	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description, 'xtra' => "class='widefat'"));
 }
 
 function setting_calendar_date_color_callback()
@@ -298,11 +298,11 @@ function column_cell_event($col, $id)
 				if($post_start_date == $post_end_date)
 				{
 					echo $post_start_date;
-					
+
 					if($post_start_time > "00:00")
 					{
 						echo "&nbsp;".$post_start_time;
-						
+
 						if($post_end_time > "00:00" && $post_end_time != $post_start_time)
 						{
 							echo "&nbsp;-&nbsp;".$post_end_time;

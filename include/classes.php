@@ -51,7 +51,7 @@ class mf_calendar
 		foreach($json['items'] as $item)
 		{
 			/*array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-02-20T12:10:49.000Z', 'updated' => '2017-02-20T12:11:06.582Z', 'summary' => '[title]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'dateTime' => '2017-03-14T18:00:00+01:00', ), 'end' => array ( 'dateTime' => '2017-03-14T19:00:00+01:00', ), 'iCalUID' => '[uid]', 'sequence' => 0, )
-			
+
 			array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-03-03T09:03:03.000Z', 'updated' => '2017-03-03T09:05:30.290Z', 'summary' => '[title]', 'description' => '[deascription]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'date' => '2017-04-22', ), 'end' => array ( 'date' => '2017-04-23', ), 'transparency' => 'transparent', 'iCalUID' => '[uid]', 'sequence' => 0, ) */
 
 			$item_id = $item['id'];
@@ -240,7 +240,7 @@ class widget_calendar extends WP_Widget
 					.$instance['calendar_heading']
 				.$after_title;
 			}
-			
+
 			$query_join = $query_where = "";
 
 			$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
@@ -251,7 +251,7 @@ class widget_calendar extends WP_Widget
 				$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
 				$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
 			}
-			
+
 			$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
 
 			if($wpdb->num_rows > 0)
@@ -360,7 +360,7 @@ class widget_calendar extends WP_Widget
 											if($post_start_time > "00:00")
 											{
 												echo $post_start_time;
-												
+
 												if($post_end_time > "00:00" && $post_end_time != $post_start_time)
 												{
 													echo "&nbsp;-&nbsp;".$post_end_time;
@@ -380,7 +380,7 @@ class widget_calendar extends WP_Widget
 												echo "<i class='fa fa-arrow-right'></i> ".$post_end_date;
 											}
 										}
-										
+
 									echo "</span>
 									<p".($more_class != '' ? " class='".$more_class."'" : "").">"
 										.$event['title']
@@ -393,7 +393,7 @@ class widget_calendar extends WP_Widget
 							$year_temp = $post_start_year;
 							$yearmonth_temp = $post_start_yearmonth;
 						}
-					
+
 					echo "</ul>";
 				}
 			}
@@ -435,7 +435,7 @@ class widget_calendar extends WP_Widget
 			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => "class='widefat'"))
 		."</p>
 		<p>"
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds'], 'xtra' => " class='widefat'"))
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds'], 'xtra' => "class='widefat'"))
 		."</p>
 		<p>"
 			.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']))
