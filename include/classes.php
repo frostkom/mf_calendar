@@ -221,7 +221,7 @@ class widget_calendar extends WP_Widget
 
 		$this->meta_prefix = "mf_calendar_";
 
-		wp_enqueue_style('style_calendar', plugin_dir_url(__FILE__)."style.php");
+		mf_enqueue_style('style_calendar', plugin_dir_url(__FILE__)."style.php", get_plugin_version(__FILE__));
 	}
 
 	function widget($args, $instance)
