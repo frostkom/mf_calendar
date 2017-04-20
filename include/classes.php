@@ -48,50 +48,53 @@ class mf_calendar
 		$content = file_get_contents($calendar_url);
 		$json = json_decode($content, true);
 
-		foreach($json['items'] as $item)
+		if(is_array($json['items']))
 		{
-			/*array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-02-20T12:10:49.000Z', 'updated' => '2017-02-20T12:11:06.582Z', 'summary' => '[title]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'dateTime' => '2017-03-14T18:00:00+01:00', ), 'end' => array ( 'dateTime' => '2017-03-14T19:00:00+01:00', ), 'iCalUID' => '[uid]', 'sequence' => 0, )
-
-			array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-03-03T09:03:03.000Z', 'updated' => '2017-03-03T09:05:30.290Z', 'summary' => '[title]', 'description' => '[deascription]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'date' => '2017-04-22', ), 'end' => array ( 'date' => '2017-04-23', ), 'transparency' => 'transparent', 'iCalUID' => '[uid]', 'sequence' => 0, ) */
-
-			$item_id = $item['id'];
-			$item_link = $item['htmlLink'];
-			$item_title = $item['summary'];
-			$item_content = isset($item['description']) ? $item['description'] : "";
-			$item_location = isset($item['location']) ? $item['location'] : "";
-			$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
-
-			if(isset($item['start']['dateTime']))
+			foreach($json['items'] as $item)
 			{
-				$item_start = date("Y-m-d H:i:s", strtotime($item['start']['dateTime']));
-			}
+				/*array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-02-20T12:10:49.000Z', 'updated' => '2017-02-20T12:11:06.582Z', 'summary' => '[title]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'dateTime' => '2017-03-14T18:00:00+01:00', ), 'end' => array ( 'dateTime' => '2017-03-14T19:00:00+01:00', ), 'iCalUID' => '[uid]', 'sequence' => 0, )
 
-			else
-			{
-				$item_start = $item['start']['date'];
-			}
+				array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-03-03T09:03:03.000Z', 'updated' => '2017-03-03T09:05:30.290Z', 'summary' => '[title]', 'description' => '[deascription]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'date' => '2017-04-22', ), 'end' => array ( 'date' => '2017-04-23', ), 'transparency' => 'transparent', 'iCalUID' => '[uid]', 'sequence' => 0, ) */
 
-			if(isset($item['end']['dateTime']))
-			{
-				$item_end = date("Y-m-d H:i:s", strtotime($item['end']['dateTime']));
-			}
+				$item_id = $item['id'];
+				$item_link = $item['htmlLink'];
+				$item_title = $item['summary'];
+				$item_content = isset($item['description']) ? $item['description'] : "";
+				$item_location = isset($item['location']) ? $item['location'] : "";
+				$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
 
-			else
-			{
-				$item_end = $item['end']['date'];
-			}
+				if(isset($item['start']['dateTime']))
+				{
+					$item_start = date("Y-m-d H:i:s", strtotime($item['start']['dateTime']));
+				}
 
-			$this->arr_events[] = array(
-				'type' => "gcal",
-				'id' => $item_id,
-				'link' => $item_link,
-				'title' => $item_title,
-				'content' => $item_content,
-				'location' => $item_location,
-				'start' => $item_start,
-				'end' => $item_end,
-				'created' => $item_created,
-			);
+				else
+				{
+					$item_start = $item['start']['date'];
+				}
+
+				if(isset($item['end']['dateTime']))
+				{
+					$item_end = date("Y-m-d H:i:s", strtotime($item['end']['dateTime']));
+				}
+
+				else
+				{
+					$item_end = $item['end']['date'];
+				}
+
+				$this->arr_events[] = array(
+					'type' => "gcal",
+					'id' => $item_id,
+					'link' => $item_link,
+					'title' => $item_title,
+					'content' => $item_content,
+					'location' => $item_location,
+					'start' => $item_start,
+					'end' => $item_end,
+					'created' => $item_created,
+				);
+			}
 		}
 	}
 
@@ -292,6 +295,8 @@ class widget_calendar extends WP_Widget
 
 						$year_temp = $yearmonth_temp = "";
 
+						$i = 1;
+
 						foreach($arr_events as $event)
 						{
 							$post_start_date = date("Y-m-d", strtotime($event['start']));
@@ -319,15 +324,16 @@ class widget_calendar extends WP_Widget
 								}
 							}
 
-							$more_class = $more_icon = $more_content = "";
+							$more_class = $more_rel = $more_icon = $more_content = "";
 
 							if($event['content'] != '' || $event['location'] != '')
 							{
-								$more_class = "toggler";
+								$more_class = 'toggler';
+								$more_rel = $i++;
 
-								$more_icon = "<i class='fa fa-caret-right toggler'></i>";
+								$more_icon = "<i class='fa fa-caret-right'></i>";
 
-								$more_content = "<div class='toggle_container hide'>";
+								$more_content = "<div class='toggle_container hide'".($more_rel != '' ? " rel='".$more_rel."'" : "").">";
 
 									if($event['content'] != '')
 									{
@@ -352,7 +358,7 @@ class widget_calendar extends WP_Widget
 
 							echo "<li>
 								<div class='date'><p>".$post_start_day."</p></div>
-								<div class='content'>
+								<div class='content".($more_class != '' ? " ".$more_class : "")."'".($more_rel != '' ? " rel='".$more_rel."'" : "").">
 									<span>";
 
 										if($post_start_date == $post_end_date)
@@ -382,7 +388,7 @@ class widget_calendar extends WP_Widget
 										}
 
 									echo "</span>
-									<p".($more_class != '' ? " class='".$more_class."'" : "").">"
+									<p>"
 										.$event['title']
 										.$more_icon
 									."</p>"

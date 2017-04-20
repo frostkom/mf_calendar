@@ -112,7 +112,7 @@ function setting_google_calendar_api_key_callback()
 	."2. ".__("Create a new project", 'lang_social_feed')."<br>"
 	."3. ".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_social_feed'), "Google Calendar API", "Web server", "Application data", "No");
 
-	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description, 'xtra' => "class='widefat'"));
+	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
 }
 
 function setting_calendar_date_color_callback()
