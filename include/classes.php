@@ -437,14 +437,10 @@ class widget_calendar extends WP_Widget
 		$arr_data = array();
 		get_post_children(array('post_type' => 'mf_calendar'), $arr_data);
 
-		echo "<p>"
-			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => "class='widefat'"))
-		."</p>
-		<p>"
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds'], 'xtra' => "class='widefat'"))
-		."</p>
-		<p>"
+		echo "<div class='mf_form'>"
+			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading']))
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']))
 			.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']))
-		."</p>";
+		."</div>";
 	}
 }
