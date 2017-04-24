@@ -244,172 +244,175 @@ class widget_calendar extends WP_Widget
 				.$after_title;
 			}
 
-			$query_join = $query_where = "";
+			echo "<div class='content'>";
 
-			$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
-			$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10) OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10))";
+				$query_join = $query_where = "";
 
-			if(count($instance['calendar_feeds']) > 0)
-			{
-				$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
-				$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
-			}
+				$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
+				$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10) OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10))";
 
-			$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
-
-			if($wpdb->num_rows > 0)
-			{
-				$arr_events = array();
-
-				foreach($result as $r)
+				if(count($instance['calendar_feeds']) > 0)
 				{
-					$post_id = $r->ID;
-					$post_title = $r->post_title;
-					$post_content = $r->post_content;
-
-					$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
-					$post_start = get_post_meta($post_id, $this->meta_prefix.'start', true);
-					$post_end = get_post_meta($post_id, $this->meta_prefix.'end', true);
-					$post_uid = get_post_meta($post_id, $this->meta_prefix.'uid', true);
-
-					if(!($post_end > $post_start))
-					{
-						$post_end = $post_start;
-					}
-
-					$arr_events[] = array(
-						'title' => $post_title,
-						'content' => $post_content,
-						'location' => $post_location,
-						'start' => $post_start,
-						'end' => $post_end,
-						'uid' => $post_uid,
-					);
+					$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
+					$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
 				}
 
-				if(count($arr_events) > 0)
+				$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
+
+				if($wpdb->num_rows > 0)
 				{
-					$arr_events = array_sort(array('array' => $arr_events, 'on' => 'start'));
+					$arr_events = array();
 
-					echo "<ul>";
+					foreach($result as $r)
+					{
+						$post_id = $r->ID;
+						$post_title = $r->post_title;
+						$post_content = $r->post_content;
 
-						$year_temp = $yearmonth_temp = "";
+						$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
+						$post_start = get_post_meta($post_id, $this->meta_prefix.'start', true);
+						$post_end = get_post_meta($post_id, $this->meta_prefix.'end', true);
+						$post_uid = get_post_meta($post_id, $this->meta_prefix.'uid', true);
 
-						$i = 1;
-
-						foreach($arr_events as $event)
+						if(!($post_end > $post_start))
 						{
-							$post_start_date = date("Y-m-d", strtotime($event['start']));
-							$post_start_year = date("Y", strtotime($event['start']));
-							$post_start_yearmonth = date("Y-m", strtotime($event['start']));
-							$post_start_month = date("m", strtotime($event['start']));
-							$post_start_day = date("d", strtotime($event['start']));
-							$post_start_time = date("H:i", strtotime($event['start']));
-
-							$post_end_date = date("Y-m-d", strtotime($event['end']));
-							$post_end_time = date("H:i", strtotime($event['end']));
-
-							if($yearmonth_temp != $post_start_yearmonth)
-							{
-								$out_temp = month_name($post_start_month);
-
-								if($post_start_year != $year_temp && $year_temp != '')
-								{
-									$out_temp .= "&nbsp;".$post_start_year;
-								}
-
-								if($out_temp != '')
-								{
-									echo "<li><h4>".$out_temp."</h4></li>";
-								}
-							}
-
-							$more_class = $more_rel = $more_icon = $more_content = "";
-
-							if($event['content'] != '' || $event['location'] != '')
-							{
-								$more_class = 'toggler';
-								$more_rel = $i++;
-
-								$more_icon = "<i class='fa fa-caret-right'></i>";
-
-								$more_content = "<div class='toggle_container hide'".($more_rel != '' ? " rel='".$more_rel."'" : "").">";
-
-									if($event['content'] != '')
-									{
-										$more_content .= "<p>".$event['content']."</p>";
-									}
-
-									if($event['location'] != '')
-									{
-										if(is_plugin_active("mf_maps/index.php"))
-										{
-											$more_content .= get_map(array('input' => $event['location'])); //, 'coords' => $profile_search_coords
-										}
-
-										else
-										{
-											$more_content .= $obj_calendar->get_map_link($event['location']);
-										}
-									}
-
-								$more_content .= "</div>";
-							}
-
-							echo "<li>
-								<div class='date'><p>".$post_start_day."</p></div>
-								<div class='content".($more_class != '' ? " ".$more_class : "")."'".($more_rel != '' ? " rel='".$more_rel."'" : "").">
-									<span>";
-
-										if($post_start_date == $post_end_date)
-										{
-											if($post_start_time > "00:00")
-											{
-												echo $post_start_time;
-
-												if($post_end_time > "00:00" && $post_end_time != $post_start_time)
-												{
-													echo "&nbsp;-&nbsp;".$post_end_time;
-												}
-											}
-										}
-
-										else
-										{
-											if($event['uid'] != '')
-											{
-												$post_end_date = filter_end_date($post_end_date);
-											}
-
-											if($post_start_date != $post_end_date)
-											{
-												echo "<i class='fa fa-arrow-right'></i> ".$post_end_date;
-											}
-										}
-
-									echo "</span>
-									<p>"
-										.$event['title']
-										.$more_icon
-									."</p>"
-									.$more_content
-								."</div>
-							</li>";
-
-							$year_temp = $post_start_year;
-							$yearmonth_temp = $post_start_yearmonth;
+							$post_end = $post_start;
 						}
 
-					echo "</ul>";
+						$arr_events[] = array(
+							'title' => $post_title,
+							'content' => $post_content,
+							'location' => $post_location,
+							'start' => $post_start,
+							'end' => $post_end,
+							'uid' => $post_uid,
+						);
+					}
+
+					if(count($arr_events) > 0)
+					{
+						$arr_events = array_sort(array('array' => $arr_events, 'on' => 'start'));
+
+						echo "<ul>";
+
+							$year_temp = $yearmonth_temp = "";
+
+							$i = 1;
+
+							foreach($arr_events as $event)
+							{
+								$post_start_date = date("Y-m-d", strtotime($event['start']));
+								$post_start_year = date("Y", strtotime($event['start']));
+								$post_start_yearmonth = date("Y-m", strtotime($event['start']));
+								$post_start_month = date("m", strtotime($event['start']));
+								$post_start_day = date("d", strtotime($event['start']));
+								$post_start_time = date("H:i", strtotime($event['start']));
+
+								$post_end_date = date("Y-m-d", strtotime($event['end']));
+								$post_end_time = date("H:i", strtotime($event['end']));
+
+								if($yearmonth_temp != $post_start_yearmonth)
+								{
+									$out_temp = month_name($post_start_month);
+
+									if($post_start_year != $year_temp && $year_temp != '')
+									{
+										$out_temp .= "&nbsp;".$post_start_year;
+									}
+
+									if($out_temp != '')
+									{
+										echo "<li><h4>".$out_temp."</h4></li>";
+									}
+								}
+
+								$more_class = $more_rel = $more_icon = $more_content = "";
+
+								if($event['content'] != '' || $event['location'] != '')
+								{
+									$more_class = 'toggler';
+									$more_rel = $i++;
+
+									$more_icon = "<i class='fa fa-caret-right'></i>";
+
+									$more_content = "<div class='toggle_container hide'".($more_rel != '' ? " rel='".$more_rel."'" : "").">";
+
+										if($event['content'] != '')
+										{
+											$more_content .= "<p>".$event['content']."</p>";
+										}
+
+										if($event['location'] != '')
+										{
+											if(is_plugin_active("mf_maps/index.php"))
+											{
+												$more_content .= get_map(array('input' => $event['location'])); //, 'coords' => $profile_search_coords
+											}
+
+											else
+											{
+												$more_content .= $obj_calendar->get_map_link($event['location']);
+											}
+										}
+
+									$more_content .= "</div>";
+								}
+
+								echo "<li>
+									<div class='date'><p>".$post_start_day."</p></div>
+									<div class='content".($more_class != '' ? " ".$more_class : "")."'".($more_rel != '' ? " rel='".$more_rel."'" : "").">
+										<span>";
+
+											if($post_start_date == $post_end_date)
+											{
+												if($post_start_time > "00:00")
+												{
+													echo $post_start_time;
+
+													if($post_end_time > "00:00" && $post_end_time != $post_start_time)
+													{
+														echo "&nbsp;-&nbsp;".$post_end_time;
+													}
+												}
+											}
+
+											else
+											{
+												if($event['uid'] != '')
+												{
+													$post_end_date = filter_end_date($post_end_date);
+												}
+
+												if($post_start_date != $post_end_date)
+												{
+													echo "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+												}
+											}
+
+										echo "</span>
+										<p>"
+											.$event['title']
+											.$more_icon
+										."</p>"
+										.$more_content
+									."</div>
+								</li>";
+
+								$year_temp = $post_start_year;
+								$yearmonth_temp = $post_start_yearmonth;
+							}
+
+						echo "</ul>";
+					}
 				}
-			}
 
-			else
-			{
-				echo "<p>".__("I could not find any events at the moment. Sorry!", 'lang_calendar')."</p>";
-			}
+				else
+				{
+					echo "<p>".__("I could not find any events at the moment. Sorry!", 'lang_calendar')."</p>";
+				}
 
-		echo $after_widget;
+			echo "</div>"
+		.$after_widget;
 	}
 
 	function update($new_instance, $old_instance)
