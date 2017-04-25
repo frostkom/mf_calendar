@@ -244,7 +244,7 @@ class widget_calendar extends WP_Widget
 				.$after_title;
 			}
 
-			echo "<div class='content'>";
+			echo "<div class='section'>";
 
 				$query_join = $query_where = "";
 
