@@ -353,7 +353,7 @@ function meta_boxes_calendar($meta_boxes)
 	$meta_boxes[] = array(
 		'id' => $meta_prefix.'settings',
 		'title' => __("Settings", 'lang_calendar'),
-		'pages' => array('mf_calendar'),
+		'post_types' => array('mf_calendar'),
 		//'context' => 'side',
 		'priority' => 'low',
 		'fields' => array(
@@ -388,7 +388,7 @@ function meta_boxes_calendar($meta_boxes)
 	$meta_boxes[] = array(
 		'id' => $meta_prefix.'settings',
 		'title' => __("Settings", 'lang_calendar'),
-		'pages' => array('mf_calendar_event'),
+		'post_types' => array('mf_calendar_event'),
 		'context' => 'side',
 		'priority' => 'low',
 		'fields' => array(
