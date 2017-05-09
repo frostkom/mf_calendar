@@ -205,9 +205,9 @@ class mf_calendar
 
 			foreach($result as $r)
 			{
-				do_log("The event (".$r->post_content." | ".$r->post_content.") should be deleted from gCal");
+				//do_log("The event (".$r->post_content." | ".$r->post_content.") should be deleted from gCal");
 
-				//wp_trash_post($r->ID);
+				wp_trash_post($r->ID);
 			}
 		}
 	}

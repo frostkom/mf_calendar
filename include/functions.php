@@ -80,7 +80,6 @@ function cron_calendar()
 		}
 
 		$obj_calendar->set_id($r->ID);
-
 		$obj_calendar->fetch_source();
 	}
 }
