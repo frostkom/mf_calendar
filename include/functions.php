@@ -161,7 +161,9 @@ function column_cell_calendar($col, $id)
 		case 'calendar_id':
 			$post_meta = get_post_meta($id, $meta_prefix.$col, true);
 
-			echo $post_meta;
+			$obj_calendar = new mf_calendar($id);
+
+			echo "<a href='".$obj_calendar->get_calendar_url()."' rel='external'>".$post_meta."</a>";
 		break;
 
 		case 'amount_of_posts':
@@ -171,11 +173,10 @@ function column_cell_calendar($col, $id)
 
 			if($amount > 0)
 			{
-				echo $amount;
-
 				$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
 
-				echo "<div class='row-actions'>"
+				echo $amount
+				."<div class='row-actions'>"
 					.format_date($post_modified)
 				."</div>";
 			}
@@ -255,7 +256,7 @@ function column_cell_event($col, $id)
 				$edit_url = admin_url("post.php?post=".$id."&action=edit");
 
 				echo "<a href='".$edit_url."'>".$post_title."</a>"
-				."<div class='row-actions'>"; //https://core.trac.wordpress.org/browser/tags/4.7/src/wp-admin/includes/class-wp-posts-list-table.php#L1306
+				."<div class='row-actions'>";
 
 					if(get_post_status($id) == 'trash')
 					{

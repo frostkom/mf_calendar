@@ -28,6 +28,15 @@ class mf_calendar
 		return $this->calendar_id;
 	}
 
+	function get_calendar_url()
+	{
+		$this->get_calendar_id();
+
+		$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$this->google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
+
+		return $this->calendar_url;
+	}
+
 	function fetch_source()
 	{
 		$this->arr_events = array();
@@ -41,11 +50,7 @@ class mf_calendar
 
 	function fetch_google_calendar()
 	{
-		$this->get_calendar_id();
-		
-		$timeMin = date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month"));
-
-		$calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$this->google_calendar_api_key."&timeMin=".$timeMin; //&maxResults=20
+		$calendar_url = $this->get_calendar_url();
 
 		$content = get_url_content($calendar_url);
 		$json = json_decode($content, true);
@@ -278,7 +283,7 @@ class widget_calendar extends WP_Widget
 					$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
 				}
 
-				$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY post_date DESC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
+				$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
 
 				if($wpdb->num_rows > 0)
 				{
