@@ -42,13 +42,15 @@ class mf_calendar
 	function fetch_google_calendar()
 	{
 		$this->get_calendar_id();
+		
+		$timeMin = date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month"));
 
-		$calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$this->google_calendar_api_key;
+		$calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$this->google_calendar_api_key."&timeMin=".$timeMin; //&maxResults=20
 
-		$content = file_get_contents($calendar_url);
+		$content = get_url_content($calendar_url);
 		$json = json_decode($content, true);
 
-		if(is_array($json['items']))
+		if(is_array($json) && is_array($json['items']))
 		{
 			foreach($json['items'] as $item)
 			{
@@ -95,6 +97,11 @@ class mf_calendar
 					'created' => $item_created,
 				);
 			}
+
+			if(count($json['items']) == 250)
+			{
+				do_log("The Calendar API returned the maximum number of items (".$calendar_url.")");
+			}
 		}
 	}
 
@@ -110,26 +117,27 @@ class mf_calendar
 
 			if($wpdb->num_rows == 0)
 			{
-				//do_log("Insert: ".$post['title']." (".$wpdb->last_query.")");
+				if(substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d"))
+				{
+					$post_data = array(
+						'post_type' => 'mf_calendar_event',
+						'post_status' => 'publish',
+						'post_title' => $post['title'],
+						'post_content' => $post['content'],
+						'post_date' => $post['created'],
+						'guid' => $post['link'],
+						'post_parent' => $this->id,
+						'meta_input' => array(
+							$this->meta_prefix.'calendar' => $this->id,
+							$this->meta_prefix.'uid' => $post_uid,
+							$this->meta_prefix.'location' => $post['location'],
+							$this->meta_prefix.'start' => $post['start'],
+							$this->meta_prefix.'end' => $post['end'],
+						),
+					);
 
-				$post_data = array(
-					'post_type' => 'mf_calendar_event',
-					'post_status' => 'publish',
-					'post_title' => $post['title'],
-					'post_content' => $post['content'],
-					'post_date' => $post['created'],
-					'guid' => $post['link'],
-					'post_parent' => $this->id,
-					'meta_input' => array(
-						$this->meta_prefix.'calendar' => $this->id,
-						$this->meta_prefix.'uid' => $post_uid,
-						$this->meta_prefix.'location' => $post['location'],
-						$this->meta_prefix.'start' => $post['start'],
-						$this->meta_prefix.'end' => $post['end'],
-					),
-				);
-
-				$post_id = wp_insert_post($post_data);
+					$post_id = wp_insert_post($post_data);
+				}
 			}
 
 			if($wpdb->num_rows > 1)
@@ -151,22 +159,30 @@ class mf_calendar
 			{
 				foreach($result as $r)
 				{
-					$post_data = array(
-						'ID' => $r->ID,
-						'post_title' => $post['title'],
-						'post_content' => $post['content'],
-						'guid' => $post['link'],
-						'post_parent' => $this->id,
-						'meta_input' => array(
-							$this->meta_prefix.'calendar' => $this->id,
-							$this->meta_prefix.'uid' => $post_uid,
-							$this->meta_prefix.'location' => $post['location'],
-							$this->meta_prefix.'start' => $post['start'],
-							$this->meta_prefix.'end' => $post['end'],
-						),
-					);
+					if(substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d"))
+					{
+						$post_data = array(
+							'ID' => $r->ID,
+							'post_title' => $post['title'],
+							'post_content' => $post['content'],
+							'guid' => $post['link'],
+							'post_parent' => $this->id,
+							'meta_input' => array(
+								$this->meta_prefix.'calendar' => $this->id,
+								$this->meta_prefix.'uid' => $post_uid,
+								$this->meta_prefix.'location' => $post['location'],
+								$this->meta_prefix.'start' => $post['start'],
+								$this->meta_prefix.'end' => $post['end'],
+							),
+						);
 
-					wp_update_post($post_data);
+						wp_update_post($post_data);
+					}
+
+					else
+					{
+						wp_trash_post($r->ID);
+					}
 				}
 			}
 		}
@@ -178,18 +194,21 @@ class mf_calendar
 
 		$arr_titles = array();
 
-		foreach($this->arr_events as $post)
+		if(count($this->arr_events) > 0)
 		{
-			$arr_titles[] = $post['type']." ".$post['id'];
-		}
+			foreach($this->arr_events as $post)
+			{
+				$arr_titles[] = $post['type']." ".$post['id'];
+			}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND meta_key = '".$this->meta_prefix."uid' AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->id));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND meta_key = '".$this->meta_prefix."uid' AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->id));
 
-		foreach($result as $r)
-		{
-			do_log("The event (".$r->post_content." | ".$r->post_content.") has been deleted from gCal");
+			foreach($result as $r)
+			{
+				do_log("The event (".$r->post_content." | ".$r->post_content.") should be deleted from gCal");
 
-			//wp_trash_post($r->ID);
+				//wp_trash_post($r->ID);
+			}
 		}
 	}
 
@@ -250,8 +269,10 @@ class widget_calendar extends WP_Widget
 
 				$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
 				$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10) OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10))";
+				/*$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id AND meta_date.meta_key = 'mf_calendar_end'";
+				$query_where .= " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";*/
 
-				if(count($instance['calendar_feeds']) > 0)
+				if(isset($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0)
 				{
 					$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
 					$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
@@ -441,9 +462,14 @@ class widget_calendar extends WP_Widget
 		get_post_children(array('post_type' => 'mf_calendar'), $arr_data);
 
 		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading']))
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']))
-			.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']))
+			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading']));
+
+			if(count($arr_data) > 1)
+			{
+				echo show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
+			}
+
+			echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']))
 		."</div>";
 	}
 }

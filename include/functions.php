@@ -68,7 +68,9 @@ function cron_calendar()
 	$obj_cron = new mf_cron();
 	$obj_calendar = new mf_calendar();
 
-	$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$meta_prefix."calendar_id' WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL 30 MINUTE) ORDER BY RAND()");
+	$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
+
+	$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$meta_prefix."calendar_id' WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()");
 
 	foreach($result as $r)
 	{
@@ -92,6 +94,7 @@ function settings_calendar()
 	$arr_settings = array();
 	$arr_settings['setting_google_calendar_api_key'] = __("Google Calendar API key", 'lang_calendar');
 	$arr_settings['setting_calendar_date_color'] = __("Date Color", 'lang_calendar');
+	$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
 
 	show_settings_fields(array('area' => $options_area, 'settings' => $arr_settings));
 }
@@ -121,6 +124,16 @@ function setting_calendar_date_color_callback()
 	$option = get_option($setting_key);
 
 	echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
+}
+
+function setting_calendar_time_limit_callback()
+{
+	$setting_key = get_setting_key(__FUNCTION__);
+	$option = get_option_or_default($setting_key, 30);
+
+	$description = __("Minutes between each API request", 'lang_calendar');
+
+	echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => $description));
 }
 
 function widgets_calendar()
