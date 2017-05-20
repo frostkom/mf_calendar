@@ -55,7 +55,7 @@ class mf_calendar
 		$content = get_url_content($calendar_url);
 		$json = json_decode($content, true);
 
-		if(is_array($json) && is_array($json['items']))
+		if(isset($json['items']))
 		{
 			foreach($json['items'] as $item)
 			{
