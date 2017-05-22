@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-09 10:19+0100\n"
+"POT-Creation-Date: 2017-05-22 10:53+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,40 +16,40 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:232
+#: ../include/classes.php:242
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:237
+#: ../include/classes.php:247
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
-#: ../include/functions.php:49
-#: ../include/functions.php:52
-#: ../include/functions.php:106
-#: ../include/functions.php:233
-#: ../include/functions.php:409
+#: ../include/functions.php:59
+#: ../include/functions.php:62
+#: ../include/functions.php:115
+#: ../include/functions.php:243
+#: ../include/functions.php:419
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:427
+#: ../include/classes.php:435
 msgid "I could not find any events at the moment. Sorry!"
 msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"
 
-#: ../include/classes.php:460
+#: ../include/classes.php:468
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:464
+#: ../include/classes.php:472
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:467
+#: ../include/classes.php:475
 msgid "Show Events"
 msgstr "Visa händelser"
 
 #: ../include/functions.php:25
-#: ../include/functions.php:55
+#: ../include/functions.php:65
 msgid "Events"
 msgstr "Händelser"
 
@@ -58,95 +58,95 @@ msgstr "Händelser"
 msgid "Event"
 msgstr "Händelse"
 
-#: ../include/functions.php:58
+#: ../include/functions.php:68
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:95
+#: ../include/functions.php:104
 msgid "Google Calendar API key"
 msgstr ""
 
-#: ../include/functions.php:96
+#: ../include/functions.php:105
 msgid "Date Color"
 msgstr "Datumfärg"
 
-#: ../include/functions.php:97
+#: ../include/functions.php:106
 msgid "Time Limit"
 msgstr "Tidsgräns"
 
-#: ../include/functions.php:114
+#: ../include/functions.php:123
 #, php-format
 msgid "Go to %s and log in"
 msgstr "Gå till %s och logga in"
 
-#: ../include/functions.php:115
+#: ../include/functions.php:124
 msgid "Create a new project"
 msgstr "Skapa ett nytt projekt"
 
-#: ../include/functions.php:116
+#: ../include/functions.php:125
 #, php-format
 msgid "Choose '%s', '%s', '%s' and '%s'"
 msgstr "Välj '%s', '%s', '%s' och '%s'"
 
-#: ../include/functions.php:134
+#: ../include/functions.php:143
 msgid "Minutes between each API request"
 msgstr "Minuter mellan varje API-anrop"
 
-#: ../include/functions.php:148
+#: ../include/functions.php:157
 msgid "Account"
 msgstr "Konto"
 
-#: ../include/functions.php:149
+#: ../include/functions.php:158
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/functions.php:196
+#: ../include/functions.php:206
 msgid "I got an error when accessing the calendar"
 msgstr "Jag fick ett fel när jag hämtade kalendern"
 
-#: ../include/functions.php:206
+#: ../include/functions.php:216
 msgid "I am waiting to get access to the calendar"
 msgstr "Jag väntar på att få tillgång till kalendern"
 
-#: ../include/functions.php:230
+#: ../include/functions.php:240
 msgid "Title"
 msgstr "Titel"
 
-#: ../include/functions.php:231
-#: ../include/functions.php:416
+#: ../include/functions.php:241
+#: ../include/functions.php:426
 msgid "Location"
 msgstr "Plats"
 
-#: ../include/functions.php:232
+#: ../include/functions.php:242
 msgid "Date"
 msgstr "Datum"
 
-#: ../include/functions.php:264
+#: ../include/functions.php:274
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/functions.php:271
+#: ../include/functions.php:281
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/functions.php:274
+#: ../include/functions.php:284
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/functions.php:368
-#: ../include/functions.php:403
+#: ../include/functions.php:378
+#: ../include/functions.php:413
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/functions.php:374
+#: ../include/functions.php:384
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/functions.php:421
+#: ../include/functions.php:431
 msgid "Start"
 msgstr "Start"
 
-#: ../include/functions.php:426
+#: ../include/functions.php:436
 msgid "End"
 msgstr "Slut"
 

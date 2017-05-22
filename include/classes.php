@@ -247,8 +247,6 @@ class widget_calendar extends WP_Widget
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops, $control_ops);
 
 		$this->meta_prefix = "mf_calendar_";
-
-		mf_enqueue_style('style_calendar', plugin_dir_url(__FILE__)."style.php", get_plugin_version(__FILE__));
 	}
 
 	function widget($args, $instance)
