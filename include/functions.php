@@ -367,6 +367,19 @@ function column_cell_event($col, $id)
 	}
 }
 
+function get_calendar_info()
+{
+	$out = "<ol>
+		<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com' rel='external'>", "</a>")."</li>
+		<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
+		<li>".__("Click the Calendars tab", 'lang_calendar')."</li>
+		<li>".__("Choose which calendar to share if there are multiple and click Edit settings to the right in the table", 'lang_calendar')."</li>
+		<li>".__("Make the calendar public and enter the calendar e-mail in the field above", 'lang_calendar')."</li>
+	</ol>";
+
+	return $out;
+}
+
 function meta_boxes_calendar($meta_boxes)
 {
 	global $wpdb;
@@ -381,9 +394,14 @@ function meta_boxes_calendar($meta_boxes)
 		'priority' => 'low',
 		'fields' => array(
 			array(
-				'name' => __("Calendar ID", 'lang_calendar')." (Google)",
+				'name' => __("Calendar ID", 'lang_calendar')." (".__("Google", 'lang_calendar').")",
 				'id' => $meta_prefix.'calendar_id',
 				'type' => 'text',
+			),
+			array(
+				'id' => $meta_prefix.'info',
+				'type' => 'custom_html',
+				'callback' => 'get_calendar_info',
 			),
 		)
 	);

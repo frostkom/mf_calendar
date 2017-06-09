@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-22 10:53+0100\n"
+"POT-Creation-Date: 2017-06-09 10:28+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -28,7 +28,7 @@ msgstr "Visa kalender"
 #: ../include/functions.php:62
 #: ../include/functions.php:115
 #: ../include/functions.php:243
-#: ../include/functions.php:419
+#: ../include/functions.php:437
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -113,7 +113,7 @@ msgid "Title"
 msgstr "Titel"
 
 #: ../include/functions.php:241
-#: ../include/functions.php:426
+#: ../include/functions.php:444
 msgid "Location"
 msgstr "Plats"
 
@@ -133,20 +133,45 @@ msgstr "Redigera"
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/functions.php:378
-#: ../include/functions.php:413
+#: ../include/functions.php:373
+#, php-format
+msgid "Go to %sGoogle Calendar%s and login"
+msgstr "Gå till %sGoogle Calendar%s och logga in"
+
+#: ../include/functions.php:374
+msgid "Click on Settings (The grey gear icon to the right)"
+msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
+
+#: ../include/functions.php:375
+msgid "Click the Calendars tab"
+msgstr "Klicka på tabben Kalendrar"
+
+#: ../include/functions.php:376
+msgid "Choose which calendar to share if there are multiple and click Edit settings to the right in the table"
+msgstr "Välj vilken kalender att dela om det finns flera och klicka på Redigera inställningar till höger i tabellen"
+
+#: ../include/functions.php:377
+msgid "Make the calendar public and enter the calendar e-mail in the field above"
+msgstr "Gör kalendern offentlig och fyll i kalenderns e-post i fältet ovan"
+
+#: ../include/functions.php:391
+#: ../include/functions.php:431
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/functions.php:384
+#: ../include/functions.php:397
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/functions.php:431
+#: ../include/functions.php:397
+msgid "Google"
+msgstr ""
+
+#: ../include/functions.php:449
 msgid "Start"
 msgstr "Start"
 
-#: ../include/functions.php:436
+#: ../include/functions.php:454
 msgid "End"
 msgstr "Slut"
 
