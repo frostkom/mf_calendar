@@ -37,8 +37,6 @@ echo "@media all
 					margin-top: .5em;
 				}
 
-				.widget.calendar li > h4{}
-
 					.widget.calendar li + li > h4
 					{
 						margin-top: .5em;
