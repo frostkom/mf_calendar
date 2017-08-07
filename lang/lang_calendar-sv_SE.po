@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-09 10:28+0100\n"
+"POT-Creation-Date: 2017-08-07 09:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -24,11 +24,11 @@ msgstr "Visa kalender"
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
-#: ../include/functions.php:59
-#: ../include/functions.php:62
-#: ../include/functions.php:115
-#: ../include/functions.php:243
-#: ../include/functions.php:437
+#: ../include/functions.php:60
+#: ../include/functions.php:63
+#: ../include/functions.php:116
+#: ../include/functions.php:244
+#: ../include/functions.php:438
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -49,7 +49,7 @@ msgid "Show Events"
 msgstr "Visa händelser"
 
 #: ../include/functions.php:25
-#: ../include/functions.php:65
+#: ../include/functions.php:66
 msgid "Events"
 msgstr "Händelser"
 
@@ -58,120 +58,120 @@ msgstr "Händelser"
 msgid "Event"
 msgstr "Händelse"
 
-#: ../include/functions.php:68
+#: ../include/functions.php:69
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:104
+#: ../include/functions.php:105
 msgid "Google Calendar API key"
 msgstr ""
 
-#: ../include/functions.php:105
+#: ../include/functions.php:106
 msgid "Date Color"
 msgstr "Datumfärg"
 
-#: ../include/functions.php:106
+#: ../include/functions.php:107
 msgid "Time Limit"
 msgstr "Tidsgräns"
 
-#: ../include/functions.php:123
+#: ../include/functions.php:124
 #, php-format
 msgid "Go to %s and log in"
 msgstr "Gå till %s och logga in"
 
-#: ../include/functions.php:124
+#: ../include/functions.php:125
 msgid "Create a new project"
 msgstr "Skapa ett nytt projekt"
 
-#: ../include/functions.php:125
+#: ../include/functions.php:126
 #, php-format
 msgid "Choose '%s', '%s', '%s' and '%s'"
 msgstr "Välj '%s', '%s', '%s' och '%s'"
 
-#: ../include/functions.php:143
+#: ../include/functions.php:144
 msgid "Minutes between each API request"
 msgstr "Minuter mellan varje API-anrop"
 
-#: ../include/functions.php:157
+#: ../include/functions.php:158
 msgid "Account"
 msgstr "Konto"
 
-#: ../include/functions.php:158
+#: ../include/functions.php:159
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/functions.php:206
+#: ../include/functions.php:207
 msgid "I got an error when accessing the calendar"
 msgstr "Jag fick ett fel när jag hämtade kalendern"
 
-#: ../include/functions.php:216
+#: ../include/functions.php:217
 msgid "I am waiting to get access to the calendar"
 msgstr "Jag väntar på att få tillgång till kalendern"
 
-#: ../include/functions.php:240
+#: ../include/functions.php:241
 msgid "Title"
 msgstr "Titel"
 
-#: ../include/functions.php:241
-#: ../include/functions.php:444
+#: ../include/functions.php:242
+#: ../include/functions.php:445
 msgid "Location"
 msgstr "Plats"
 
-#: ../include/functions.php:242
+#: ../include/functions.php:243
 msgid "Date"
 msgstr "Datum"
 
-#: ../include/functions.php:274
+#: ../include/functions.php:275
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/functions.php:281
+#: ../include/functions.php:282
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/functions.php:284
+#: ../include/functions.php:285
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/functions.php:373
+#: ../include/functions.php:374
 #, php-format
 msgid "Go to %sGoogle Calendar%s and login"
 msgstr "Gå till %sGoogle Calendar%s och logga in"
 
-#: ../include/functions.php:374
+#: ../include/functions.php:375
 msgid "Click on Settings (The grey gear icon to the right)"
 msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
 
-#: ../include/functions.php:375
+#: ../include/functions.php:376
 msgid "Click the Calendars tab"
 msgstr "Klicka på tabben Kalendrar"
 
-#: ../include/functions.php:376
+#: ../include/functions.php:377
 msgid "Choose which calendar to share if there are multiple and click Edit settings to the right in the table"
 msgstr "Välj vilken kalender att dela om det finns flera och klicka på Redigera inställningar till höger i tabellen"
 
-#: ../include/functions.php:377
+#: ../include/functions.php:378
 msgid "Make the calendar public and enter the calendar e-mail in the field above"
 msgstr "Gör kalendern offentlig och fyll i kalenderns e-post i fältet ovan"
 
-#: ../include/functions.php:391
-#: ../include/functions.php:431
+#: ../include/functions.php:392
+#: ../include/functions.php:432
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/functions.php:397
+#: ../include/functions.php:398
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/functions.php:397
+#: ../include/functions.php:398
 msgid "Google"
 msgstr ""
 
-#: ../include/functions.php:449
+#: ../include/functions.php:450
 msgid "Start"
 msgstr "Start"
 
-#: ../include/functions.php:454
+#: ../include/functions.php:455
 msgid "End"
 msgstr "Slut"
 

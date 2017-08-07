@@ -32,6 +32,7 @@ function init_calendar()
 		'public' => true,
 		'show_in_menu' => false,
 		'show_in_nav_menus' => false,
+		'exclude_from_search' => true,
 		'supports' => array('title', 'editor', 'excerpt'),
 		'hierarchical' => true,
 		'has_archive' => false,
