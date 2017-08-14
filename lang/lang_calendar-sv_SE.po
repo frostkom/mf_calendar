@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-07 09:45+0100\n"
+"POT-Creation-Date: 2017-08-14 08:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -32,21 +32,29 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:435
+#: ../include/classes.php:445
 msgid "I could not find any events at the moment. Sorry!"
 msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"
 
-#: ../include/classes.php:468
+#: ../include/classes.php:480
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:472
+#: ../include/classes.php:484
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:475
+#: ../include/classes.php:489
 msgid "Show Events"
 msgstr "Visa händelser"
+
+#: ../include/classes.php:494
+msgid "Show"
+msgstr "Visa"
+
+#: ../include/classes.php:494
+msgid "months"
+msgstr "månader"
 
 #: ../include/functions.php:25
 #: ../include/functions.php:66

@@ -268,7 +268,7 @@ class widget_calendar extends WP_Widget
 
 			echo "<div class='section'>";
 
-				$query_join = $query_where = "";
+				$query_join = $query_where = $query_limit = "";
 
 				$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
 				$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10) OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10))";
@@ -281,7 +281,17 @@ class widget_calendar extends WP_Widget
 					$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
 				}
 
-				$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5));
+				if($instance['calendar_items'] > 0)
+				{
+					$query_limit = " LIMIT 0, ".($instance['calendar_items'] >= 0 ? $instance['calendar_items'] : 5);
+				}
+
+				else
+				{
+					$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($instance['calendar_months'] > 0 ? $instance['calendar_months'] : 6)." MONTH)";
+				}
+
+				$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC".$query_limit);
 
 				if($wpdb->num_rows > 0)
 				{
@@ -446,6 +456,7 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_heading'] = strip_tags($new_instance['calendar_heading']);
 		$instance['calendar_feeds'] = isset($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
 		$instance['calendar_items'] = strip_tags($new_instance['calendar_items']);
+		$instance['calendar_months'] = isset($new_instance['calendar_months']) ? strip_tags($new_instance['calendar_months']) : 6;
 
 		return $instance;
 	}
@@ -457,7 +468,8 @@ class widget_calendar extends WP_Widget
 		$defaults = array(
 			'calendar_heading' => "",
 			'calendar_feeds' => array(),
-			'calendar_items' => 5,
+			'calendar_items' => 0,
+			'calendar_months' => 6,
 		);
 		$instance = wp_parse_args((array)$instance, $defaults);
 
@@ -472,7 +484,16 @@ class widget_calendar extends WP_Widget
 				echo show_select(array('data' => $arr_data, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
 			}
 
-			echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']))
-		."</div>";
+			if($instance['calendar_items'] > 0)
+			{
+				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_items'), 'text' => __("Show Events", 'lang_calendar'), 'value' => $instance['calendar_items']));
+			}
+
+			else
+			{
+				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Show", 'lang_calendar'), 'value' => $instance['calendar_months'], 'suffix' => __("months", 'lang_calendar')));
+			}
+
+		echo "</div>";
 	}
 }

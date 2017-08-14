@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: 
 Description: 
-Version: 3.1.5
+Version: 3.1.6
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
