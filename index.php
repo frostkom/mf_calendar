@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: 
 Description: 
-Version: 3.1.6
+Version: 3.1.7
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
@@ -23,6 +23,7 @@ add_action('widgets_init', 'widgets_calendar');
 if(is_admin())
 {
 	register_activation_hook(__FILE__, 'activate_calendar');
+	register_uninstall_hook(__FILE__, 'uninstall_calendar');
 
 	add_action('admin_init', 'settings_calendar');
 	add_action('admin_menu', 'menu_calendar');
@@ -56,6 +57,13 @@ if(is_admin())
 	function activate_calendar()
 	{
 		require_plugin("meta-box/meta-box.php", "Meta Box");
+	}
+
+	function uninstall_calendar()
+	{
+		mf_uninstall_plugin(array(
+			'post_types' => array('mf_calendar', 'mf_calendar_event'),
+		));
 	}
 }
 
