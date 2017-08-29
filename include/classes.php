@@ -455,7 +455,7 @@ class widget_calendar extends WP_Widget
 
 		$instance['calendar_heading'] = strip_tags($new_instance['calendar_heading']);
 		$instance['calendar_feeds'] = isset($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
-		$instance['calendar_items'] = strip_tags($new_instance['calendar_items']);
+		$instance['calendar_items'] = isset($new_instance['calendar_items']) ? strip_tags($new_instance['calendar_items']) : 0;
 		$instance['calendar_months'] = isset($new_instance['calendar_months']) ? strip_tags($new_instance['calendar_months']) : 6;
 
 		return $instance;
