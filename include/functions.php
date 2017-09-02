@@ -368,7 +368,7 @@ function column_cell_event($col, $id)
 	}
 }
 
-function get_calendar_info()
+function meta_calendar_info()
 {
 	$out = "<ol>
 		<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com' rel='external'>", "</a>")."</li>
@@ -402,7 +402,7 @@ function meta_boxes_calendar($meta_boxes)
 			array(
 				'id' => $meta_prefix.'info',
 				'type' => 'custom_html',
-				'callback' => 'get_calendar_info',
+				'callback' => 'meta_calendar_info',
 			),
 		)
 	);
