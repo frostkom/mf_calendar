@@ -242,9 +242,14 @@ class widget_calendar extends WP_Widget
 			'description' => __("Display Calendar", 'lang_calendar')
 		);
 
-		$control_ops = array('id_base' => 'gcal-widget');
+		$this->arr_default = array(
+			'calendar_heading' => "",
+			'calendar_feeds' => array(),
+			'calendar_items' => 0,
+			'calendar_months' => 6,
+		);
 
-		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops, $control_ops);
+		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops);
 
 		$this->meta_prefix = "mf_calendar_";
 	}
@@ -254,6 +259,8 @@ class widget_calendar extends WP_Widget
 		global $wpdb;
 
 		extract($args);
+
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$obj_calendar = new mf_calendar();
 
@@ -275,7 +282,7 @@ class widget_calendar extends WP_Widget
 				/*$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id AND meta_date.meta_key = 'mf_calendar_end'";
 				$query_where .= " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";*/
 
-				if(isset($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0)
+				if(count($instance['calendar_feeds']) > 0)
 				{
 					$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
 					$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $instance['calendar_feeds'])."'))";
@@ -453,25 +460,19 @@ class widget_calendar extends WP_Widget
 	{
 		$instance = $old_instance;
 
+		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
+
 		$instance['calendar_heading'] = strip_tags($new_instance['calendar_heading']);
-		$instance['calendar_feeds'] = isset($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
-		$instance['calendar_items'] = isset($new_instance['calendar_items']) ? strip_tags($new_instance['calendar_items']) : 0;
-		$instance['calendar_months'] = isset($new_instance['calendar_months']) ? strip_tags($new_instance['calendar_months']) : 6;
+		$instance['calendar_feeds'] = $new_instance['calendar_feeds'];
+		$instance['calendar_items'] = strip_tags($new_instance['calendar_items']);
+		$instance['calendar_months'] = strip_tags($new_instance['calendar_months']);
 
 		return $instance;
 	}
 
 	function form($instance)
 	{
-		global $wpdb;
-
-		$defaults = array(
-			'calendar_heading' => "",
-			'calendar_feeds' => array(),
-			'calendar_items' => 0,
-			'calendar_months' => 6,
-		);
-		$instance = wp_parse_args((array)$instance, $defaults);
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data = array();
 		get_post_children(array('post_type' => 'mf_calendar'), $arr_data);
