@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: 
 Description: 
-Version: 3.1.10
+Version: 3.2.0
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
@@ -34,25 +34,12 @@ if(is_admin())
 	add_action('manage_mf_calendar_event_posts_custom_column', 'column_cell_event', 5, 2);
 	add_action('rwmb_meta_boxes', 'meta_boxes_calendar');
 
+	$obj_calendar = new mf_calendar();
+
+	add_action('post_updated', array($obj_calendar, 'post_updated'), 10, 3);
+
 	add_filter('post_row_actions', 'row_actions_calendar', 10, 2);
 	add_filter('page_row_actions', 'row_actions_calendar', 10, 2);
-
-	function row_actions_calendar($actions, $post)
-	{
-		$meta_prefix = "mf_calendar_";
-
-		if($post->post_type == 'mf_calendar_event')
-		{
-			/*$post_uid = get_post_meta($post->ID, $meta_prefix.'uid', true);
-
-			if($post_uid != '')
-			{*/
-				$actions = array();
-			//}
-		}
-
-		return $actions;
-	}
 
 	function activate_calendar()
 	{

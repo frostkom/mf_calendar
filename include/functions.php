@@ -461,3 +461,20 @@ function meta_boxes_calendar($meta_boxes)
 
 	return $meta_boxes;
 }
+
+function row_actions_calendar($actions, $post)
+{
+	$meta_prefix = "mf_calendar_";
+
+	if($post->post_type == 'mf_calendar_event')
+	{
+		/*$post_uid = get_post_meta($post->ID, $meta_prefix.'uid', true);
+
+		if($post_uid != '')
+		{*/
+			$actions = array();
+		//}
+	}
+
+	return $actions;
+}
