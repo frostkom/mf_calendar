@@ -36,6 +36,9 @@ if(is_admin())
 
 	$obj_calendar = new mf_calendar();
 
+	add_action('restrict_manage_posts', array($obj_calendar, 'post_filter_select'));
+	add_action('pre_get_posts', array($obj_calendar, 'post_filter_query'));
+
 	add_action('post_updated', array($obj_calendar, 'post_updated'), 10, 3);
 
 	add_filter('post_row_actions', 'row_actions_calendar', 10, 2);

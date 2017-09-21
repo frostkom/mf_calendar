@@ -12,6 +12,48 @@ class mf_calendar
 		$this->google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
 	}
 
+	function post_filter_select()
+	{
+		global $post_type, $wpdb;
+
+		if($post_type == 'mf_calendar_event')
+		{
+			$strFilter = check_var('strFilter');
+
+			$arr_data = array();
+			get_post_children(array('post_type' => 'mf_calendar', 'post_status' => '', 'add_choose_here' => true), $arr_data);
+
+			if(count($arr_data) > 1)
+			{
+				echo show_select(array('data' => $arr_data, 'name' => "strFilter", 'value' => $strFilter));
+			}
+		}
+	}
+
+	function post_filter_query($wp_query)
+	{
+		global $post_type, $pagenow;
+
+		if($pagenow == 'edit.php')
+		{
+			if($post_type == 'mf_calendar_event')
+			{
+				$strFilter = check_var('strFilter');
+
+				if($strFilter != '')
+				{
+					$wp_query->query_vars['meta_query'] = array(
+						array(
+							'key' => $this->meta_prefix.'calendar',
+							'value' => $strFilter,
+							'compare' => '=',
+						),
+					);
+				}
+			}
+		}
+	}
+
 	function post_updated($post_id, $post_after, $post_before)
 	{
 		$arr_include = array('mf_calendar', 'mf_calendar_event');

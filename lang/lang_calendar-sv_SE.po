@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-29 13:29+0100\n"
+"POT-Creation-Date: 2017-09-21 10:36+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,11 +16,11 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:242
+#: ../include/classes.php:297
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:247
+#: ../include/classes.php:307
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -32,27 +32,27 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:445
+#: ../include/classes.php:507
 msgid "I could not find any events at the moment. Sorry!"
 msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"
 
-#: ../include/classes.php:480
+#: ../include/classes.php:536
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:484
+#: ../include/classes.php:540
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:489
+#: ../include/classes.php:545
 msgid "Show Events"
 msgstr "Visa händelser"
 
-#: ../include/classes.php:494
+#: ../include/classes.php:550
 msgid "Show"
 msgstr "Visa"
 
-#: ../include/classes.php:494
+#: ../include/classes.php:550
 msgid "months"
 msgstr "månader"
 

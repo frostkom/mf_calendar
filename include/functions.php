@@ -186,8 +186,8 @@ function column_cell_calendar($col, $id)
 			{
 				$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
 
-				echo $amount
-				."<div class='row-actions'>"
+				echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilter=".$id)."'>".$amount."</a>
+				<div class='row-actions'>"
 					.format_date($post_modified)
 				."</div>";
 			}
