@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-21 10:36+0100\n"
+"POT-Creation-Date: 2017-10-10 09:44+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,48 +16,48 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:297
+#: ../include/classes.php:310
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:307
+#: ../include/classes.php:320
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
-#: ../include/functions.php:60
-#: ../include/functions.php:63
-#: ../include/functions.php:116
-#: ../include/functions.php:244
-#: ../include/functions.php:438
+#: ../include/functions.php:55
+#: ../include/functions.php:58
+#: ../include/functions.php:111
+#: ../include/functions.php:239
+#: ../include/functions.php:433
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:507
+#: ../include/classes.php:520
 msgid "I could not find any events at the moment. Sorry!"
 msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"
 
-#: ../include/classes.php:536
+#: ../include/classes.php:549
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:540
+#: ../include/classes.php:553
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:545
+#: ../include/classes.php:558
 msgid "Show Events"
 msgstr "Visa händelser"
 
-#: ../include/classes.php:550
+#: ../include/classes.php:563
 msgid "Show"
 msgstr "Visa"
 
-#: ../include/classes.php:550
+#: ../include/classes.php:563
 msgid "months"
 msgstr "månader"
 
 #: ../include/functions.php:25
-#: ../include/functions.php:66
+#: ../include/functions.php:61
 msgid "Events"
 msgstr "Händelser"
 
@@ -66,120 +66,120 @@ msgstr "Händelser"
 msgid "Event"
 msgstr "Händelse"
 
-#: ../include/functions.php:69
+#: ../include/functions.php:64
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:105
+#: ../include/functions.php:100
 msgid "Google Calendar API key"
 msgstr ""
 
-#: ../include/functions.php:106
+#: ../include/functions.php:101
 msgid "Date Color"
 msgstr "Datumfärg"
 
-#: ../include/functions.php:107
+#: ../include/functions.php:102
 msgid "Time Limit"
 msgstr "Tidsgräns"
 
-#: ../include/functions.php:124
+#: ../include/functions.php:119
 #, php-format
 msgid "Go to %s and log in"
 msgstr "Gå till %s och logga in"
 
-#: ../include/functions.php:125
+#: ../include/functions.php:120
 msgid "Create a new project"
 msgstr "Skapa ett nytt projekt"
 
-#: ../include/functions.php:126
+#: ../include/functions.php:121
 #, php-format
 msgid "Choose '%s', '%s', '%s' and '%s'"
 msgstr "Välj '%s', '%s', '%s' och '%s'"
 
-#: ../include/functions.php:144
+#: ../include/functions.php:139
 msgid "Minutes between each API request"
 msgstr "Minuter mellan varje API-anrop"
 
-#: ../include/functions.php:158
+#: ../include/functions.php:153
 msgid "Account"
 msgstr "Konto"
 
-#: ../include/functions.php:159
+#: ../include/functions.php:154
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/functions.php:207
+#: ../include/functions.php:202
 msgid "I got an error when accessing the calendar"
 msgstr "Jag fick ett fel när jag hämtade kalendern"
 
-#: ../include/functions.php:217
+#: ../include/functions.php:212
 msgid "I am waiting to get access to the calendar"
 msgstr "Jag väntar på att få tillgång till kalendern"
 
-#: ../include/functions.php:241
+#: ../include/functions.php:236
 msgid "Title"
 msgstr "Titel"
 
-#: ../include/functions.php:242
-#: ../include/functions.php:445
+#: ../include/functions.php:237
+#: ../include/functions.php:440
 msgid "Location"
 msgstr "Plats"
 
-#: ../include/functions.php:243
+#: ../include/functions.php:238
 msgid "Date"
 msgstr "Datum"
 
-#: ../include/functions.php:275
+#: ../include/functions.php:270
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/functions.php:282
+#: ../include/functions.php:277
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/functions.php:285
+#: ../include/functions.php:280
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/functions.php:374
+#: ../include/functions.php:369
 #, php-format
 msgid "Go to %sGoogle Calendar%s and login"
 msgstr "Gå till %sGoogle Calendar%s och logga in"
 
-#: ../include/functions.php:375
+#: ../include/functions.php:370
 msgid "Click on Settings (The grey gear icon to the right)"
 msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
 
-#: ../include/functions.php:376
+#: ../include/functions.php:371
 msgid "Click the Calendars tab"
 msgstr "Klicka på tabben Kalendrar"
 
-#: ../include/functions.php:377
+#: ../include/functions.php:372
 msgid "Choose which calendar to share if there are multiple and click Edit settings to the right in the table"
 msgstr "Välj vilken kalender att dela om det finns flera och klicka på Redigera inställningar till höger i tabellen"
 
-#: ../include/functions.php:378
+#: ../include/functions.php:373
 msgid "Make the calendar public and enter the calendar e-mail in the field above"
 msgstr "Gör kalendern offentlig och fyll i kalenderns e-post i fältet ovan"
 
-#: ../include/functions.php:392
-#: ../include/functions.php:432
+#: ../include/functions.php:387
+#: ../include/functions.php:427
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/functions.php:398
+#: ../include/functions.php:393
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/functions.php:398
+#: ../include/functions.php:393
 msgid "Google"
 msgstr ""
 
-#: ../include/functions.php:450
+#: ../include/functions.php:445
 msgid "Start"
 msgstr "Start"
 
-#: ../include/functions.php:455
+#: ../include/functions.php:450
 msgid "End"
 msgstr "Slut"
 

@@ -60,10 +60,23 @@ class mf_calendar
 
 		if(isset($post_after) && in_array($post_after->post_type, $arr_include) && ($post_after->post_status == 'publish' || $post_before->post_status == 'publish') && class_exists('mf_cache')) // && $post_after != $post_before //post_modified is different so point in checking for changes this way
 		{
-			do_log("A calendar event was updated");
-
 			$obj_cache = new mf_cache();
 			$obj_cache->clear();
+		}
+	}
+
+	function delete_post($post_id)
+	{
+		global $wpdb, $post_type;
+
+		if($post_type == 'mf_calendar')
+		{
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND meta_key = '".$meta_prefix."calendar' AND meta_value = '%d'", $post_id));
+
+			foreach($result as $r)
+			{
+				wp_trash_post($r->ID);
+			}
 		}
 	}
 
