@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: MF Calendar
-Plugin URI: 
+Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 3.2.1
+Version: 3.2.2
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
 Domain Path: /lang
 
-GitHub Plugin URI: 
+GitHub Plugin URI: frostkom/mf_calendar
 */
 
 include_once("include/classes.php");
