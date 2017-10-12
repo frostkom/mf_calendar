@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-10 09:44+0100\n"
+"POT-Creation-Date: 2017-10-12 12:08+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -159,8 +159,9 @@ msgid "Choose which calendar to share if there are multiple and click Edit setti
 msgstr "Välj vilken kalender att dela om det finns flera och klicka på Redigera inställningar till höger i tabellen"
 
 #: ../include/functions.php:373
-msgid "Make the calendar public and enter the calendar e-mail in the field above"
-msgstr "Gör kalendern offentlig och fyll i kalenderns e-post i fältet ovan"
+#, php-format
+msgid "Make the calendar public and enter the calendar e-mail (%s) in the field above"
+msgstr "Gör kalendern offentlig och fyll i kalenderns e-post (%s) i fältet ovan"
 
 #: ../include/functions.php:387
 #: ../include/functions.php:427
