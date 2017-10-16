@@ -370,7 +370,7 @@ function meta_calendar_info()
 		<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
 		<li>".__("Click the Calendars tab", 'lang_calendar')."</li>
 		<li>".__("Choose which calendar to share if there are multiple and click Edit settings to the right in the table", 'lang_calendar')."</li>
-		<li>".sprintf(__("Make the calendar public and enter the calendar e-mail (%s) in the field above", 'lang_calendar'), "@gmail.com")."</li>
+		<li>".__("Make the calendar public and enter the calendar e-mail in the field above", 'lang_calendar')."</li>
 	</ol>";
 
 	return $out;
