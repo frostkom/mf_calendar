@@ -1,9 +1,11 @@
 <?php
 
-header("Content-Type: text/css; charset=utf-8");
+$is_standalone = !defined('ABSPATH');
 
-if(!defined('ABSPATH'))
+if($is_standalone)
 {
+	header("Content-Type: text/css; charset=utf-8");
+
 	$folder = str_replace("/wp-content/plugins/mf_calendar/include", "/", dirname(__FILE__));
 
 	require_once($folder."wp-load.php");
