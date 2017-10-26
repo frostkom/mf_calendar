@@ -54,16 +54,16 @@ class mf_calendar
 		}
 	}
 
-	function post_updated($post_id, $post_after, $post_before)
+	/*function post_updated($post_id, $post_after, $post_before)
 	{
 		$arr_include = array('mf_calendar', 'mf_calendar_event');
 
-		if(isset($post_after) && in_array($post_after->post_type, $arr_include) && ($post_after->post_status == 'publish' || $post_before->post_status == 'publish') && class_exists('mf_cache')) // && $post_after != $post_before //post_modified is different so point in checking for changes this way
+		if(isset($post_after) && in_array($post_after->post_type, $arr_include) && ($post_after->post_status == 'publish' || $post_before->post_status == 'publish') && class_exists('mf_cache')) // && $post_after != $post_before //post_modified is different so no point in checking for changes this way
 		{
 			$obj_cache = new mf_cache();
 			$obj_cache->clear();
 		}
-	}
+	}*/
 
 	function delete_post($post_id)
 	{
