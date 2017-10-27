@@ -44,57 +44,78 @@ echo "@media all
 						margin-top: .5em;
 					}
 
-				.widget.calendar li > div
+				/*.widget.calendar li > div
 				{
 					-webkit-box-flex: initial;
 					-webkit-flex: initial;
 					-ms-flex: initial;
 					flex: initial;
-				}
+				}*/
 
-				.widget.calendar li .date p
-				{
-					background: ".$setting_calendar_date_color.";
-					border-radius: .3em;
-					color: #fff;
-					font-size: 1.5em;
-					padding: .4em .5em;
-				}
-
-				.widget.calendar li .content
-				{
-					margin-left: 2%;
-				}
-
-					.widget.calendar li .content span
+					.widget.calendar li .date
 					{
-						font-weight: bold;
+						flex: 0 0 1.5em;
 					}
 
-					.widget.calendar li .content p
-					{
-						margin: .2em 0 0;
-					}
-
-						.widget.calendar li .content p > .fa
+						.widget.calendar li .date p
 						{
-							margin-left: .4em;
+							background: ".$setting_calendar_date_color.";
+							border-radius: .3em;
+							color: #fff;
+							font-size: 1.5em;
+							padding: .4em .5em;
 						}
 
-					.widget.calendar li .content .toggler
+					.widget.calendar li .content
 					{
-						padding: 0;
+						flex: 1 0 auto;
+						margin-left: 2%;
+						text-align: left;
 					}
 
-					.widget.calendar li .content .toggle_container
-					{
-						margin: 1em 0;
-						padding: 0;
-					}
-
-						.widget.calendar li .content .toggle_container p
+						.widget.calendar li .content > span
 						{
-							font-size: .8em;
-							margin-bottom: .5em;
+							font-weight: bold;
 						}
+
+						.widget.calendar li .content p
+						{
+							margin: .2em 0 0;
+						}
+
+							.widget.calendar li .content p > span
+							{
+								display: inline-block;
+							}
+
+								.widget.calendar li .content p > span.has_more
+								{
+									overflow: hidden;
+									text-overflow: ellipsis;
+									white-space: nowrap;
+									max-width: 75%;
+								}
+
+							.widget.calendar li .content p > .fa
+							{
+								margin-left: .4em;
+								-webkit-transform: translateY(-25%);
+								transform: translateY(-25%);
+							}
+
+						.widget.calendar li .content .toggler
+						{
+							padding: 0;
+						}
+
+						.widget.calendar li .content .toggle_container
+						{
+							margin-bottom: 1em;
+						}
+
+							.widget.calendar li .content .toggle_container p
+							{
+								font-size: .8em;
+								margin-bottom: .5em;
+							}
 }";

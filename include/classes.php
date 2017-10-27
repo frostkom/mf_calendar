@@ -435,7 +435,33 @@ class widget_calendar extends WP_Widget
 									}
 								}
 
-								$more_class = $more_rel = $more_icon = $more_content = "";
+								$more_date = $more_class = $more_rel = $more_icon = $more_content = "";
+
+								if($post_start_date == $post_end_date)
+								{
+									if($post_start_time > "00:00")
+									{
+										$more_date .= $post_start_time;
+
+										if($post_end_time > "00:00" && $post_end_time != $post_start_time)
+										{
+											$more_date .= "&nbsp;-&nbsp;".$post_end_time;
+										}
+									}
+								}
+
+								else
+								{
+									if($event['uid'] != '')
+									{
+										$post_end_date = filter_end_date($post_end_date);
+									}
+
+									if($post_start_date != $post_end_date)
+									{
+										$more_date .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+									}
+								}
 
 								if($event['content'] != '' || $event['location'] != '')
 								{
@@ -469,38 +495,15 @@ class widget_calendar extends WP_Widget
 
 								echo "<li>
 									<div class='date'><p>".$post_start_day."</p></div>
-									<div class='content".($more_class != '' ? " ".$more_class : "")."'".($more_rel != '' ? " rel='".$more_rel."'" : "").">
-										<span>";
+									<div class='content".($more_class != '' ? " ".$more_class : "")."'".($more_rel != '' ? " rel='".$more_rel."'" : "").">";
 
-											if($post_start_date == $post_end_date)
-											{
-												if($post_start_time > "00:00")
-												{
-													echo $post_start_time;
+										if($more_date != '')
+										{
+											echo "<span>".$more_date."</span>";
+										}
 
-													if($post_end_time > "00:00" && $post_end_time != $post_start_time)
-													{
-														echo "&nbsp;-&nbsp;".$post_end_time;
-													}
-												}
-											}
-
-											else
-											{
-												if($event['uid'] != '')
-												{
-													$post_end_date = filter_end_date($post_end_date);
-												}
-
-												if($post_start_date != $post_end_date)
-												{
-													echo "<i class='fa fa-arrow-right'></i> ".$post_end_date;
-												}
-											}
-
-										echo "</span>
-										<p>"
-											.$event['title']
+										echo "<p>"
+											."<span".($more_icon != '' ? " class='has_more'" : "").">".$event['title']."</span>"
 											.$more_icon
 										."</p>"
 										.$more_content
