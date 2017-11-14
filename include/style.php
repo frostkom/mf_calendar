@@ -20,6 +20,25 @@ echo "@media all
 		text-align: left;
 	}
 
+		.widget.calendar .section > h4
+		{
+			font-size: 1.2em;
+			margin-bottom: 1em;
+			text-align: left;
+		}
+
+			.widget.calendar .section > h4 a
+			{
+				display: inline-block;
+				margin: 0 .5em;
+			}
+
+			.widget.calendar .section > h4 span + span
+			{
+				display: inline-block;
+				margin-left: .5em;
+			}
+
 		.widget.calendar ul
 		{
 			list-style: none;
@@ -43,14 +62,6 @@ echo "@media all
 					{
 						margin-top: .5em;
 					}
-
-				/*.widget.calendar li > div
-				{
-					-webkit-box-flex: initial;
-					-webkit-flex: initial;
-					-ms-flex: initial;
-					flex: initial;
-				}*/
 
 					.widget.calendar li .date
 					{

@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 3.2.7
+Version: 3.3.0
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
@@ -14,6 +14,8 @@ GitHub Plugin URI: frostkom/mf_calendar
 
 include_once("include/classes.php");
 include_once("include/functions.php");
+
+$obj_calendar = new mf_calendar();
 
 add_action('cron_base', 'cron_calendar', mt_rand(1, 10));
 
@@ -33,8 +35,6 @@ if(is_admin())
 	add_filter('manage_mf_calendar_event_posts_columns', 'column_header_event', 5);
 	add_action('manage_mf_calendar_event_posts_custom_column', 'column_cell_event', 5, 2);
 	add_action('rwmb_meta_boxes', 'meta_boxes_calendar');
-
-	$obj_calendar = new mf_calendar();
 
 	add_action('restrict_manage_posts', array($obj_calendar, 'post_filter_select'));
 	add_action('pre_get_posts', array($obj_calendar, 'post_filter_query'));
@@ -56,6 +56,11 @@ if(is_admin())
 			'post_types' => array('mf_calendar', 'mf_calendar_event'),
 		));
 	}
+}
+
+else
+{
+	add_action('wp_footer', array($obj_calendar, 'get_footer'), 0);
 }
 
 load_plugin_textdomain('lang_calendar', false, dirname(plugin_basename(__FILE__))."/lang/");
