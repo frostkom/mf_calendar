@@ -17,7 +17,7 @@ var CalendarView = Backbone.View.extend(
 
 	events:
 	{
-		"click .section > h4 a" : 'change_week'
+		"click .section .controls.fa:not(.disabled)" : 'change_week'
 	},
 
 	on_load_calendar: function()
@@ -38,8 +38,7 @@ var CalendarView = Backbone.View.extend(
 
 		if(dom_obj.children("h4").length > 0)
 		{
-			this.display_week = parseInt(jQuery(this.el).find(".calendar_week").text());
-			this.display_year = parseInt(jQuery(this.el).find(".calendar_year").text());
+			this.calendar_type = 'week';
 		}
 
 		this.loadPage(action_type);
@@ -68,17 +67,23 @@ var CalendarView = Backbone.View.extend(
 			this.display_year++;
 		}
 
-		jQuery(this.el).find(".calendar_week").text(this.display_week);
-		jQuery(this.el).find(".calendar_year").text(this.display_year);
-
+		this.update_current_week();
 		this.show_events();
 
 		return false;
 	},
 
+	update_current_week: function()
+	{
+		jQuery(this.el).find(".calendar_week").text(this.display_week);
+		jQuery(this.el).find(".calendar_year").text(this.display_year);
+	},
+
 	show_events: function()
 	{
 		jQuery(this.el).find(".section .fa-spinner").addClass('hide');
+
+		this.show_arrows();
 
 		var response = this.model.get('response_events'),
 			amount = response.length,
@@ -89,7 +94,7 @@ var CalendarView = Backbone.View.extend(
 		{
 			for(var i = 0; i < amount; i++)
 			{
-				if(response[i].type == 'week')
+				if(this.calendar_type == 'week')
 				{
 					if(response[i].start_year != this.display_year || response[i].start_week != this.display_week)
 					{
@@ -107,13 +112,50 @@ var CalendarView = Backbone.View.extend(
 		}
 
 		dom_obj.html(html).removeClass('hide');
-		jQuery(this.el).find(".section > h4").removeClass('hide');
+	},
+
+	show_arrows: function()
+	{
+		if(this.calendar_type == 'week')
+		{
+			var response = this.model.get('response_data');
+
+			if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
+			{
+				this.display_week = parseInt(response.week_start);
+				this.display_year = parseInt(response.year_start);
+
+				this.update_current_week();
+			}
+
+			if(response.week_start < this.display_week || response.year_start < this.display_year)
+			{
+				jQuery(this.el).find(".previous").removeClass('disabled');
+			}
+
+			else
+			{
+				jQuery(this.el).find(".previous").addClass('disabled');
+			}
+
+			if(response.week_end > this.display_week || response.year_end > this.display_year)
+			{
+				jQuery(this.el).find(".next").removeClass('disabled');
+			}
+
+			else
+			{
+				jQuery(this.el).find(".next").addClass('disabled');
+			}
+
+			jQuery(this.el).find(".section > h4").removeClass('hide');
+		}
 	}
 });
 
 var myCalendarView = new CalendarView({model: new CalendarModel()});
 
-if(typeof Backbone.history === 'undefined')
+if(typeof Backbone.history == 'undefined')
 {
 	Backbone.history.start();
 }

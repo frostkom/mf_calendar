@@ -27,11 +27,23 @@ echo "@media all
 			text-align: left;
 		}
 
-			.widget.calendar .section > h4 a
+			.widget.calendar .controls.fa
 			{
 				display: inline-block;
-				margin: 0 .5em;
+				padding: .5em;
+				opacity: .5;
 			}
+
+				.widget.calendar .controls.fa.disabled
+				{
+					cursor: no-drop;
+					opacity: .2 !important;
+				}
+
+				.widget.calendar .controls.fa:hover
+				{
+					opacity: .9;
+				}
 
 			.widget.calendar .section > h4 span + span
 			{

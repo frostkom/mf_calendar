@@ -27,11 +27,12 @@ if($type == 'events')
 	}
 
 	$obj_calendar = new mf_calendar();
-	$arr_events = $obj_calendar->get_events(array('calendar_feeds' => $calendar_feeds, 'calendar_type' => $calendar_type, 'calendar_months' => $calendar_months));
+	$obj_calendar->get_events(array('calendar_feeds' => $calendar_feeds, 'calendar_type' => $calendar_type, 'calendar_months' => $calendar_months));
 
-	if(count($arr_events) > 0)
+	if(count($obj_calendar->arr_events) > 0)
 	{
-		$json_output['response_events'] = $arr_events;
+		$json_output['response_data'] = $obj_calendar->arr_data;
+		$json_output['response_events'] = $obj_calendar->arr_events;
 		$json_output['success'] = true;
 	}
 }
