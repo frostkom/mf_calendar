@@ -85,6 +85,7 @@ class mf_calendar
 		global $wpdb;
 
 		if(!isset($data['calendar_feeds']) || $data['calendar_feeds'] == ''){		$data['calendar_feeds'] = array();}
+		if(!isset($data['calendar_display_filter'])){								$data['calendar_display_filter'] = 'no';}
 		if(!isset($data['calendar_type'])){											$data['calendar_type'] = '';}
 		if(!isset($data['calendar_months']) || !($data['calendar_months'] > 0)){	$data['calendar_months'] = 6;}
 
@@ -106,15 +107,16 @@ class mf_calendar
 		//$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id AND meta_date.meta_key = 'mf_calendar_end'";
 		//$query_where .= " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";
 
+		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
+
 		if(count($data['calendar_feeds']) > 0)
 		{
-			$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id";
-			$query_where .= " AND (meta_calendar.meta_key = '".$this->meta_prefix."calendar' AND meta_calendar.meta_value IN('".implode("','", $data['calendar_feeds'])."'))";
+			$query_where .= " AND meta_calendar.meta_value IN('".implode("','", $data['calendar_feeds'])."')";
 		}
 
 		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['calendar_months'] > 0 ? $data['calendar_months'] : 6)." MONTH)";
 
-		$result = $wpdb->get_results("SELECT ID, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC");
+		$result = $wpdb->get_results("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC");
 
 		if($wpdb->num_rows > 0)
 		{
@@ -123,6 +125,7 @@ class mf_calendar
 			foreach($result as $r)
 			{
 				$post_id = $r->ID;
+				$post_feed = $r->post_feed;
 				$post_title = $r->post_title;
 				$post_content = $r->post_content;
 
@@ -249,6 +252,9 @@ class mf_calendar
 
 				$this->arr_events[] = array(
 					//'type' => $data['calendar_type'],
+
+					//display_filter == yes
+					'feed' => $post_feed,
 
 					'heading' => $heading,
 
@@ -576,6 +582,7 @@ class widget_calendar extends WP_Widget
 		$this->arr_default = array(
 			'calendar_heading' => "",
 			'calendar_feeds' => array(),
+			'calendar_display_filter' => 'no',
 			'calendar_type' => '',
 			'calendar_months' => 6,
 		);
@@ -608,21 +615,37 @@ class widget_calendar extends WP_Widget
 
 			echo "<div class='section'"
 				.(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $instance['calendar_feeds'])."'" : "")
-				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : "")
+				.($instance['calendar_display_filter'] != '' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
+				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
 				.($instance['calendar_months'] > 0 ? " data-calendar_months='".$instance['calendar_months']."'" : 6)
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
-				switch($instance['calendar_type'])
+				if('week' == $instance['calendar_type'])
 				{
-					case 'week':
-						echo "<h4 class='hide'>
-							<i class='fa fa-chevron-left controls previous'></i>
-							<span>".__("w", 'lang_calendar')."<span class='calendar_week'></span></span>
-							<span class='calendar_year'></span>
-							<i class='fa fa-chevron-right controls next'></i>
-						</h4>";
-					break;
+					echo "<h4 class='hide'>
+						<i class='fa fa-chevron-left controls previous'></i>
+						<span>".__("w", 'lang_calendar')."<span class='calendar_week'></span></span>
+						<span class='calendar_year'></span>
+						<i class='fa fa-chevron-right controls next'></i>
+					</h4>";
+				}
+
+				if('yes' == $instance['calendar_display_filter'])
+				{
+					$data = array('post_type' => 'mf_calendar');
+
+					if(count($instance['calendar_feeds']) > 0)
+					{
+						$data['include'] = $instance['calendar_feeds'];
+					}
+
+					$arr_data_feeds = array();
+					get_post_children($data, $arr_data_feeds);
+
+					echo "<form action='' method='post' class='mf_form hide'>"
+						.show_select(array('data' => $arr_data_feeds, 'name' => "calendar_feeds[]", 'xtra' => "class='multiselect'"))
+					."</form>";
 				}
 
 				echo "<ul class='hide'></ul>
@@ -636,10 +659,11 @@ class widget_calendar extends WP_Widget
 
 		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
 
-		$instance['calendar_heading'] = strip_tags($new_instance['calendar_heading']);
-		$instance['calendar_feeds'] = $new_instance['calendar_feeds'];
-		$instance['calendar_type'] = $new_instance['calendar_type'];
-		$instance['calendar_months'] = strip_tags($new_instance['calendar_months']);
+		$instance['calendar_heading'] = sanitize_text_field($new_instance['calendar_heading']);
+		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
+		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
+		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
+		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
 
 		return $instance;
 	}
@@ -661,15 +685,19 @@ class widget_calendar extends WP_Widget
 
 			if(count($arr_data_feeds) > 1)
 			{
-				echo show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
+				echo show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']))
+				.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
 			}
 
-			if(count($arr_data_types) > 1)
-			{
-				echo show_select(array('data' => $arr_data_types, 'name' => $this->get_field_name('calendar_type'), 'text' => __("Type", 'lang_calendar'), 'value' => $instance['calendar_type']));
-			}
+			echo "<div class='flex_flow'>";
 
-			echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Show", 'lang_calendar'), 'value' => $instance['calendar_months'], 'suffix' => __("months", 'lang_calendar')))
+				if(count($arr_data_types) > 1)
+				{
+					echo show_select(array('data' => $arr_data_types, 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']));
+				}
+
+				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Show", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
+			."</div>"
 		."</div>";
 	}
 }

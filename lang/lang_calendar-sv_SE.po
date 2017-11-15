@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-14 18:07+0100\n"
+"POT-Creation-Date: 2017-11-15 09:16+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,19 +16,19 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:305
+#: ../include/classes.php:306
 msgid "Lost Connection"
 msgstr "Tappade uppkopplingen"
 
-#: ../include/classes.php:308
+#: ../include/classes.php:309
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:573
+#: ../include/classes.php:574
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:583
+#: ../include/classes.php:585
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -40,35 +40,39 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:621
+#: ../include/classes.php:623
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:655
+#: ../include/classes.php:672
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:656
+#: ../include/classes.php:673
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:660
+#: ../include/classes.php:677
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:664
+#: ../include/classes.php:681
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:669
-msgid "Type"
-msgstr "Sort"
+#: ../include/classes.php:682
+msgid "Display Filter"
+msgstr "Visa filter"
 
-#: ../include/classes.php:672
+#: ../include/classes.php:689
+msgid "Design"
+msgstr "Utseende"
+
+#: ../include/classes.php:692
 msgid "Show"
 msgstr "Visa"
 
-#: ../include/classes.php:672
+#: ../include/classes.php:692
 msgid "months"
 msgstr "månader"
 
@@ -198,6 +202,9 @@ msgstr "Start"
 #: ../include/functions.php:453
 msgid "End"
 msgstr "Slut"
+
+#~ msgid "Type"
+#~ msgstr "Sort"
 
 #~ msgid "I could not find any events at the moment. Sorry!"
 #~ msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"

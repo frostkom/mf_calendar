@@ -17,7 +17,8 @@ var CalendarView = Backbone.View.extend(
 
 	events:
 	{
-		"click .section .controls.fa:not(.disabled)" : 'change_week'
+		"click .section .controls.fa:not(.disabled)" : 'change_week',
+		"change #calendar_feeds" : 'change_feeds'
 	},
 
 	on_load_calendar: function()
@@ -33,13 +34,30 @@ var CalendarView = Backbone.View.extend(
 			action_type = "type=events&time=" + Date.now();
 
 		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined'){	action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');}
-		if(typeof dom_obj.attr('data-calendar_type') != 'undefined'){	action_type += "&calendar_type=" + dom_obj.attr('data-calendar_type');}
-		if(typeof dom_obj.attr('data-calendar_months') != 'undefined'){	action_type += "&calendar_months=" + dom_obj.attr('data-calendar_months');}
-
-		if(dom_obj.children("h4").length > 0)
+		
+		if(typeof dom_obj.attr('data-calendar_display_filter') != 'undefined')
 		{
-			this.calendar_type = 'week';
+			action_type += "&calendar_display_filter=" + dom_obj.attr('data-calendar_display_filter');
+			this.calendar_display_filter = dom_obj.attr('data-calendar_display_filter');
 		}
+
+		else
+		{
+			this.calendar_display_filter = 'no';
+		}
+		
+		if(typeof dom_obj.attr('data-calendar_type') != 'undefined')
+		{
+			action_type += "&calendar_type=" + dom_obj.attr('data-calendar_type');
+			this.calendar_type = dom_obj.attr('data-calendar_type');
+		}
+
+		else
+		{
+			this.calendar_type = '';
+		}
+
+		if(typeof dom_obj.attr('data-calendar_months') != 'undefined'){	action_type += "&calendar_months=" + dom_obj.attr('data-calendar_months');}
 
 		this.loadPage(action_type);
 	},
@@ -69,8 +87,18 @@ var CalendarView = Backbone.View.extend(
 
 		this.update_current_week();
 		this.show_events();
+	},
 
-		return false;
+	change_feeds: function()
+	{
+		var dom_obj = jQuery(this.el).find("#calendar_feeds");
+
+		this.chosen_feeds = dom_obj.val() || [];
+
+		console.log('change_feeds');
+
+		/*this.update_current_week();*/
+		this.show_events();
 	},
 
 	update_current_week: function()
@@ -83,12 +111,13 @@ var CalendarView = Backbone.View.extend(
 	{
 		jQuery(this.el).find(".section .fa-spinner").addClass('hide');
 
+		this.show_filter();
 		this.show_arrows();
 
 		var response = this.model.get('response_events'),
 			amount = response.length,
 			html = "",
-			dom_obj = jQuery(this.el).find(".section ul");
+			dom_obj = jQuery(this.el).find(".section > ul");
 
 		if(amount > 0)
 		{
@@ -97,6 +126,14 @@ var CalendarView = Backbone.View.extend(
 				if(this.calendar_type == 'week')
 				{
 					if(response[i].start_year != this.display_year || response[i].start_week != this.display_week)
+					{
+						continue;
+					}
+				}
+
+				if(this.calendar_display_filter == 'yes')
+				{
+					if(this.chosen_feeds.length > 0 && jQuery(this.el).find("#calendar_feeds option[value='" + response[i].feed + "']:selected").length == 0)
 					{
 						continue;
 					}
@@ -112,6 +149,19 @@ var CalendarView = Backbone.View.extend(
 		}
 
 		dom_obj.html(html).removeClass('hide');
+	},
+
+	show_filter: function()
+	{
+		if(this.calendar_display_filter == 'yes')
+		{
+			if(typeof this.chosen_feeds == 'undefined')
+			{
+				this.chosen_feeds = jQuery(this.el).find("#calendar_feeds").val() || [];
+			}
+
+			jQuery(this.el).find(".section .mf_form").removeClass('hide');
+		}
 	},
 
 	show_arrows: function()

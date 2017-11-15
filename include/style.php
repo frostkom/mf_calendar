@@ -23,24 +23,23 @@ echo "@media all
 		.widget.calendar .section > h4
 		{
 			font-size: 1.2em;
-			margin-bottom: 1em;
 			text-align: left;
 		}
 
-			.widget.calendar .controls.fa
+			.widget.calendar .section > h4 .controls.fa
 			{
 				display: inline-block;
 				padding: .5em;
 				opacity: .5;
 			}
 
-				.widget.calendar .controls.fa.disabled
+				.widget.calendar .section > h4 .controls.fa.disabled
 				{
 					cursor: no-drop;
 					opacity: .2 !important;
 				}
 
-				.widget.calendar .controls.fa:hover
+				.widget.calendar .section > h4 .controls.fa:hover
 				{
 					opacity: .9;
 				}
@@ -51,12 +50,13 @@ echo "@media all
 				margin-left: .5em;
 			}
 
-		.widget.calendar ul
+		.widget.calendar .section > ul
 		{
 			list-style: none;
+			margin-top: .5em;
 		}
 
-			.widget.calendar li
+			.widget.calendar .section > ul li
 			{
 				display: -webkit-box;
 				display: -ms-flexbox;
@@ -65,22 +65,22 @@ echo "@media all
 				overflow: hidden;
 			}
 
-				.widget.calendar li + li
+				.widget.calendar .section > ul li + li
 				{
 					margin-top: .5em;
 				}
 
-					.widget.calendar li + li > h4
+					.widget.calendar .section > ul li + li > h4
 					{
 						margin-top: .5em;
 					}
 
-					.widget.calendar li .date
+					.widget.calendar .section > ul li .date
 					{
 						flex: 0 0 1.5em;
 					}
 
-						.widget.calendar li .date p
+						.widget.calendar .section > ul li .date p
 						{
 							background: ".$setting_calendar_date_color.";
 							border-radius: .3em;
@@ -89,29 +89,29 @@ echo "@media all
 							padding: .4em .5em;
 						}
 
-					.widget.calendar li .content
+					.widget.calendar .section > ul li .content
 					{
 						flex: 1 0 auto;
 						margin-left: 2%;
 						text-align: left;
 					}
 
-						.widget.calendar li .content > span
+						.widget.calendar .section > ul li .content > span
 						{
 							font-weight: bold;
 						}
 
-						.widget.calendar li .content p
+						.widget.calendar .section > ul li .content p
 						{
 							margin: .2em 0 0;
 						}
 
-							.widget.calendar li .content p > span
+							.widget.calendar .section > ul li .content p > span
 							{
 								display: inline-block;
 							}
 
-								.widget.calendar li .content p > span.has_more
+								.widget.calendar .section > ul li .content p > span.has_more
 								{
 									overflow: hidden;
 									text-overflow: ellipsis;
@@ -119,24 +119,24 @@ echo "@media all
 									max-width: 75%;
 								}
 
-							.widget.calendar li .content p > .fa
+							.widget.calendar .section > ul li .content p > .fa
 							{
 								margin-left: .4em;
 								-webkit-transform: translateY(-25%);
 								transform: translateY(-25%);
 							}
 
-						.widget.calendar li .content .toggler
+						.widget.calendar .section > ul li .content .toggler
 						{
 							padding: 0;
 						}
 
-						.widget.calendar li .content .toggle_container
+						.widget.calendar .section > ul li .content .toggle_container
 						{
 							margin-bottom: 1em;
 						}
 
-							.widget.calendar li .content .toggle_container p
+							.widget.calendar .section > ul li .content .toggle_container p
 							{
 								font-size: .8em;
 								margin-bottom: .5em;
