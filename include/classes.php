@@ -69,7 +69,7 @@ class mf_calendar
 
 		if($post_type == 'mf_calendar')
 		{
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND meta_key = '".$meta_prefix."calendar' AND meta_value = '%d'", $post_id));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND meta_key = '".$this->meta_prefix."calendar' AND meta_value = '%d'", $post_id));
 
 			foreach($result as $r)
 			{

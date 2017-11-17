@@ -1,6 +1,6 @@
 var CalendarView = Backbone.View.extend(
 {
-	el: jQuery('.widget.calendar'),
+	el: jQuery(".widget.calendar"),
 
 	initialize: function()
 	{
