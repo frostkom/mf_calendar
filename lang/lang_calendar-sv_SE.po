@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 09:16+0100\n"
+"POT-Creation-Date: 2017-11-19 12:24+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,19 +16,19 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:306
+#: ../include/classes.php:346
 msgid "Lost Connection"
 msgstr "Tappade uppkopplingen"
 
-#: ../include/classes.php:309
+#: ../include/classes.php:349
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:574
+#: ../include/classes.php:619
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:585
+#: ../include/classes.php:630
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -40,39 +40,39 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:623
+#: ../include/classes.php:668
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:672
+#: ../include/classes.php:719
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:673
+#: ../include/classes.php:720
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:677
+#: ../include/classes.php:724
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:681
+#: ../include/classes.php:728
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:682
+#: ../include/classes.php:729
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:689
+#: ../include/classes.php:736
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:692
+#: ../include/classes.php:739
 msgid "Show"
 msgstr "Visa"
 
-#: ../include/classes.php:692
+#: ../include/classes.php:739
 msgid "months"
 msgstr "månader"
 
@@ -203,8 +203,3 @@ msgstr "Start"
 msgid "End"
 msgstr "Slut"
 
-#~ msgid "Type"
-#~ msgstr "Sort"
-
-#~ msgid "I could not find any events at the moment. Sorry!"
-#~ msgstr "Jag kunde inte hitta några händelser just nu. Förlåt!"

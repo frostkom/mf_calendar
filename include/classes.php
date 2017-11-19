@@ -192,17 +192,17 @@ class mf_calendar
 					break;
 				}
 
-				$more_date = "";
+				$date_end = "";
 
 				if($post_start_date == $post_end_date)
 				{
 					if($post_start_time > "00:00")
 					{
-						$more_date .= $post_start_time;
+						$date_end .= $post_start_time;
 
 						if($post_end_time > "00:00" && $post_end_time != $post_start_time)
 						{
-							$more_date .= "&nbsp;-&nbsp;".$post_end_time;
+							$date_end .= "&nbsp;-&nbsp;".$post_end_time;
 						}
 					}
 				}
@@ -216,22 +216,22 @@ class mf_calendar
 
 					if($post_start_date != $post_end_date)
 					{
-						$more_date .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+						$date_end .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
 					}
 				}
 
-				$more_class = $more_rel = $more_icon = $more_content = "";
+				$content_class = $more_rel = $more_icon = $more_content = "";
 
 				if($post_content != '' || $post_location != '')
 				{
-					$more_class = 'toggler';
+					$content_class = 'toggler';
 					$more_icon = "<i class='fa fa-caret-right'></i>";
 
 					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>";
 
 						if($post_content != '')
 						{
-							$more_content .= "<p>".$post_content."</p>";
+							$more_content .= "<p itemprop='description'>".$post_content."</p>";
 						}
 
 						if($post_location != '')
@@ -245,6 +245,36 @@ class mf_calendar
 							{
 								$more_content .= $this->get_map_link($post_location);
 							}
+
+							$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
+								<meta itemprop='address' content='".$post_location."'>
+							</div>";
+
+							/* Marknadsgatan 22 || Turning Torso, Lilla Varvsgatan 14, 211 15 Malmö, Sweden */
+							/*$location_name = $location_address = $location_locality = $location_region = $location_zip = '';
+
+							foreach(explode(",", $post_location) as $location_temp)
+							{
+								if(preg_match("/(\d\s){5-6}/", $location_temp))
+								{
+									list($location_zip, $location_locality) = explode(" ", $location_temp);
+								}
+
+								else
+								{
+									
+								}
+							}
+
+							$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
+								<span itemprop='name'>".$location_name."</span>
+								<div itemprop='address' itemscope itemtype='//schema.org/PostalAddress'>
+									<span itemprop='streetAddress'>".$location_address."</span><br>
+									<span itemprop='addressLocality'>".$location_locality."</span>,
+									<span itemprop='addressRegion'>".$location_region."</span>
+									<span itemprop='postalCode'>".$location_zip."</span>
+								</div>
+							</div>";*/
 						}
 
 					$more_content .= "</div>";
@@ -255,6 +285,7 @@ class mf_calendar
 
 					//display_filter == yes
 					'feed' => $post_feed,
+					'feed_name' => ('yes' == $data['calendar_display_filter'] ? get_post_title($post_feed) : ''),
 
 					'heading' => $heading,
 
@@ -266,8 +297,8 @@ class mf_calendar
 					//'end' => $post_end,
 					//'uid' => $post_uid,
 
-					'more_date' => $more_date,
-					'more_class' => $more_class,
+					'date_end' => $date_end,
+					'content_class' => ($content_class != '' ? " ".$content_class : ''),
 					'more_icon' => $more_icon,
 					'more_content' => $more_content,
 
@@ -285,6 +316,10 @@ class mf_calendar
 
 					//'end_date' => $post_end_date,
 					//'end_time' => $post_end_time,
+
+					//microformats
+					'start_date_c' => date("c", strtotime($post_start_date." ".$post_start_time)),
+					'end_date_c' => date("c", strtotime($post_end_date." ".$post_end_time)),
 				);
 
 				$year_temp = $post_start_year;
@@ -319,13 +354,12 @@ class mf_calendar
 			{ %>
 				<li><h4><%= heading %></h4></li>
 			<% } %>
-			<li>
-				<div class='date'><p><%= start_day %></p></div>
-				<div class='content <%= more_class %>' rel='<%= id %>'>
-
-					<% if(more_date != '')
+			<li itemscope itemtype='//schema.org/Event'>
+				<div class='date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
+				<div class='content<%= content_class %>' rel='<%= id %>'>
+					<% if(feed_name != '')
 					{ %>
-						<span><%= more_date %></span>
+						<span><%= feed_name %></span>
 					<% } %>
 
 					<p>
@@ -334,9 +368,15 @@ class mf_calendar
 							{ %>
 								 class='has_more'
 							<% } %>
-						><%= title %></span>
+						 itemprop='name'><%= title %></span>
 						<%= more_icon %>
 					</p>
+					
+					<% if(date_end != '')
+					{ %>
+						<span itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span>
+					<% } %>
+
 					<%= more_content %>
 				</div>
 			</li>
