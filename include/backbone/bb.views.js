@@ -170,35 +170,38 @@ var CalendarView = Backbone.View.extend(
 		{
 			var response = this.model.get('response_data');
 
-			if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
+			if(typeof response != 'undefined')
 			{
-				this.display_week = parseInt(response.week_start);
-				this.display_year = parseInt(response.year_start);
+				if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
+				{
+					this.display_week = parseInt(response.week_start);
+					this.display_year = parseInt(response.year_start);
 
-				this.update_current_week();
+					this.update_current_week();
+				}
+
+				if(response.week_start < this.display_week || response.year_start < this.display_year)
+				{
+					jQuery(this.el).find(".previous").removeClass('disabled');
+				}
+
+				else
+				{
+					jQuery(this.el).find(".previous").addClass('disabled');
+				}
+
+				if(response.week_end > this.display_week || response.year_end > this.display_year)
+				{
+					jQuery(this.el).find(".next").removeClass('disabled');
+				}
+
+				else
+				{
+					jQuery(this.el).find(".next").addClass('disabled');
+				}
+
+				jQuery(this.el).find(".section > h4").removeClass('hide');
 			}
-
-			if(response.week_start < this.display_week || response.year_start < this.display_year)
-			{
-				jQuery(this.el).find(".previous").removeClass('disabled');
-			}
-
-			else
-			{
-				jQuery(this.el).find(".previous").addClass('disabled');
-			}
-
-			if(response.week_end > this.display_week || response.year_end > this.display_year)
-			{
-				jQuery(this.el).find(".next").removeClass('disabled');
-			}
-
-			else
-			{
-				jQuery(this.el).find(".next").addClass('disabled');
-			}
-
-			jQuery(this.el).find(".section > h4").removeClass('hide');
 		}
 	}
 });

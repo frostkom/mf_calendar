@@ -12,7 +12,9 @@ else
 	require_once($wp_root.'/wp-config.php');
 }
 
-$json_output = "";
+$json_output = array(
+	'success' => false,
+);
 
 $type = check_var('type', 'char');
 $calendar_feeds = check_var('calendar_feeds', 'char');
@@ -33,9 +35,15 @@ if($type == 'events')
 	if(count($obj_calendar->arr_events) > 0)
 	{
 		$json_output['response_data'] = $obj_calendar->arr_data;
-		$json_output['response_events'] = $obj_calendar->arr_events;
-		$json_output['success'] = true;
 	}
+
+	$json_output['response_events'] = $obj_calendar->arr_events;
+	$json_output['success'] = true;
+}
+
+else
+{
+	$json_output['message'] = sprintf(__("I have never seen the type '%s' before", 'lang_calendar'), $type);
 }
 
 echo json_encode($json_output);

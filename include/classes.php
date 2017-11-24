@@ -339,7 +339,6 @@ class mf_calendar
 		mf_enqueue_script('underscore');
 		mf_enqueue_script('backbone');
 		mf_enqueue_script('script_base_plugins', plugins_url()."/mf_base/include/backbone/bb.plugins.js", $plugin_version);
-		//mf_enqueue_script('script_calendar_router', $plugin_include_url."backbone/bb.router.js", $plugin_version);
 		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
 		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", $plugin_version);
 
