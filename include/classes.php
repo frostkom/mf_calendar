@@ -585,8 +585,6 @@ class mf_calendar
 
 			foreach($result as $r)
 			{
-				//do_log("The event (".$r->post_content." | ".$r->post_content.") should be deleted from gCal");
-
 				wp_trash_post($r->ID);
 			}
 		}
@@ -724,8 +722,15 @@ class widget_calendar extends WP_Widget
 
 			if(count($arr_data_feeds) > 1)
 			{
-				echo show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']))
-				.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
+				echo "<div class='flex_flow'>"
+					.show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
+
+					if(count($instance['calendar_feeds']) != 1)
+					{
+						echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
+					}
+
+				echo "</div>";
 			}
 
 			echo "<div class='flex_flow'>";
@@ -735,7 +740,7 @@ class widget_calendar extends WP_Widget
 					echo show_select(array('data' => $arr_data_types, 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']));
 				}
 
-				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Show", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
+				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Display", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
 			."</div>"
 		."</div>";
 	}

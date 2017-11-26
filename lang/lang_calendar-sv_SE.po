@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-19 12:24+0100\n"
+"POT-Creation-Date: 2017-11-25 10:40+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,19 +16,24 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:346
+#: ../include/ajax.php:46
+#, php-format
+msgid "I have never seen the type '%s' before"
+msgstr "Jag har aldrig sett typen '%s' förut"
+
+#: ../include/classes.php:345
 msgid "Lost Connection"
 msgstr "Tappade uppkopplingen"
 
-#: ../include/classes.php:349
+#: ../include/classes.php:348
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:619
+#: ../include/classes.php:618
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:630
+#: ../include/classes.php:629
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -40,19 +45,19 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:668
+#: ../include/classes.php:667
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:719
+#: ../include/classes.php:718
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:720
+#: ../include/classes.php:719
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:724
+#: ../include/classes.php:723
 msgid "Heading"
 msgstr "Rubrik"
 
@@ -60,19 +65,19 @@ msgstr "Rubrik"
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:729
+#: ../include/classes.php:737
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:736
+#: ../include/classes.php:747
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:739
-msgid "Show"
+#: ../include/classes.php:750
+msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:739
+#: ../include/classes.php:750
 msgid "months"
 msgstr "månader"
 
@@ -203,3 +208,5 @@ msgstr "Start"
 msgid "End"
 msgstr "Slut"
 
+#~ msgid "Show"
+#~ msgstr "Visa"
