@@ -333,14 +333,16 @@ class mf_calendar
 
 	function get_footer()
 	{
+		$plugin_base_include_url = plugins_url();
 		$plugin_include_url = plugin_dir_url(__FILE__);
 		$plugin_version = get_plugin_version(__FILE__);
 
 		mf_enqueue_script('underscore');
 		mf_enqueue_script('backbone');
-		mf_enqueue_script('script_base_plugins', plugins_url()."/mf_base/include/backbone/bb.plugins.js", $plugin_version);
+		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."/mf_base/include/backbone/bb.plugins.js", $plugin_version);
 		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
 		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", $plugin_version);
+		mf_enqueue_script('script_base_bb_init', $plugin_base_include_url."/mf_base/include/backbone/bb.init.js", $plugin_version);
 
 		echo "<div id='overlay_lost_connection'><span>".__("Lost Connection", 'lang_calendar')."</span></div>
 

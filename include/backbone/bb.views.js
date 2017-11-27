@@ -207,8 +207,3 @@ var CalendarView = Backbone.View.extend(
 });
 
 var myCalendarView = new CalendarView({model: new CalendarModel()});
-
-if(typeof Backbone.history == 'undefined')
-{
-	Backbone.history.start();
-}
