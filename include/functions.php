@@ -119,7 +119,7 @@ function setting_google_calendar_api_key_callback()
 	$setting_key = get_setting_key(__FUNCTION__);
 	$option = get_option($setting_key);
 
-	$description = "1. ".sprintf(__("Go to %s and log in", 'lang_social_feed'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1' rel='external'>Google Developer Console</a>")."<br>"
+	$description = "1. ".sprintf(__("Go to %s and log in", 'lang_social_feed'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."<br>"
 	."2. ".__("Create a new project", 'lang_social_feed')."<br>"
 	."3. ".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_social_feed'), "Google Calendar API", "Web server", "Application data", "No");
 
@@ -172,7 +172,7 @@ function column_cell_calendar($col, $id)
 
 			$obj_calendar = new mf_calendar($id);
 
-			echo "<a href='".$obj_calendar->get_calendar_url()."' rel='external'>".$post_meta."</a>";
+			echo "<a href='".$obj_calendar->get_calendar_url()."'>".$post_meta."</a>";
 		break;
 
 		case 'amount_of_posts':
@@ -369,7 +369,7 @@ function column_cell_event($col, $id)
 function meta_calendar_info()
 {
 	$out = "<ol>
-		<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com' rel='external'>", "</a>")."</li>
+		<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
 		<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
 		<li>".__("Click the Calendars tab", 'lang_calendar')."</li>
 		<li>".__("Choose which calendar to share if there are multiple and click Edit settings to the right in the table", 'lang_calendar')."</li>

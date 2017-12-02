@@ -285,7 +285,7 @@ class mf_calendar
 
 					//display_filter == yes
 					'feed' => $post_feed,
-					'feed_name' => ('yes' == $data['calendar_display_filter'] ? get_post_title($post_feed) : ''),
+					'feed_name' => ($data['calendar_display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
 
 					'heading' => $heading,
 
@@ -604,7 +604,7 @@ class mf_calendar
 	{
 		if($location != '')
 		{
-			return "&nbsp;<a href='//google.com/maps?q=".$location."' rel='external'><i class='fa fa-globe fa-lg green'></i></a>";
+			return "&nbsp;<a href='//google.com/maps?q=".$location."'><i class='fa fa-globe fa-lg green'></i></a>";
 		}
 	}
 }
@@ -660,7 +660,7 @@ class widget_calendar extends WP_Widget
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
-				if('week' == $instance['calendar_type'])
+				if($instance['calendar_type'] == 'week')
 				{
 					echo "<h4 class='hide'>
 						<i class='fa fa-chevron-left controls previous'></i>
@@ -670,7 +670,7 @@ class widget_calendar extends WP_Widget
 					</h4>";
 				}
 
-				if('yes' == $instance['calendar_display_filter'])
+				if($instance['calendar_display_filter'] == 'yes')
 				{
 					$data = array('post_type' => 'mf_calendar');
 
