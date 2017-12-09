@@ -259,11 +259,6 @@ class mf_calendar
 								{
 									list($location_zip, $location_locality) = explode(" ", $location_temp);
 								}
-
-								else
-								{
-									
-								}
 							}
 
 							$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
@@ -372,7 +367,7 @@ class mf_calendar
 						 itemprop='name'><%= title %></span>
 						<%= more_icon %>
 					</p>
-					
+
 					<% if(date_end != '')
 					{ %>
 						<span itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span>
@@ -482,7 +477,7 @@ class mf_calendar
 
 			if(count($json['items']) == 250)
 			{
-				do_log("The Calendar API returned the maximum number of items (".$calendar_url.")");
+				error_log("The Calendar API returned the maximum number of items (".$calendar_url.")");
 			}
 		}
 	}

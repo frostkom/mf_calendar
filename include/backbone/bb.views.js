@@ -34,7 +34,7 @@ var CalendarView = Backbone.View.extend(
 			action_type = "type=events&time=" + Date.now();
 
 		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined'){	action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');}
-		
+
 		if(typeof dom_obj.attr('data-calendar_display_filter') != 'undefined')
 		{
 			action_type += "&calendar_display_filter=" + dom_obj.attr('data-calendar_display_filter');
@@ -45,7 +45,7 @@ var CalendarView = Backbone.View.extend(
 		{
 			this.calendar_display_filter = 'no';
 		}
-		
+
 		if(typeof dom_obj.attr('data-calendar_type') != 'undefined')
 		{
 			action_type += "&calendar_type=" + dom_obj.attr('data-calendar_type');
