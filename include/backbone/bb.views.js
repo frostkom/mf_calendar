@@ -31,7 +31,7 @@ var CalendarView = Backbone.View.extend(
 	loadEvents: function()
 	{
 		var dom_obj = jQuery(this.el).find(".section"),
-			action_type = "type=events&time=" + Date.now();
+			action_type = "type=events"; /*&time=" + Date.now()*/
 
 		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined'){	action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');}
 
