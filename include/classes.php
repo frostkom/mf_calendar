@@ -340,7 +340,7 @@ class mf_calendar
 		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
 
 		$obj_base = new mf_base();
-		$out = $obj_base->get_templates(array('lost_connection'))
+		$out = $obj_base->get_templates(array('lost_connection'));
 
 		echo "<script type='text/template' id='template_calendar_message'>
 			<li>".__("There are no events to display", 'lang_calendar')."</li>
