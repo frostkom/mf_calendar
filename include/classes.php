@@ -480,8 +480,13 @@ class mf_calendar
 
 			if(count($json['items']) == 250)
 			{
-				error_log("The Calendar API returned the maximum number of items (".$calendar_url.")");
+				error_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$calendar_url.")");
 			}
+		}
+
+		else
+		{
+			error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".htmlspecialchars($content).")");
 		}
 	}
 

@@ -100,7 +100,7 @@ function settings_calendar()
 	add_settings_section($options_area, "", $options_area."_callback", BASE_OPTIONS_PAGE);
 
 	$arr_settings = array();
-	$arr_settings['setting_google_calendar_api_key'] = __("Google Calendar API key", 'lang_calendar');
+	$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
 	$arr_settings['setting_calendar_date_color'] = __("Date Color", 'lang_calendar');
 	$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
 
@@ -170,27 +170,58 @@ function column_cell_calendar($col, $id)
 		case 'calendar_id':
 			$post_meta = get_post_meta($id, $meta_prefix.$col, true);
 
-			$obj_calendar = new mf_calendar($id);
+			if($post_meta != '')
+			{
+				$obj_calendar = new mf_calendar($id);
 
-			echo "<a href='".$obj_calendar->get_calendar_url()."'>".$post_meta."</a>";
+				$fetch_link = "";
+
+				if(IS_SUPER_ADMIN)
+				{
+					$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar' AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id));
+
+					if($wpdb->num_rows > 0)
+					{
+						$intCalendarID = check_var('intCalendarID');
+
+						if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce'], 'calendar_fetch_'.$id))
+						{
+							$obj_calendar->set_id($id);
+							$obj_calendar->fetch_source();
+						}
+
+						else
+						{
+							$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=mf_calendar&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id)."'>".__("Fetch", 'lang_calendar')."</a> | ";
+						}
+					}
+				}
+
+				$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
+
+				echo "<a href='".$obj_calendar->get_calendar_url()."'>".$post_meta."</a>
+				<div class='row-actions'>"
+					.$fetch_link
+					.__("Fetched", 'lang_calendar').": ".format_date($post_modified)
+				."</div>";
+			}
 		break;
 
 		case 'amount_of_posts':
 			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d'", $id));
-
 			$amount = $wpdb->num_rows;
 
 			if($amount > 0)
 			{
-				$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
+				$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
 
-				echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilter=".$id)."'>".$amount."</a>
-				<div class='row-actions'>"
-					.format_date($post_modified)
+				echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilter=".$id)."'>".$amount."</a>"
+				."<div class='row-actions'>"
+					.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 				."</div>";
 			}
 
-			else
+			/*else
 			{
 				$result = $wpdb->get_results($wpdb->prepare("SELECT post_date, post_modified FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND ID = '%d' LIMIT 0, 1", $id));
 
@@ -202,7 +233,7 @@ function column_cell_calendar($col, $id)
 					if($post_modified > $post_date)
 					{
 						echo "<i class='fa fa-close red fa-2x'></i>
-						<div class='row-actions'>".__("I got an error when accessing the calendar", 'lang_calendar')."</div>";
+						<div class='row-actions'>".__("I have fetched from the source but there were no events", 'lang_calendar')."</div>";
 					}
 
 					else
@@ -221,7 +252,7 @@ function column_cell_calendar($col, $id)
 						}
 					}
 				}
-			}
+			}*/
 		break;
 	}
 }
