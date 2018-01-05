@@ -225,7 +225,9 @@ class mf_calendar
 				if($post_content != '' || $post_location != '')
 				{
 					$content_class = 'toggler';
-					$more_icon = "<i class='fa fa-caret-right'></i>";
+					//$more_icon = "<i class='fa fa-caret-right'></i>";
+					$more_icon = "<i class='fa fa-lg fa-caret-right toggle_icon_closed'></i>
+					<i class='fa fa-lg fa-caret-down toggle_icon_open'></i>";
 
 					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>";
 

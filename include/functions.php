@@ -371,9 +371,9 @@ function meta_calendar_info()
 	$out = "<ol>
 		<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
 		<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
-		<li>".__("Click the Calendars tab", 'lang_calendar')."</li>
-		<li>".__("Choose which calendar to share if there are multiple and click Edit settings to the right in the table", 'lang_calendar')."</li>
-		<li>".__("Make the calendar public and enter the calendar e-mail in the field above", 'lang_calendar')."</li>
+		<li>".__("Click on My Calendar Settings", 'lang_calendar')."</li>
+		<li>".__("Choose which calendar to share if there are multiple", 'lang_calendar')."</li>
+		<li>".__("Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category", 'lang_calendar')."</li>
 	</ol>";
 
 	return $out;
@@ -393,7 +393,7 @@ function meta_boxes_calendar($meta_boxes)
 		'priority' => 'low',
 		'fields' => array(
 			array(
-				'name' => __("Calendar ID", 'lang_calendar')." (".__("Google", 'lang_calendar').")",
+				'name' => __("Calendar ID", 'lang_calendar'),
 				'id' => $meta_prefix.'calendar_id',
 				'type' => 'text',
 			),

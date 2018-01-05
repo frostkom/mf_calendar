@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-26 11:48+0100\n"
+"POT-Creation-Date: 2018-01-05 08:18+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,15 +16,15 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:346
+#: ../include/classes.php:348
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:614
+#: ../include/classes.php:616
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:625
+#: ../include/classes.php:627
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -36,39 +36,39 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:663
+#: ../include/classes.php:665
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:714
+#: ../include/classes.php:716
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:715
+#: ../include/classes.php:717
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:719
+#: ../include/classes.php:721
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:724
+#: ../include/classes.php:726
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:728
+#: ../include/classes.php:730
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:738
+#: ../include/classes.php:740
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:741
+#: ../include/classes.php:743
 msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:741
+#: ../include/classes.php:743
 msgid "months"
 msgstr "månader"
 
@@ -167,16 +167,16 @@ msgid "Click on Settings (The grey gear icon to the right)"
 msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
 
 #: ../include/functions.php:374
-msgid "Click the Calendars tab"
-msgstr "Klicka på tabben Kalendrar"
+msgid "Click on My Calendar Settings"
+msgstr "Klicka på Mina kalenderinställningar"
 
 #: ../include/functions.php:375
-msgid "Choose which calendar to share if there are multiple and click Edit settings to the right in the table"
-msgstr "Välj vilken kalender att dela om det finns flera och klicka på Redigera inställningar till höger i tabellen"
+msgid "Choose which calendar to share if there are multiple"
+msgstr "Välj vilken kalender att dela om det finns flera"
 
 #: ../include/functions.php:376
-msgid "Make the calendar public and enter the calendar e-mail in the field above"
-msgstr "Gör kalendern offentlig och fyll i kalenderns e-post i fältet ovan"
+msgid "Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category"
+msgstr "Gör kalendern tillgänglig för alla i Behörighetskategorin och kopiera e-posten som visas i Integreringskategorin"
 
 #: ../include/functions.php:390
 #: ../include/functions.php:430
@@ -186,10 +186,6 @@ msgstr "Inställningar"
 #: ../include/functions.php:396
 msgid "Calendar ID"
 msgstr "Kalender-ID"
-
-#: ../include/functions.php:396
-msgid "Google"
-msgstr ""
 
 #: ../include/functions.php:448
 msgid "Start"
