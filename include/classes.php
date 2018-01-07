@@ -627,6 +627,7 @@ class widget_calendar extends WP_Widget
 			'calendar_display_filter' => 'no',
 			'calendar_type' => '',
 			'calendar_months' => 6,
+			'calendar_page' => 0,
 		);
 
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops);
@@ -690,8 +691,16 @@ class widget_calendar extends WP_Widget
 					."</form>";
 				}
 
-				echo "<ul class='hide'></ul>
-			</div>"
+				echo "<ul class='hide'></ul>";
+
+				if($instance['calendar_page'] > 0)
+				{
+					echo "<a href='".get_permalink($instance['calendar_page'])."'>"
+						.__("Read More", 'lang_calendar')
+					."</a>";
+				}
+
+			echo "</div>"
 		.$after_widget;
 	}
 
@@ -706,6 +715,7 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
 		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
 		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
+		$instance['calendar_page'] = sanitize_text_field($new_instance['calendar_page']);
 
 		return $instance;
 	}
@@ -721,6 +731,9 @@ class widget_calendar extends WP_Widget
 			'' => __("Normal", 'lang_calendar'),
 			'week' => __("Weekly", 'lang_calendar'),
 		);
+
+		$arr_data_pages = array();
+		get_post_children(array('add_choose_here' => true), $arr_data_pages);
 
 		echo "<div class='mf_form'>"
 			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading']));
@@ -747,6 +760,7 @@ class widget_calendar extends WP_Widget
 
 				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Display", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
 			."</div>"
+			.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']))
 		."</div>";
 	}
 }

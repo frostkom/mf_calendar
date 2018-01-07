@@ -180,9 +180,12 @@ var CalendarView = Backbone.View.extend(
 					this.update_current_week();
 				}
 
+				var week_disabled = true;
+
 				if(response.week_start < this.display_week || response.year_start < this.display_year)
 				{
 					jQuery(this.el).find(".previous").removeClass('disabled');
+					week_disabled = false;
 				}
 
 				else
@@ -193,6 +196,7 @@ var CalendarView = Backbone.View.extend(
 				if(response.week_end > this.display_week || response.year_end > this.display_year)
 				{
 					jQuery(this.el).find(".next").removeClass('disabled');
+					week_disabled = false;
 				}
 
 				else
@@ -200,7 +204,10 @@ var CalendarView = Backbone.View.extend(
 					jQuery(this.el).find(".next").addClass('disabled');
 				}
 
-				jQuery(this.el).find(".section > h4").removeClass('hide');
+				if(week_disabled == false)
+				{
+					jQuery(this.el).find(".section > h4").removeClass('hide');
+				}
 			}
 		}
 	}
