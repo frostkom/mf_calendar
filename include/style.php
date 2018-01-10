@@ -27,7 +27,7 @@ echo "@media all
 			.widget.calendar .section > h4 .controls.fa
 			{
 				display: inline-block;
-				padding: .5em;
+				padding: 0 .5em .5em;
 				opacity: .5;
 			}
 
