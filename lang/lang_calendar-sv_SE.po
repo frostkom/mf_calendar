@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-07 08:33+0100\n"
+"POT-Creation-Date: 2018-01-11 10:54+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -24,15 +24,15 @@ msgstr "Det finns inga händelser att visa"
 msgid "The Calendar API returned the maximum number of events"
 msgstr "Kalender-APIet svarade med maxantalet av händelser"
 
-#: ../include/classes.php:489
+#: ../include/classes.php:493
 msgid "Something went wrong when fetching the calendar source"
 msgstr "Något gick fel vid hämtning av kalenderkällan"
 
-#: ../include/classes.php:621
+#: ../include/classes.php:626
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:633
+#: ../include/classes.php:639
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -44,44 +44,52 @@ msgstr "Visa kalender"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:671
+#: ../include/classes.php:677
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:699
-#: ../include/classes.php:763
+#: ../include/classes.php:710
+#: ../include/classes.php:783
 msgid "Read More"
 msgstr "Läs mer"
 
-#: ../include/classes.php:731
+#: ../include/classes.php:743
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:732
+#: ../include/classes.php:744
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:739
+#: ../include/classes.php:751
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:744
+#: ../include/classes.php:756
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:748
+#: ../include/classes.php:761
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:758
+#: ../include/classes.php:765
+msgid "Label"
+msgstr "Etikett"
+
+#: ../include/classes.php:765
+msgid "Choose here"
+msgstr "Välj här"
+
+#: ../include/classes.php:778
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:761
+#: ../include/classes.php:781
 msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:761
+#: ../include/classes.php:781
 msgid "months"
 msgstr "månader"
 

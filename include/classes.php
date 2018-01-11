@@ -630,6 +630,7 @@ class widget_calendar extends WP_Widget
 			'calendar_heading' => "",
 			'calendar_feeds' => array(),
 			'calendar_display_filter' => 'no',
+			'calendar_filter_label' => "",
 			'calendar_type' => '',
 			'calendar_months' => 6,
 			'calendar_page' => 0,
@@ -692,7 +693,7 @@ class widget_calendar extends WP_Widget
 					get_post_children($data, $arr_data_feeds);
 
 					echo "<form action='' method='post' class='mf_form hide'>"
-						.show_select(array('data' => $arr_data_feeds, 'name' => "calendar_feeds[]", 'xtra' => "class='multiselect'"))
+						.show_select(array('data' => $arr_data_feeds, 'name' => "calendar_feeds[]", 'xtra' => "class='multiselect'".($instance['calendar_filter_label'] != '' ? " data-choose-here='".$instance['calendar_filter_label']."'" : "")))
 					."</form>";
 				}
 
@@ -718,6 +719,7 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_heading'] = sanitize_text_field($new_instance['calendar_heading']);
 		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
 		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
+		$instance['calendar_filter_label'] = sanitize_text_field($new_instance['calendar_filter_label']);
 		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
 		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
 		$instance['calendar_page'] = sanitize_text_field($new_instance['calendar_page']);
@@ -750,7 +752,15 @@ class widget_calendar extends WP_Widget
 
 					if(count($instance['calendar_feeds']) != 1)
 					{
-						echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
+						echo "<div>"
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
+
+							if($instance['calendar_display_filter'] == 'yes' && is_plugin_active('mf_multiselect/index.php'))
+							{
+								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose here", 'lang_calendar')));
+							}
+
+						echo "</div>";
 					}
 
 				echo "</div>";
