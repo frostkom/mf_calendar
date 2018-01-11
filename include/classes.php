@@ -488,7 +488,10 @@ class mf_calendar
 		{
 			$content = trim(preg_replace('/\s\s+/', ' ', $content));
 
-			error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".htmlspecialchars($content).")");
+			if($content != '' && !preg_match("/Not Found/i", $content))
+			{
+				error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".htmlspecialchars($content).")");
+			}
 		}
 	}
 
