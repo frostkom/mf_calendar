@@ -144,7 +144,7 @@ class mf_calendar
 				$post_start_year = date("Y", strtotime($post_start));
 				$post_start_yearmonth = date("Y-m", strtotime($post_start));
 				$post_start_month = date("m", strtotime($post_start));
-				$post_start_day = date("d", strtotime($post_start));
+				$post_start_day = date("j", strtotime($post_start));
 				$post_start_time = date("H:i", strtotime($post_start));
 
 				$post_end_date = date("Y-m-d", strtotime($post_end));
@@ -278,45 +278,29 @@ class mf_calendar
 				}
 
 				$this->arr_events[] = array(
-					//'type' => $data['calendar_type'],
-
-					//display_filter == yes
-					'feed' => $post_feed,
-					'feed_name' => ($data['calendar_display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
-
 					'heading' => $heading,
-
 					'id' => $post_id,
 					'title' => $post_title,
-					//'content' => $post_content,
-					//'location' => $post_location,
-					//'start' => $post_start,
-					//'end' => $post_end,
-					//'uid' => $post_uid,
 
 					'date_end' => $date_end,
 					'content_class' => ($content_class != '' ? " ".$content_class : ''),
 					'more_icon' => $more_icon,
 					'more_content' => $more_content,
 
+					//display_filter == yes
+					'feed' => $post_feed,
+					'feed_name' => ($data['calendar_display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
+
 					//type == week
 					'start_week' => $post_start_week,
-					//'start_weekday' => $post_start_weekday,
 
 					//default
-					//'start_date' => $post_start_date,
 					'start_year' => $post_start_year,
-					//'start_yearmonth' => $post_start_yearmonth,
-					//'start_month' => $post_start_month,
 					'start_day' => $post_start_day,
-					//'start_time' => $post_start_time,
-
-					//'end_date' => $post_end_date,
-					//'end_time' => $post_end_time,
 
 					//microformats
-					'start_date_c' => date("c", strtotime($post_start_date." ".$post_start_time)),
-					'end_date_c' => date("c", strtotime($post_end_date." ".$post_end_time)),
+					'start_date_c' => date("c", strtotime($post_start)),
+					'end_date_c' => date("c", strtotime($post_end)),
 				);
 
 				$year_temp = $post_start_year;
@@ -490,7 +474,7 @@ class mf_calendar
 
 			if($content != '' && !preg_match("/Not Found/i", $content))
 			{
-				error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".htmlspecialchars($content).")");
+				error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".$calendar_url.", ".htmlspecialchars($content).")");
 			}
 		}
 	}

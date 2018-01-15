@@ -85,6 +85,8 @@ echo "@media all
 							color: #fff;
 							font-size: 1.5em;
 							padding: .4em .5em;
+							text-align: center;
+							min-width: 2.12em;
 						}
 
 					.widget.calendar .section > ul li .content
