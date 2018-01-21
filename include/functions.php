@@ -103,6 +103,7 @@ function settings_calendar()
 	$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
 	$arr_settings['setting_calendar_date_color'] = __("Date Color", 'lang_calendar');
 	$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
+	$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
 
 	show_settings_fields(array('area' => $options_area, 'settings' => $arr_settings));
 }
@@ -142,6 +143,14 @@ function setting_calendar_time_limit_callback()
 	$description = __("Minutes between each API request", 'lang_calendar');
 
 	echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => $description));
+}
+
+function setting_calendar_debug_callback()
+{
+	$setting_key = get_setting_key(__FUNCTION__);
+	$option = get_option($setting_key, 'no');
+
+	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
 }
 
 function widgets_calendar()

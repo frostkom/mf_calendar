@@ -409,6 +409,8 @@ class mf_calendar
 
 	function fetch_google_calendar()
 	{
+		$setting_calendar_debug = get_option('setting_calendar_debug');
+
 		$calendar_url = $this->get_calendar_url();
 
 		$content = get_url_content($calendar_url);
@@ -418,9 +420,47 @@ class mf_calendar
 		{
 			foreach($json['items'] as $item)
 			{
-				/*array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-02-20T12:10:49.000Z', 'updated' => '2017-02-20T12:11:06.582Z', 'summary' => '[title]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'dateTime' => '2017-03-14T18:00:00+01:00', ), 'end' => array ( 'dateTime' => '2017-03-14T19:00:00+01:00', ), 'iCalUID' => '[uid]', 'sequence' => 0, )
+				if($setting_calendar_debug == 'yes')
+				{
+					do_log("Calendar Event: ".var_export($item, true));
+				}
 
-				array ( 'kind' => 'calendar#event', 'etag' => '[etag]', 'id' => '[id]', 'status' => 'confirmed', 'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]', 'created' => '2017-03-03T09:03:03.000Z', 'updated' => '2017-03-03T09:05:30.290Z', 'summary' => '[title]', 'description' => '[deascription]', 'location' => '[location]', 'creator' => array ( 'email' => '[email]', 'self' => true, ), 'organizer' => array ( 'email' => '[email]', 'self' => true, ), 'start' => array ( 'date' => '2017-04-22', ), 'end' => array ( 'date' => '2017-04-23', ), 'transparency' => 'transparent', 'iCalUID' => '[uid]', 'sequence' => 0, ) */
+				/*array(
+					'kind' => 'calendar#event',
+					'etag' => '[etag]',
+					'id' => '[id]',
+					'status' => 'confirmed',
+					'htmlLink' => 'https://www.google.com/calendar/event?eid=[eid]',
+					'created' => '[datetime]',
+					'updated' => '[datetime]',
+					'summary' => '[title]',
+					'description' => '[description]',
+					'location' => '[location]',
+					'creator' => array(
+						'email' => '[email]',
+						'self' => true
+					),
+					'organizer' => array(
+						'email' => '[email]',
+						'self' => true
+					),
+					'start' => array(
+						'dateTime' => '[datetime]',
+						'timeZone' => 'Europe/Stockholm'
+					),
+					'end' => array(
+						'dateTime' => '[datetime]',
+						'timeZone' => 'Europe/Stockholm'
+					),
+					'recurringEventId' => '[id]',
+					'recurrence' => array
+					(
+						0 => 'RRULE:FREQ=MONTHLY;COUNT=12'
+					),
+					'transparency' => 'transparent',
+					'iCalUID' => '[id]@google.com',
+					'sequence' => 0
+				)*/
 
 				$item_id = $item['id'];
 				$item_link = $item['htmlLink'];
@@ -458,8 +498,82 @@ class mf_calendar
 					'location' => $item_location,
 					'start' => $item_start,
 					'end' => $item_end,
+					'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
 					'created' => $item_created,
 				);
+
+				if(isset($item['recurrence']))
+				{
+					foreach($item['recurrence'] as $recurrence)
+					{
+						list($type, $value) = explode(":", $recurrence);
+
+						if($type == 'RRULE')
+						{
+							list($frequence, $count) = explode(";", $value);
+
+							list($frequence_type, $frequence_value) = explode("=", $frequence);
+							list($count_type, $count_value) = explode("=", $count);
+
+							if($frequence_type == 'FREQ' && $count_type == 'COUNT')
+							{
+								switch($frequence_value)
+								{
+									case 'YEARLY':
+										$frequence_type_time = 'year';
+									break;
+
+									case 'MONTHLY':
+										$frequence_type_time = 'month';
+									break;
+
+									case 'WEEKLY':
+										$frequence_type_time = 'week';
+									break;
+
+									case 'DAILY':
+										$frequence_type_time = 'day';
+									break;
+
+									default:
+										$frequence_type_time = '';
+
+										do_log("Calendar Frequence Unknown: ".$frequence_value);
+									break;
+								}
+
+								if($frequence_type_time != '')
+								{
+									for($i = 1; $i < $count_value; $i++)
+									{
+										$this->arr_events[] = array(
+											'type' => "gcal",
+											'id' => $item_id."_req_".$i,
+											'link' => $item_link,
+											'title' => $item_title,
+											'content' => $item_content,
+											'location' => $item_location,
+											'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
+											'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
+											'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+											'created' => $item_created,
+										);
+									}
+								}
+							}
+
+							else
+							{
+								do_log("Calendar Frequence Error: ".$value);
+							}
+						}
+
+						else
+						{
+							do_log("Calendar Recurrence Error: ".$recurrence);
+						}
+					}
+				}
 			}
 
 			if(count($json['items']) == 250)
@@ -479,19 +593,45 @@ class mf_calendar
 		}
 	}
 
+	function check_before_insert($post)
+	{
+		global $wpdb;
+
+		$requrrence_exists = false;
+
+		if($post['recurringEventId'] != '')
+		{
+			$post['uid_temp'] = $post['type']." ".$post['recurringEventId'];
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid_temp']));
+
+			foreach($result as $r)
+			{
+				$post_start = get_post_meta($r->ID, $this->meta_prefix.'start', true);
+
+				if($post_start == $post['start'])
+				{
+					$requrrence_exists = true;
+				}
+			}
+		}
+
+		return (substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d")) && $requrrence_exists == false;
+	}
+
 	function insert_events()
 	{
 		global $wpdb;
 
 		foreach($this->arr_events as $post)
 		{
-			$post_uid = $post['type']." ".$post['id'];
+			$post['uid'] = $post['type']." ".$post['id'];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post_uid));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
 
 			if($wpdb->num_rows == 0)
 			{
-				if(substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d"))
+				if($this->check_before_insert($post))
 				{
 					$post_data = array(
 						'post_type' => 'mf_calendar_event',
@@ -503,7 +643,7 @@ class mf_calendar
 						'post_parent' => $this->id,
 						'meta_input' => array(
 							$this->meta_prefix.'calendar' => $this->id,
-							$this->meta_prefix.'uid' => $post_uid,
+							$this->meta_prefix.'uid' => $post['uid'],
 							$this->meta_prefix.'location' => $post['location'],
 							$this->meta_prefix.'start' => $post['start'],
 							$this->meta_prefix.'end' => $post['end'],
@@ -514,7 +654,7 @@ class mf_calendar
 				}
 			}
 
-			if($wpdb->num_rows > 1)
+			else if($wpdb->num_rows > 1)
 			{
 				$i = 0;
 
@@ -533,7 +673,7 @@ class mf_calendar
 			{
 				foreach($result as $r)
 				{
-					if(substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d"))
+					if($this->check_before_insert($post))
 					{
 						$post_data = array(
 							'ID' => $r->ID,
@@ -543,7 +683,7 @@ class mf_calendar
 							'post_parent' => $this->id,
 							'meta_input' => array(
 								$this->meta_prefix.'calendar' => $this->id,
-								$this->meta_prefix.'uid' => $post_uid,
+								$this->meta_prefix.'uid' => $post['uid'],
 								$this->meta_prefix.'location' => $post['location'],
 								$this->meta_prefix.'start' => $post['start'],
 								$this->meta_prefix.'end' => $post['end'],
