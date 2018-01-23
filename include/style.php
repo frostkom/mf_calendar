@@ -141,10 +141,4 @@ echo "@media all
 								font-size: .8em;
 								margin-bottom: .5em;
 							}
-
-		.widget.calendar .section > a
-		{
-			display: block;
-			margin-top: 1em;
-		}
 }";

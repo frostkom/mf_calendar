@@ -825,9 +825,7 @@ class widget_calendar extends WP_Widget
 
 				if($instance['calendar_page'] > 0)
 				{
-					echo "<a href='".get_permalink($instance['calendar_page'])."'>"
-						.__("Read More", 'lang_calendar')
-					."</a>";
+					echo "<p class='read_more'><a href='".get_permalink($instance['calendar_page'])."'>".__("Read More", 'lang_calendar')."</a></p>";
 				}
 
 			echo "</div>"
