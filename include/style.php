@@ -75,7 +75,7 @@ echo "@media all
 
 					.widget.calendar .section > ul li .date
 					{
-						flex: 0 0 1.5em;
+						flex: 0 0 3.1em;
 					}
 
 						.widget.calendar .section > ul li .date p

@@ -3,13 +3,14 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 3.5.4
+Version: 3.5.6
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_calendar
 Domain Path: /lang
 
+Depends: Meta Box, MF Base
 GitHub Plugin URI: frostkom/mf_calendar
 */
 
