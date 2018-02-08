@@ -6,12 +6,9 @@ var CalendarView = Backbone.View.extend(
 	{
 		if(jQuery(this.el).length > 0)
 		{
-			this.on_load_calendar();
+			this.model.on("change:response_events", this.show_events, this);
 
-			if(typeof collect_on_load == 'function')
-			{
-				collect_on_load('myPageView.on_load_calendar');
-			}
+			this.loadEvents();
 		}
 	},
 
@@ -19,13 +16,6 @@ var CalendarView = Backbone.View.extend(
 	{
 		"click .section .controls.fa:not(.disabled)" : 'change_week',
 		"change #calendar_feeds" : 'change_feeds'
-	},
-
-	on_load_calendar: function()
-	{
-		this.model.on("change:response_events", this.show_events, this);
-
-		this.loadEvents();
 	},
 
 	loadEvents: function()
