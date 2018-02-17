@@ -463,116 +463,170 @@ class mf_calendar
 				)*/
 
 				$item_id = $item['id'];
-				$item_link = $item['htmlLink'];
-				$item_title = $item['summary'];
-				$item_content = isset($item['description']) ? $item['description'] : "";
-				$item_location = isset($item['location']) ? $item['location'] : "";
-				$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
+				$item_status = $item['status'];
 
-				if(isset($item['start']['dateTime']))
+				switch($item_status)
 				{
-					$item_start = date("Y-m-d H:i:s", strtotime($item['start']['dateTime']));
-				}
+					case 'confirmed':
+						$item_link = $item['htmlLink'];
+						$item_title = $item['summary'];
+						$item_content = isset($item['description']) ? $item['description'] : '';
+						$item_location = isset($item['location']) ? $item['location'] : '';
+						$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
 
-				else
-				{
-					$item_start = $item['start']['date'];
-				}
-
-				if(isset($item['end']['dateTime']))
-				{
-					$item_end = date("Y-m-d H:i:s", strtotime($item['end']['dateTime']));
-				}
-
-				else
-				{
-					$item_end = $item['end']['date'];
-				}
-
-				$this->arr_events[] = array(
-					'type' => "gcal",
-					'id' => $item_id,
-					'link' => $item_link,
-					'title' => $item_title,
-					'content' => $item_content,
-					'location' => $item_location,
-					'start' => $item_start,
-					'end' => $item_end,
-					'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-					'created' => $item_created,
-				);
-
-				if(isset($item['recurrence']))
-				{
-					foreach($item['recurrence'] as $recurrence)
-					{
-						list($type, $value) = explode(":", $recurrence);
-
-						if($type == 'RRULE')
+						if(isset($item['start']['dateTime']))
 						{
-							list($frequence, $count) = explode(";", $value);
-
-							list($frequence_type, $frequence_value) = explode("=", $frequence);
-							list($count_type, $count_value) = explode("=", $count);
-
-							if($frequence_type == 'FREQ' && $count_type == 'COUNT')
-							{
-								switch($frequence_value)
-								{
-									case 'YEARLY':
-										$frequence_type_time = 'year';
-									break;
-
-									case 'MONTHLY':
-										$frequence_type_time = 'month';
-									break;
-
-									case 'WEEKLY':
-										$frequence_type_time = 'week';
-									break;
-
-									case 'DAILY':
-										$frequence_type_time = 'day';
-									break;
-
-									default:
-										$frequence_type_time = '';
-
-										do_log("Calendar Frequence Unknown: ".$frequence_value);
-									break;
-								}
-
-								if($frequence_type_time != '')
-								{
-									for($i = 1; $i < $count_value; $i++)
-									{
-										$this->arr_events[] = array(
-											'type' => "gcal",
-											'id' => $item_id."_req_".$i,
-											'link' => $item_link,
-											'title' => $item_title,
-											'content' => $item_content,
-											'location' => $item_location,
-											'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
-											'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
-											'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-											'created' => $item_created,
-										);
-									}
-								}
-							}
-
-							else
-							{
-								do_log("Calendar Frequence Error: ".$value);
-							}
+							$item_start = date("Y-m-d H:i:s", strtotime($item['start']['dateTime']));
 						}
 
 						else
 						{
-							do_log("Calendar Recurrence Error: ".$recurrence);
+							$item_start = $item['start']['date'];
 						}
-					}
+
+						if(isset($item['end']['dateTime']))
+						{
+							$item_end = date("Y-m-d H:i:s", strtotime($item['end']['dateTime']));
+						}
+
+						else
+						{
+							$item_end = $item['end']['date'];
+						}
+
+						$this->arr_events[] = array(
+							'type' => "gcal",
+							'id' => $item_id,
+							'status' => $item_status,
+							'link' => $item_link,
+							'title' => $item_title,
+							'content' => $item_content,
+							'location' => $item_location,
+							'start' => $item_start,
+							'end' => $item_end,
+							'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+							'created' => $item_created,
+						);
+
+						if(isset($item['recurrence']))
+						{
+							foreach($item['recurrence'] as $recurrence)
+							{
+								list($type, $value) = explode(":", $recurrence);
+
+								if($type == 'RRULE')
+								{
+									@list($frequence, $rule, $xtra) = explode(";", $value);
+
+									list($frequence_type, $frequence_value) = explode("=", $frequence);
+									list($rule_type, $rule_value) = explode("=", $rule);
+									@list($xtra_type, $xtra_value) = explode("=", $xtra);
+
+									if($frequence_type == 'FREQ')
+									{
+										switch($frequence_value)
+										{
+											case 'YEARLY':
+												$frequence_type_time = 'year';
+											break;
+
+											case 'MONTHLY':
+												$frequence_type_time = 'month';
+											break;
+
+											case 'WEEKLY':
+												$frequence_type_time = 'week';
+											break;
+
+											case 'DAILY':
+												$frequence_type_time = 'day';
+											break;
+
+											default:
+												$frequence_type_time = '';
+
+												do_log("Calendar Frequence Unknown: ".$frequence_value);
+											break;
+										}
+
+										if($rule_type == 'COUNT')
+										{
+											if($frequence_type_time != '')
+											{
+												for($i = 1; $i < $rule_value; $i++)
+												{
+													$this->arr_events[] = array(
+														'type' => "gcal",
+														'id' => $item_id."_req_".$i,
+														'status' => $item_status,
+														'link' => $item_link,
+														'title' => $item_title,
+														'content' => $item_content,
+														'location' => $item_location,
+														'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
+														'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
+														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+														'created' => $item_created,
+													);
+												}
+											}
+										}
+
+										else if($rule_type == 'UNTIL')
+										{
+											if($frequence_type_time != '')
+											{
+												do_log("Date UNTIL: ".var_export($item, true).", ".$item_start." -> ".date("Y-m-d H:i:s", strtotime($rule_value)));
+
+												/*for($i = $item_start; $i < date("Y-m-d H:i:s", strtotime($rule_value); $i++)
+												{
+													$this->arr_events[] = array(
+														'type' => "gcal",
+														'id' => $item_id."_req_".$i,
+														'link' => $item_link,
+														'title' => $item_title,
+														'content' => $item_content,
+														'location' => $item_location,
+														'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
+														'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
+														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+														'created' => $item_created,
+													);
+												}*/
+											}
+										}
+
+										else
+										{
+											do_log("Calendar Rule Error: ".$value);
+										}
+									}
+
+									else
+									{
+										do_log("Calendar Frequence Error: ".$value);
+									}
+								}
+
+								else
+								{
+									do_log("Calendar Recurrence Error: ".$recurrence);
+								}
+							}
+						}
+					break;
+
+					case 'cancelled':
+						$this->arr_events[] = array(
+							'type' => "gcal",
+							'id' => $item_id,
+							'status' => $item_status,
+						);
+					break;
+
+					default:
+						do_log("Calendar Status: ".var_export($item, true));
+					break;
 				}
 			}
 
@@ -629,75 +683,87 @@ class mf_calendar
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
 
-			if($wpdb->num_rows == 0)
+			switch($post['status'])
 			{
-				if($this->check_before_insert($post))
-				{
-					$post_data = array(
-						'post_type' => 'mf_calendar_event',
-						'post_status' => 'publish',
-						'post_title' => $post['title'],
-						'post_content' => $post['content'],
-						'post_date' => $post['created'],
-						'guid' => $post['link'],
-						'post_parent' => $this->id,
-						'meta_input' => array(
-							$this->meta_prefix.'calendar' => $this->id,
-							$this->meta_prefix.'uid' => $post['uid'],
-							$this->meta_prefix.'location' => $post['location'],
-							$this->meta_prefix.'start' => $post['start'],
-							$this->meta_prefix.'end' => $post['end'],
-						),
-					);
-
-					$post_id = wp_insert_post($post_data);
-				}
-			}
-
-			else if($wpdb->num_rows > 1)
-			{
-				$i = 0;
-
-				foreach($result as $r)
-				{
-					if($i > 0)
+				case 'confirmed':
+					if($wpdb->num_rows == 0)
 					{
-						wp_trash_post($r->ID);
+						if($this->check_before_insert($post))
+						{
+							$post_data = array(
+								'post_type' => 'mf_calendar_event',
+								'post_status' => 'publish',
+								'post_title' => $post['title'],
+								'post_content' => $post['content'],
+								'post_date' => $post['created'],
+								'guid' => $post['link'],
+								'post_parent' => $this->id,
+								'meta_input' => array(
+									$this->meta_prefix.'calendar' => $this->id,
+									$this->meta_prefix.'uid' => $post['uid'],
+									$this->meta_prefix.'location' => $post['location'],
+									$this->meta_prefix.'start' => $post['start'],
+									$this->meta_prefix.'end' => $post['end'],
+								),
+							);
+
+							$post_id = wp_insert_post($post_data);
+						}
 					}
 
-					$i++;
-				}
-			}
-
-			else
-			{
-				foreach($result as $r)
-				{
-					if($this->check_before_insert($post))
+					else if($wpdb->num_rows > 1)
 					{
-						$post_data = array(
-							'ID' => $r->ID,
-							'post_title' => $post['title'],
-							'post_content' => $post['content'],
-							'guid' => $post['link'],
-							'post_parent' => $this->id,
-							'meta_input' => array(
-								$this->meta_prefix.'calendar' => $this->id,
-								$this->meta_prefix.'uid' => $post['uid'],
-								$this->meta_prefix.'location' => $post['location'],
-								$this->meta_prefix.'start' => $post['start'],
-								$this->meta_prefix.'end' => $post['end'],
-							),
-						);
+						$i = 0;
 
-						wp_update_post($post_data);
+						foreach($result as $r)
+						{
+							if($i > 0)
+							{
+								wp_trash_post($r->ID);
+							}
+
+							$i++;
+						}
 					}
 
 					else
 					{
+						foreach($result as $r)
+						{
+							if($this->check_before_insert($post))
+							{
+								$post_data = array(
+									'ID' => $r->ID,
+									'post_title' => $post['title'],
+									'post_content' => $post['content'],
+									'guid' => $post['link'],
+									'post_parent' => $this->id,
+									'meta_input' => array(
+										$this->meta_prefix.'calendar' => $this->id,
+										$this->meta_prefix.'uid' => $post['uid'],
+										$this->meta_prefix.'location' => $post['location'],
+										$this->meta_prefix.'start' => $post['start'],
+										$this->meta_prefix.'end' => $post['end'],
+									),
+								);
+
+								wp_update_post($post_data);
+							}
+
+							else
+							{
+								wp_trash_post($r->ID);
+							}
+						}
+					}
+				break;
+
+				case 'cancelled':
+					foreach($result as $r)
+					{
 						wp_trash_post($r->ID);
 					}
-				}
+				break;
 			}
 		}
 	}
