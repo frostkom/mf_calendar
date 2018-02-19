@@ -409,6 +409,11 @@ class mf_calendar
 
 	function fetch_google_calendar()
 	{
+		$repeating_event_limit = 300;
+		$weekday_short_array = array('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA');
+		$weekday_medium_array = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+		$ordinal_array = array('zero', 'first', 'second', 'third', 'fourth', 'fifth');
+
 		$setting_calendar_debug = get_option('setting_calendar_debug');
 
 		$calendar_url = $this->get_calendar_url();
@@ -418,6 +423,8 @@ class mf_calendar
 
 		if(isset($json['items']))
 		{
+			//$arr_debug = array('old' => array(), 'new' => array());
+
 			foreach($json['items'] as $item)
 			{
 				if($setting_calendar_debug == 'yes')
@@ -469,9 +476,9 @@ class mf_calendar
 				{
 					case 'confirmed':
 						$item_link = $item['htmlLink'];
-						$item_title = $item['summary'];
-						$item_content = isset($item['description']) ? $item['description'] : '';
-						$item_location = isset($item['location']) ? $item['location'] : '';
+						$item_title = trim($item['summary']);
+						$item_content = isset($item['description']) ? trim($item['description']) : '';
+						$item_location = isset($item['location']) ? trim($item['location']) : '';
 						$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
 
 						if(isset($item['start']['dateTime']))
@@ -512,11 +519,169 @@ class mf_calendar
 						{
 							foreach($item['recurrence'] as $recurrence)
 							{
-								list($type, $value) = explode(":", $recurrence);
+								list($recurrence_type, $recurrence_value) = explode(":", $recurrence);
 
-								if($type == 'RRULE')
+								if($recurrence_type == 'RRULE')
 								{
-									@list($frequence, $rule, $xtra) = explode(";", $value);
+									/* NEW */
+									#################################
+									$repeating_rule = explode(";", $recurrence_value);
+
+									$arr_repeat = array();
+
+									foreach($repeating_rule as $row)
+									{
+										list($key, $value) = explode("=", $row);
+
+										if($key == 'BYDAY')
+										{
+											$value = explode(",", $value);
+										}									
+
+										$arr_repeat[$key] = $value;
+									}
+
+									if(!empty($arr_repeat))
+									{
+										if(isset($arr_repeat['UNTIL']))
+										{
+											$limit = array('UNTIL' => $arr_repeat['UNTIL']);
+										}
+
+										else if(isset($arr_repeat['COUNT']))
+										{
+											$limit = array('COUNT' => $arr_repeat['COUNT']);
+										}
+
+										else
+										{
+											$limit = array('COUNT' => $repeating_event_limit); // too avoid infinite arrays
+										}
+
+										$timestamp = strtotime($item_start);
+										$elapsed_time = strtotime($item_end) - $timestamp;
+										$count = 0;
+
+										$continue2run = true;
+
+										while($continue2run == true)
+										{
+											switch($arr_repeat['FREQ'])
+											{
+												case 'DAILY':
+													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
+													$timestamp += 24 * 60 * 60 * $interval;
+												break;
+
+												case 'WEEKLY':
+													unset($next_day);
+
+													$day = date('w', $timestamp);
+
+													if(isset($arr_repeat['BYDAY']))
+													{
+														foreach($arr_repeat['BYDAY'] as $repeat_day)
+														{
+															$repeat_day_index = array_search($repeat_day, $weekday_short_array);
+
+															if($repeat_day_index > $day)
+															{
+																$next_day = $repeat_day_index;
+
+																break;
+															}
+														}
+													}
+
+													if(isset($next_day))
+													{
+														$timestamp += 24 * 60 * 60 * ($next_day - $day);
+													}
+
+													else
+													{
+														if(isset($arr_repeat['BYDAY'][0]))
+														{
+															$next_day = array_search($arr_repeat['BYDAY'][0], $weekday_short_array);
+															$timestamp += 24 * 60 * 60 * ($next_day + 7 - $day);
+														}
+
+														else
+														{
+															$timestamp += 24 * 60 * 60 * 7;
+														}
+													}
+												break;
+
+												case 'MONTHLY':
+													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
+
+													if(isset($arr_repeat['BYMONTHDAY']))
+													{
+														$timestamp = strtotime(date('c', $timestamp) . " +".$interval." month");
+													}
+
+													else
+													{
+														$by_day = $arr_repeat['BYDAY'][0];
+														$by_day_week_number = substr($by_day, 0, 1);
+														$ordinal = $ordinal_array[$by_day_week_number];
+														$by_day_weekday = substr($by_day, 1);
+														$day_index = array_search($by_day_weekday, $weekday_short_array);
+														$dayname = $weekday_medium_array[$day_index];
+														$timestamp = strtotime(date('c', $timestamp) . " +".$interval." month");
+														$month = date('F', $timestamp);
+														$year = date('Y', $timestamp);
+														$relative_timestamp = $ordinal." ".$dayname." of ".$month." ".$year;
+														$timestamp = strtotime($relative_timestamp);
+													}
+												break;
+
+												case 'YEARLY':
+													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
+													$timestamp = strtotime(date('c', $timestamp) . " +".$interval." year");
+												break;
+
+												default:
+													do_log("Calendar Frequence Error: ".$arr_repeat['FREQ']);
+												break;
+											}
+
+											if((isset($limit['UNTIL']) && $timestamp > strtotime($limit['UNTIL'])) || (isset($limit['COUNT']) && ($count + 1) >= $limit['COUNT']))
+											{
+												//do_log("Break loop because (".isset($limit['UNTIL'])." && ".$timestamp." > ".strtotime($limit['UNTIL']).") || (".isset($limit['COUNT'])." && (".$count." + 1) >= ".$limit['COUNT']."))");
+
+												$continue2run = false;
+											}
+
+											else
+											{
+												//$arr_debug['new'][] = 
+												$this->arr_events[] = array(
+													'type' => "gcal",
+													'id' => $item_id."_req_".$count,
+													'status' => $item_status,
+													'link' => $item_link,
+													'title' => $item_title,
+													'content' => $item_content,
+													'location' => $item_location,
+													'start' => date("Y-m-d H:i:s", $timestamp),
+													'end' => date("Y-m-d H:i:s", ($timestamp + $elapsed_time)),
+													'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+													'created' => $item_created,
+													'rule' => $recurrence_value,
+													'start_orig' => $item_start,
+												);
+
+												$count++;
+											}
+										}
+									}
+									#################################
+
+									/* OLD */
+									#################################
+									/*@list($frequence, $rule, $xtra) = explode(";", $recurrence_value);
 
 									list($frequence_type, $frequence_value) = explode("=", $frequence);
 									list($rule_type, $rule_value) = explode("=", $rule);
@@ -555,6 +720,7 @@ class mf_calendar
 											{
 												for($i = 1; $i < $rule_value; $i++)
 												{
+													//$arr_debug['old'][] = 
 													$this->arr_events[] = array(
 														'type' => "gcal",
 														'id' => $item_id."_req_".$i,
@@ -567,6 +733,8 @@ class mf_calendar
 														'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
 														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
 														'created' => $item_created,
+														'rule' => $recurrence_value,
+														'start_orig' => $item_start,
 													);
 												}
 											}
@@ -578,21 +746,70 @@ class mf_calendar
 											{
 												do_log("Date UNTIL: ".var_export($item, true).", ".$item_start." -> ".date("Y-m-d H:i:s", strtotime($rule_value)));
 
-												/*for($i = $item_start; $i < date("Y-m-d H:i:s", strtotime($rule_value); $i++)
+												if(1 == 2)
 												{
-													$this->arr_events[] = array(
-														'type' => "gcal",
-														'id' => $item_id."_req_".$i,
-														'link' => $item_link,
-														'title' => $item_title,
-														'content' => $item_content,
-														'location' => $item_location,
-														'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
-														'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
-														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-														'created' => $item_created,
-													);
-												}*/
+													for($i = 1; $i < $rule_value; $i++)
+													{
+														$date_start = date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time));
+														$date_end = date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time));
+
+														if($xtra_type == 'BYDAY')
+														{
+															switch($xtra_value)
+															{
+																case 'MO':
+																	$date_start = date('Y-m-d', strtotime("Second Monday of february ".date("Y", $date_start)));
+																break;
+
+																	case '2MO':
+																		
+																	break;
+
+																case 'WE':
+																	
+																break;
+
+																case 'FR':
+																	
+																break;
+
+																case 'SA':
+																	
+																break;
+
+																case 'SU':
+																	
+																break;
+
+																default:
+																	do_log("Calendar Day Error: ".$xtra_type."=".$xtra_value);
+																break;
+															}
+														}
+
+														if($date_start > date("Y-m-d H:i:s", strtotime($rule_value)))
+														{
+															break;
+														}
+
+														else
+														{
+															$this->arr_events[] = array(
+																'type' => "gcal",
+																'id' => $item_id."_req_".$i,
+																'status' => $item_status,
+																'link' => $item_link,
+																'title' => $item_title,
+																'content' => $item_content,
+																'location' => $item_location,
+																'start' => $date_start,
+																'end' => $date_end,
+																'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+																'created' => $item_created,
+															);
+														}
+													}
+												}
 											}
 										}
 
@@ -604,8 +821,9 @@ class mf_calendar
 
 									else
 									{
-										do_log("Calendar Frequence Error: ".$value);
-									}
+										do_log("Calendar Frequence Error: ".$frequence);
+									}*/
+									#################################
 								}
 
 								else
@@ -629,6 +847,8 @@ class mf_calendar
 					break;
 				}
 			}
+
+			//echo "Debug: ".var_export($arr_debug, true);
 
 			if(count($json['items']) == 250)
 			{
