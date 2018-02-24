@@ -423,14 +423,14 @@ class mf_calendar
 
 		if(isset($json['items']))
 		{
-			//$arr_debug = array('old' => array(), 'new' => array());
+			$arr_debug = array('old' => array(), 'new' => array());
 
 			foreach($json['items'] as $item)
 			{
-				if($setting_calendar_debug == 'yes')
+				/*if($setting_calendar_debug == 'yes')
 				{
 					do_log("Calendar Event: ".var_export($item, true));
-				}
+				}*/
 
 				/*array(
 					'kind' => 'calendar#event',
@@ -563,6 +563,7 @@ class mf_calendar
 										$count = 0;
 
 										$continue2run = true;
+										$out_of_bounds = 0;
 
 										while($continue2run == true)
 										{
@@ -570,6 +571,7 @@ class mf_calendar
 											{
 												case 'DAILY':
 													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
+
 													$timestamp += 24 * 60 * 60 * $interval;
 												break;
 
@@ -625,26 +627,80 @@ class mf_calendar
 													{
 														$by_day = $arr_repeat['BYDAY'][0];
 														$by_day_week_number = substr($by_day, 0, 1);
+														
 														$ordinal = $ordinal_array[$by_day_week_number];
+														
 														$by_day_weekday = substr($by_day, 1);
+														
 														$day_index = array_search($by_day_weekday, $weekday_short_array);
 														$dayname = $weekday_medium_array[$day_index];
-														$timestamp = strtotime(date('c', $timestamp)." +".$interval." month");
-														$month = date('F', $timestamp);
-														$year = date('Y', $timestamp);
-														$relative_timestamp = $ordinal." ".$dayname." of ".$month." ".$year;
-														$timestamp = strtotime($relative_timestamp);
+
+														$timestamp_temp = strtotime(date('c', $timestamp)." +".$interval." month");
+														$month = date('F', $timestamp_temp);
+														$year = date('Y', $timestamp_temp);
+
+														$timestamp = strtotime($ordinal." ".$dayname." of ".$month." ".$year);
 													}
 
 													else
 													{
-														$timestamp = strtotime(date('c', $timestamp)." +".$interval." month");
+														$year = date('Y', $timestamp);
+														$month = date('m', $timestamp);
+														//$day_start = date('d', strtotime($item_start));
+
+														$hour = date('H', $timestamp);
+														$minute = date('i', $timestamp);
+														$second = date('s', $timestamp);
+
+														//$timestamp_temp = mktime($hour, $minute, $second, $month, $day_start, $year);
+
+														/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+														{
+															echo "Temp Get: ".$item_start." -> ".date('c', $timestamp)." -> ".date('c', $timestamp_temp)."<br>";
+														}*/
+
+														$first_date_of_month = date('Y-m-d H:i:s', mktime($hour, $minute, $second, $month, 1, $year));
+														$first_date_next_month = date('Y-m-d H:i:s', strtotime($first_date_of_month." +".($interval * ($out_of_bounds + 1))." month"));
+														$days_next_month = date('t', strtotime($first_date_next_month));
+														$month_next_month = date('m', strtotime($first_date_next_month));
+														$year_next_month = date('Y', strtotime($first_date_next_month));
+
+														$last_timestamp_next_month = mktime($hour, $minute, $second, $month_next_month, $days_next_month, $year_next_month);
+
+														$timestamp_temp = strtotime(date('c', $timestamp)." +".($interval * ($out_of_bounds + 1))." month");
+
+														if(date("Y-m-d", $timestamp_temp) > date("Y-m-d", $last_timestamp_next_month))
+														{
+															$out_of_bounds++;
+
+															if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+															{
+																echo "Outside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
+															}
+
+															/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+															{
+																echo "Temp Set: ".date('c', $timestamp)."<br>";
+															}*/
+														}
+
+														else
+														{
+															$timestamp = $timestamp_temp;
+															$out_of_bounds = 0;
+
+															if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+															{
+																echo "Inside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
+															}
+														}
 													}
 												break;
 
 												case 'YEARLY':
 													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
-													$timestamp = strtotime(date('c', $timestamp) . " +".$interval." year");
+
+													$timestamp = strtotime(date('c', $timestamp)." +".$interval." year");
 												break;
 
 												default:
@@ -661,22 +717,24 @@ class mf_calendar
 
 											else
 											{
-												//$arr_debug['new'][] = 
-												$this->arr_events[] = array(
-													'type' => "gcal",
-													'id' => $item_id."_req_".$count,
-													'status' => $item_status,
-													'link' => $item_link,
-													'title' => $item_title,
-													'content' => $item_content,
-													'location' => $item_location,
-													'start' => date("Y-m-d H:i:s", $timestamp),
-													'end' => date("Y-m-d H:i:s", ($timestamp + $elapsed_time)),
-													'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-													'created' => $item_created,
-													'rule' => $recurrence_value,
-													'start_orig' => $item_start,
-												);
+												if($out_of_bounds == 0)
+												{
+													$this->arr_events[] = $arr_debug['new'][] = array(
+														'type' => "gcal",
+														'id' => $item_id."_req_".$count,
+														'status' => $item_status,
+														'link' => $item_link,
+														'title' => $item_title,
+														'content' => $item_content,
+														'location' => $item_location,
+														'start' => date("Y-m-d H:i:s", $timestamp),
+														'end' => date("Y-m-d H:i:s", ($timestamp + $elapsed_time)),
+														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
+														'created' => $item_created,
+														'rule' => $recurrence_value,
+														'start_orig' => $item_start,
+													);
+												}
 
 												$count++;
 											}
@@ -725,8 +783,7 @@ class mf_calendar
 											{
 												for($i = 1; $i < $rule_value; $i++)
 												{
-													//$arr_debug['old'][] = 
-													$this->arr_events[] = array(
+													$this->arr_events[] = $arr_debug['old'][] = array(
 														'type' => "gcal",
 														'id' => $item_id."_req_".$i,
 														'status' => $item_status,
@@ -853,7 +910,10 @@ class mf_calendar
 				}
 			}
 
-			//echo "Debug: ".var_export($arr_debug, true);
+			if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+			{
+				echo "Debug: ".var_export($arr_debug, true);
+			}
 
 			if(count($json['items']) == 250)
 			{
@@ -906,7 +966,7 @@ class mf_calendar
 		{
 			$post['uid'] = $post['type']." ".$post['id'];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
 
 			switch($post['status'])
 			{
