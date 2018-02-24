@@ -616,12 +616,12 @@ class mf_calendar
 												case 'MONTHLY':
 													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
 
-													if(isset($arr_repeat['BYMONTHDAY']))
+													/*if(isset($arr_repeat['BYMONTHDAY']))
 													{
 														$timestamp = strtotime(date('c', $timestamp) . " +".$interval." month");
 													}
 
-													else
+													else */if(isset($arr_repeat['BYDAY'][0]))
 													{
 														$by_day = $arr_repeat['BYDAY'][0];
 														$by_day_week_number = substr($by_day, 0, 1);
@@ -629,11 +629,16 @@ class mf_calendar
 														$by_day_weekday = substr($by_day, 1);
 														$day_index = array_search($by_day_weekday, $weekday_short_array);
 														$dayname = $weekday_medium_array[$day_index];
-														$timestamp = strtotime(date('c', $timestamp) . " +".$interval." month");
+														$timestamp = strtotime(date('c', $timestamp)." +".$interval." month");
 														$month = date('F', $timestamp);
 														$year = date('Y', $timestamp);
 														$relative_timestamp = $ordinal." ".$dayname." of ".$month." ".$year;
 														$timestamp = strtotime($relative_timestamp);
+													}
+
+													else
+													{
+														$timestamp = strtotime(date('c', $timestamp)." +".$interval." month");
 													}
 												break;
 
