@@ -372,7 +372,7 @@ class mf_calendar
 	function set_id($id)
 	{
 		$this->id = $id;
-		$this->calendar_id = "";
+		$this->calendar_id = $this->display_birthdays = '';
 	}
 
 	function get_calendar_id()
@@ -382,25 +382,47 @@ class mf_calendar
 			$this->calendar_id = get_post_meta($this->id, $this->meta_prefix.'calendar_id', true);
 		}
 
-		return $this->calendar_id;
+		if($this->display_birthdays == '')
+		{
+			$this->display_birthdays = get_post_meta($this->id, $this->meta_prefix.'display_birthdays', true);
+		}
 	}
 
 	function get_calendar_url()
 	{
 		$this->get_calendar_id();
 
-		$google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
+		if($this->calendar_id != '')
+		{
+			$google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
 
-		$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
+			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
 
-		return $this->calendar_url;
+			return $this->calendar_url;
+		}
 	}
 
-	function fetch_source()
+	function fetch_source($id)
 	{
+		$this->set_id($id);
+		$this->get_calendar_id();
+
 		$this->arr_events = array();
 
-		$this->fetch_google_calendar();
+		if($this->calendar_id != '')
+		{
+			$this->fetch_google_calendar();
+		}
+
+		else if($this->display_birthdays == 'yes')
+		{
+			$this->fetch_birthdays();
+		}
+
+		else
+		{
+			do_log(sprintf(__("The calendar (%d) has no source", 'lang_calendar'), $this->id));
+		}
 
 		$this->insert_events();
 		$this->remove_deleted();
@@ -930,6 +952,41 @@ class mf_calendar
 				error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".$calendar_url.", ".htmlspecialchars($content).")");
 			}
 		}
+	}
+
+	function fetch_birthdays()
+	{
+		$users = get_users(array('fields' => 'all'));
+
+		foreach($users as $user)
+		{
+			$user_birthday = get_the_author_meta('profile_birthday', $user->ID);
+
+			if($user_birthday != '')
+			{
+				$item_id = $user->ID;
+				$item_title = sprintf(__("It is %s' birthday", 'lang_calendar'), $user->display_name);
+				$item_birthday = date('Y')."-".date('m-d', strtotime($user_birthday));
+
+				if($item_birthday < date('Y-m-d'))
+				{
+					$item_birthday = date('Y', strtotime("+1 year"))."-".date('m-d', strtotime($user_birthday));
+				}
+
+				$this->arr_events[] = array(
+					'type' => "bday",
+					'id' => $item_id,
+					'status' => 'confirmed',
+					'title' => $item_title,
+					'content' => '',
+					'start' => $item_birthday,
+					'end' => $item_birthday,
+					'created' => date('Y-m-d H:i:s'),
+				);
+			}
+		}
+
+		do_log("Birthdays: ".var_export($this->arr_events, true));
 	}
 
 	function check_before_insert($post)

@@ -88,8 +88,7 @@ function cron_calendar()
 			break;
 		}
 
-		$obj_calendar->set_id($r->ID);
-		$obj_calendar->fetch_source();
+		$obj_calendar->fetch_source($r->ID);
 	}
 }
 
@@ -181,6 +180,11 @@ function column_cell_calendar($col, $id)
 		case 'calendar_id':
 			$post_meta = get_post_meta($id, $meta_prefix.$col, true);
 
+			if($post_meta == '' && is_birthday_active())
+			{
+				$post_meta = "<em>(".__("birthdays", 'lang_calendar').")</em>";
+			}
+
 			if($post_meta != '')
 			{
 				$obj_calendar = new mf_calendar($id);
@@ -197,8 +201,7 @@ function column_cell_calendar($col, $id)
 
 						if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce'], 'calendar_fetch_'.$id))
 						{
-							$obj_calendar->set_id($id);
-							$obj_calendar->fetch_source();
+							$obj_calendar->fetch_source($id);
 						}
 
 						else
@@ -210,8 +213,19 @@ function column_cell_calendar($col, $id)
 
 				$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
 
-				echo "<a href='".$obj_calendar->get_calendar_url()."'>".$post_meta."</a>
-				<div class='row-actions'>"
+				$obj_calendar->get_calendar_url();
+
+				if($obj_calendar->calendar_url != '')
+				{
+					echo "<a href='".$obj_calendar->calendar_url."'>".$post_meta."</a>";
+				}
+
+				else
+				{
+					echo $post_meta;
+				}
+
+				echo "<div class='row-actions'>"
 					.$fetch_link
 					.__("Fetched", 'lang_calendar').": ".format_date($post_modified)
 				."</div>";
@@ -421,11 +435,40 @@ function meta_calendar_info()
 	return $out;
 }
 
+function is_birthday_active()
+{
+	return is_plugin_active("mf_users/index.php") && in_array('profile_birthday', get_option('setting_add_profile_fields'));
+}
+
 function meta_boxes_calendar($meta_boxes)
 {
 	global $wpdb;
 
 	$meta_prefix = "mf_calendar_";
+
+	$fields_settings = array(
+		array(
+			'name' => __("Calendar ID", 'lang_calendar'),
+			'id' => $meta_prefix.'calendar_id',
+			'type' => 'text',
+		),
+		array(
+			'id' => $meta_prefix.'info',
+			'type' => 'custom_html',
+			'callback' => 'meta_calendar_info',
+		),
+	);
+
+	if(is_birthday_active())
+	{
+		$fields_settings[] = array(
+			'name' => __("Display Birthdays", 'lang_calendar'),
+			'id' => $meta_prefix.'display_birthdays',
+			'type' => 'select',
+			'options' => get_yes_no_for_select(),
+			'std' => 'yes',
+		);
+	}
 
 	$meta_boxes[] = array(
 		'id' => $meta_prefix.'settings',
@@ -433,18 +476,7 @@ function meta_boxes_calendar($meta_boxes)
 		'post_types' => array('mf_calendar'),
 		//'context' => 'side',
 		'priority' => 'low',
-		'fields' => array(
-			array(
-				'name' => __("Calendar ID", 'lang_calendar'),
-				'id' => $meta_prefix.'calendar_id',
-				'type' => 'text',
-			),
-			array(
-				'id' => $meta_prefix.'info',
-				'type' => 'custom_html',
-				'callback' => 'meta_calendar_info',
-			),
-		)
+		'fields' => $fields_settings
 	);
 
 	$arr_data = array();
