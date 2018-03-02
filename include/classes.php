@@ -476,7 +476,7 @@ class mf_calendar
 				{
 					case 'confirmed':
 						$item_link = $item['htmlLink'];
-						$item_title = trim($item['summary']);
+						$item_title = isset($item['summary']) ? trim($item['summary']) : '';
 						$item_content = isset($item['description']) ? trim($item['description']) : '';
 						$item_location = isset($item['location']) ? trim($item['location']) : '';
 						$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
