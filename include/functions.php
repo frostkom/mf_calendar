@@ -120,9 +120,9 @@ function setting_google_calendar_api_key_callback()
 	$option = get_option($setting_key);
 
 	$description = "<ol>
-		<li>".sprintf(__("Go to %s and log in", 'lang_social_feed'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
-		<li>".__("Create a new project", 'lang_social_feed')."</li>
-		<li>".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_social_feed'), "Google Calendar API", "Web server", "Application data", "No")."</li>
+		<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
+		<li>".__("Create a new project", 'lang_calendar')."</li>
+		<li>".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
 	</ol>";
 
 	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
@@ -282,6 +282,16 @@ function column_cell_calendar($col, $id)
 	}
 }
 
+function row_actions_calendar($actions, $post)
+{
+	if($post->post_type == 'mf_calendar_event')
+	{
+		$actions = array();
+	}
+
+	return $actions;
+}
+
 function filter_end_date($end_date)
 {
 	return date("Y-m-d", strtotime($end_date." -1 day"));
@@ -289,6 +299,11 @@ function filter_end_date($end_date)
 
 function column_header_event($cols)
 {
+	$plugin_include_url = plugin_dir_url(__FILE__);
+	$plugin_version = get_plugin_version(__FILE__);
+
+	mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
+
 	unset($cols['title']);
 	unset($cols['date']);
 
@@ -302,6 +317,8 @@ function column_header_event($cols)
 
 function column_cell_event($col, $id)
 {
+	global $done_text, $error_text;
+
 	$meta_prefix = "mf_calendar_";
 
 	switch($col)
@@ -314,6 +331,20 @@ function column_cell_event($col, $id)
 			if($post_uid != '')
 			{
 				echo $post_title;
+
+				if(get_post_status($id) == 'draft')
+				{
+					echo "<span class='strong nowrap'> - ".__("Hidden", 'lang_calendar')."</span>";
+				}
+
+				else
+				{
+					echo "<div class='row-actions'>
+						<span class='calendar_action_hide'>
+							<a href='#id_".$id."' class='calendar_event_post_action calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
+						</span>
+					</div>";
+				}
 			}
 
 			else
@@ -532,21 +563,4 @@ function meta_boxes_calendar($meta_boxes)
 	);
 
 	return $meta_boxes;
-}
-
-function row_actions_calendar($actions, $post)
-{
-	$meta_prefix = "mf_calendar_";
-
-	if($post->post_type == 'mf_calendar_event')
-	{
-		/*$post_uid = get_post_meta($post->ID, $meta_prefix.'uid', true);
-
-		if($post_uid != '')
-		{*/
-			$actions = array();
-		//}
-	}
-
-	return $actions;
 }

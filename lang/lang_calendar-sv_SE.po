@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-02 15:16+0100\n"
+"POT-Creation-Date: 2018-03-03 10:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,90 +16,98 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../include/classes.php:332
+#: ../include/classes.php:93
+msgid "I have hidden the event for you now"
+msgstr "Jag har dolt händelsen åt dig nu"
+
+#: ../include/classes.php:98
+msgid "I could not hide the event for you. An admin has been notified about this issue"
+msgstr "Jag kunde inte dölja händelsen åt dig. En admin har fått information om detta problem"
+
+#: ../include/classes.php:372
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:424
+#: ../include/classes.php:464
 #, php-format
 msgid "The calendar (%d) has no source"
-msgstr ""
+msgstr "Kalendern (%d) har ingen källa"
 
-#: ../include/classes.php:942
+#: ../include/classes.php:814
 msgid "The Calendar API returned the maximum number of events"
 msgstr "Kalender-APIet svarade med maxantalet av händelser"
 
-#: ../include/classes.php:952
+#: ../include/classes.php:824
 msgid "Something went wrong when fetching the calendar source"
 msgstr "Något gick fel vid hämtning av kalenderkällan"
 
-#: ../include/classes.php:968
+#: ../include/classes.php:840
 #, php-format
 msgid "It is %s' birthday"
 msgstr "%s fyller år"
 
-#: ../include/classes.php:1158
+#: ../include/classes.php:1028
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:1171
+#: ../include/classes.php:1041
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
 #: ../include/functions.php:58
 #: ../include/functions.php:61
 #: ../include/functions.php:114
-#: ../include/functions.php:298
-#: ../include/functions.php:510
+#: ../include/functions.php:313
+#: ../include/functions.php:541
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:1209
+#: ../include/classes.php:1079
 msgid "w"
 msgstr "v"
 
-#: ../include/classes.php:1236
-#: ../include/classes.php:1308
+#: ../include/classes.php:1106
+#: ../include/classes.php:1178
 msgid "Read More"
 msgstr "Läs mer"
 
-#: ../include/classes.php:1268
+#: ../include/classes.php:1138
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:1269
+#: ../include/classes.php:1139
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:1276
+#: ../include/classes.php:1146
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:1281
+#: ../include/classes.php:1151
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:1286
+#: ../include/classes.php:1156
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:1290
+#: ../include/classes.php:1160
 msgid "Label"
 msgstr "Etikett"
 
-#: ../include/classes.php:1290
+#: ../include/classes.php:1160
 msgid "Choose here"
 msgstr "Välj här"
 
-#: ../include/classes.php:1303
+#: ../include/classes.php:1173
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:1306
+#: ../include/classes.php:1176
 msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:1306
+#: ../include/classes.php:1176
 msgid "months"
 msgstr "månader"
 
@@ -175,70 +183,82 @@ msgstr "Hämtad"
 msgid "Latest"
 msgstr "Senaste"
 
-#: ../include/functions.php:295
+#: ../include/functions.php:310
 msgid "Title"
 msgstr "Titel"
 
-#: ../include/functions.php:296
-#: ../include/functions.php:517
+#: ../include/functions.php:311
+#: ../include/functions.php:548
 msgid "Location"
 msgstr "Plats"
 
-#: ../include/functions.php:297
+#: ../include/functions.php:312
 msgid "Date"
 msgstr "Datum"
 
-#: ../include/functions.php:329
+#: ../include/functions.php:337
+msgid "Hidden"
+msgstr "Dold"
+
+#: ../include/functions.php:344
+msgid "Are you sure?"
+msgstr "Är du säker?"
+
+#: ../include/functions.php:344
+msgid "Hide"
+msgstr "Dölj"
+
+#: ../include/functions.php:360
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/functions.php:336
+#: ../include/functions.php:367
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/functions.php:339
+#: ../include/functions.php:370
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/functions.php:428
+#: ../include/functions.php:459
 #, php-format
 msgid "Go to %sGoogle Calendar%s and login"
 msgstr "Gå till %sGoogle Calendar%s och logga in"
 
-#: ../include/functions.php:429
+#: ../include/functions.php:460
 msgid "Click on Settings (The grey gear icon to the right)"
 msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
 
-#: ../include/functions.php:430
+#: ../include/functions.php:461
 msgid "Click on My Calendar Settings"
 msgstr "Klicka på Mina kalenderinställningar"
 
-#: ../include/functions.php:431
+#: ../include/functions.php:462
 msgid "Choose which calendar to share if there are multiple"
 msgstr "Välj vilken kalender att dela om det finns flera"
 
-#: ../include/functions.php:432
+#: ../include/functions.php:463
 msgid "Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category"
 msgstr "Gör kalendern tillgänglig för alla i Behörighetskategorin och kopiera e-posten som visas i Integreringskategorin"
 
-#: ../include/functions.php:451
+#: ../include/functions.php:482
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/functions.php:465
+#: ../include/functions.php:496
 msgid "Display Birthdays"
 msgstr "Visa födelsedagar"
 
-#: ../include/functions.php:475
-#: ../include/functions.php:504
+#: ../include/functions.php:506
+#: ../include/functions.php:535
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/functions.php:522
+#: ../include/functions.php:553
 msgid "Start"
 msgstr "Start"
 
-#: ../include/functions.php:527
+#: ../include/functions.php:558
 msgid "End"
 msgstr "Slut"
 

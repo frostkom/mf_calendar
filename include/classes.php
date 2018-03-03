@@ -78,6 +78,46 @@ class mf_calendar
 		}
 	}
 
+	function action_hide()
+	{
+		global $wpdb, $done_text, $error_text;
+
+		$action_id = check_var('action_id', 'int');
+
+		$result = array();
+
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'draft' WHERE post_type = 'mf_calendar_event' AND ID = '%d'", $action_id));
+
+		if($wpdb->rows_affected > 0)
+		{
+			$done_text = __("I have hidden the event for you now", 'lang_calendar');
+		}
+
+		else
+		{
+			$error_text = __("I could not hide the event for you. An admin has been notified about this issue", 'lang_calendar');
+
+			error_log($error_text." (".$wpdb->last_query.")");
+		}
+
+		$out = get_notification();
+
+		if($done_text != '')
+		{
+			$result['success'] = true;
+			$result['message'] = $out;
+		}
+
+		else
+		{
+			$result['error'] = $out;
+		}
+
+		header('Content-Type: application/json');
+		echo json_encode($result);
+		die();
+	}
+
 	// Public
 	##############################
 	function get_events($data)
@@ -545,8 +585,6 @@ class mf_calendar
 
 								if($recurrence_type == 'RRULE')
 								{
-									/* NEW */
-									#################################
 									$repeating_rule = explode(";", $recurrence_value);
 
 									$arr_repeat = array();
@@ -577,7 +615,7 @@ class mf_calendar
 
 										else
 										{
-											$limit = array('COUNT' => $repeating_event_limit); // too avoid infinite arrays
+											$limit = array('COUNT' => $repeating_event_limit);
 										}
 
 										$timestamp = strtotime($item_start);
@@ -640,12 +678,7 @@ class mf_calendar
 												case 'MONTHLY':
 													$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
 
-													/*if(isset($arr_repeat['BYMONTHDAY']))
-													{
-														$timestamp = strtotime(date('c', $timestamp) . " +".$interval." month");
-													}
-
-													else */if(isset($arr_repeat['BYDAY'][0]))
+													if(isset($arr_repeat['BYDAY'][0]))
 													{
 														$by_day = $arr_repeat['BYDAY'][0];
 														$by_day_week_number = substr($by_day, 0, 1);
@@ -668,18 +701,10 @@ class mf_calendar
 													{
 														$year = date('Y', $timestamp);
 														$month = date('m', $timestamp);
-														//$day_start = date('d', strtotime($item_start));
 
 														$hour = date('H', $timestamp);
 														$minute = date('i', $timestamp);
 														$second = date('s', $timestamp);
-
-														//$timestamp_temp = mktime($hour, $minute, $second, $month, $day_start, $year);
-
-														/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-														{
-															echo "Temp Get: ".$item_start." -> ".date('c', $timestamp)." -> ".date('c', $timestamp_temp)."<br>";
-														}*/
 
 														$first_date_of_month = date('Y-m-d H:i:s', mktime($hour, $minute, $second, $month, 1, $year));
 														$first_date_next_month = date('Y-m-d H:i:s', strtotime($first_date_of_month." +".($interval * ($out_of_bounds + 1))." month"));
@@ -699,11 +724,6 @@ class mf_calendar
 															{
 																echo "Outside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
 															}
-
-															/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-															{
-																echo "Temp Set: ".date('c', $timestamp)."<br>";
-															}*/
 														}
 
 														else
@@ -732,8 +752,6 @@ class mf_calendar
 
 											if((isset($limit['UNTIL']) && $timestamp > strtotime($limit['UNTIL'])) || (isset($limit['COUNT']) && ($count + 1) >= $limit['COUNT']))
 											{
-												//do_log("Break loop because (".isset($limit['UNTIL'])." && ".$timestamp." > ".strtotime($limit['UNTIL']).") || (".isset($limit['COUNT'])." && (".$count." + 1) >= ".$limit['COUNT']."))");
-
 												$continue2run = false;
 											}
 
@@ -762,152 +780,6 @@ class mf_calendar
 											}
 										}
 									}
-									#################################
-
-									/* OLD */
-									#################################
-									/*@list($frequence, $rule, $xtra) = explode(";", $recurrence_value);
-
-									list($frequence_type, $frequence_value) = explode("=", $frequence);
-									list($rule_type, $rule_value) = explode("=", $rule);
-									@list($xtra_type, $xtra_value) = explode("=", $xtra);
-
-									if($frequence_type == 'FREQ')
-									{
-										switch($frequence_value)
-										{
-											case 'YEARLY':
-												$frequence_type_time = 'year';
-											break;
-
-											case 'MONTHLY':
-												$frequence_type_time = 'month';
-											break;
-
-											case 'WEEKLY':
-												$frequence_type_time = 'week';
-											break;
-
-											case 'DAILY':
-												$frequence_type_time = 'day';
-											break;
-
-											default:
-												$frequence_type_time = '';
-
-												do_log("Calendar Frequence Unknown: ".$frequence_value);
-											break;
-										}
-
-										if($rule_type == 'COUNT')
-										{
-											if($frequence_type_time != '')
-											{
-												for($i = 1; $i < $rule_value; $i++)
-												{
-													$this->arr_events[] = $arr_debug['old'][] = array(
-														'type' => "gcal",
-														'id' => $item_id."_req_".$i,
-														'status' => $item_status,
-														'link' => $item_link,
-														'title' => $item_title,
-														'content' => $item_content,
-														'location' => $item_location,
-														'start' => date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time)),
-														'end' => date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time)),
-														'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-														'created' => $item_created,
-														'rule' => $recurrence_value,
-														'start_orig' => $item_start,
-													);
-												}
-											}
-										}
-
-										else if($rule_type == 'UNTIL')
-										{
-											if($frequence_type_time != '')
-											{
-												do_log("Date UNTIL: ".var_export($item, true).", ".$item_start." -> ".date("Y-m-d H:i:s", strtotime($rule_value)));
-
-												if(1 == 2)
-												{
-													for($i = 1; $i < $rule_value; $i++)
-													{
-														$date_start = date("Y-m-d H:i:s", strtotime($item_start." +".$i." ".$frequence_type_time));
-														$date_end = date("Y-m-d H:i:s", strtotime($item_end." +".$i." ".$frequence_type_time));
-
-														if($xtra_type == 'BYDAY')
-														{
-															switch($xtra_value)
-															{
-																case 'MO':
-																	$date_start = date('Y-m-d', strtotime("Second Monday of february ".date("Y", $date_start)));
-																break;
-
-																	case '2MO':
-																		
-																	break;
-
-																case 'WE':
-																	
-																break;
-
-																case 'FR':
-																	
-																break;
-
-																case 'SA':
-																	
-																break;
-
-																case 'SU':
-																	
-																break;
-
-																default:
-																	do_log("Calendar Day Error: ".$xtra_type."=".$xtra_value);
-																break;
-															}
-														}
-
-														if($date_start > date("Y-m-d H:i:s", strtotime($rule_value)))
-														{
-															break;
-														}
-
-														else
-														{
-															$this->arr_events[] = array(
-																'type' => "gcal",
-																'id' => $item_id."_req_".$i,
-																'status' => $item_status,
-																'link' => $item_link,
-																'title' => $item_title,
-																'content' => $item_content,
-																'location' => $item_location,
-																'start' => $date_start,
-																'end' => $date_end,
-																'recurringEventId' => (isset($item['recurringEventId']) ? $item['recurringEventId'] : ''),
-																'created' => $item_created,
-															);
-														}
-													}
-												}
-											}
-										}
-
-										else
-										{
-											do_log("Calendar Rule Error: ".$value);
-										}
-									}
-
-									else
-									{
-										do_log("Calendar Frequence Error: ".$frequence);
-									}*/
-									#################################
 								}
 
 								else
@@ -985,8 +857,6 @@ class mf_calendar
 				);
 			}
 		}
-
-		do_log("Birthdays: ".var_export($this->arr_events, true));
 	}
 
 	function check_before_insert($post)
@@ -995,7 +865,7 @@ class mf_calendar
 
 		$requrrence_exists = false;
 
-		if($post['recurringEventId'] != '')
+		if(isset($post['recurringEventId']) && $post['recurringEventId'] != '')
 		{
 			$post['uid_temp'] = $post['type']." ".$post['recurringEventId'];
 
@@ -1038,12 +908,12 @@ class mf_calendar
 								'post_title' => $post['title'],
 								'post_content' => $post['content'],
 								'post_date' => $post['created'],
-								'guid' => $post['link'],
+								'guid' => (isset($post['link']) ? $post['link'] : ''),
 								'post_parent' => $this->id,
 								'meta_input' => array(
 									$this->meta_prefix.'calendar' => $this->id,
 									$this->meta_prefix.'uid' => $post['uid'],
-									$this->meta_prefix.'location' => $post['location'],
+									$this->meta_prefix.'location' => (isset($post['location']) ? $post['location'] : ''),
 									$this->meta_prefix.'start' => $post['start'],
 									$this->meta_prefix.'end' => $post['end'],
 								),

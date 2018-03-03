@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 3.6.5
+Version: 3.6.7
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
@@ -34,8 +34,12 @@ if(is_admin())
 
 	add_filter('manage_mf_calendar_posts_columns', 'column_header_calendar', 5);
 	add_action('manage_mf_calendar_posts_custom_column', 'column_cell_calendar', 5, 2);
+
+	add_filter('post_row_actions', 'row_actions_calendar', 10, 2);
+	add_filter('page_row_actions', 'row_actions_calendar', 10, 2);
 	add_filter('manage_mf_calendar_event_posts_columns', 'column_header_event', 5);
 	add_action('manage_mf_calendar_event_posts_custom_column', 'column_cell_event', 5, 2);
+
 	add_action('rwmb_meta_boxes', 'meta_boxes_calendar');
 
 	add_action('restrict_manage_posts', array($obj_calendar, 'post_filter_select'));
@@ -43,9 +47,6 @@ if(is_admin())
 
 	//add_action('post_updated', array($obj_calendar, 'post_updated'), 10, 3);
 	add_action('delete_post', array($obj_calendar, 'delete_post'));
-
-	add_filter('post_row_actions', 'row_actions_calendar', 10, 2);
-	add_filter('page_row_actions', 'row_actions_calendar', 10, 2);
 
 	function activate_calendar()
 	{
@@ -64,5 +65,7 @@ if(is_admin())
 {
 	add_action('wp_footer', array($obj_calendar, 'get_footer'), 0);
 }*/
+
+add_action('wp_ajax_calendar_action_hide', array($obj_calendar, 'action_hide'));
 
 load_plugin_textdomain('lang_calendar', false, dirname(plugin_basename(__FILE__))."/lang/");
