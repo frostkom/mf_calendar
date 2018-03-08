@@ -68,30 +68,6 @@ function menu_calendar()
 	add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");
 }
 
-function cron_calendar()
-{
-	global $wpdb;
-
-	$meta_prefix = "mf_calendar_";
-
-	$obj_cron = new mf_cron();
-	$obj_calendar = new mf_calendar();
-
-	$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
-
-	$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$meta_prefix."calendar_id' WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()");
-
-	foreach($result as $r)
-	{
-		if($obj_cron->has_expired(array('margin' => .9)))
-		{
-			break;
-		}
-
-		$obj_calendar->fetch_source($r->ID);
-	}
-}
-
 function settings_calendar()
 {
 	$options_area = __FUNCTION__;
@@ -245,39 +221,6 @@ function column_cell_calendar($col, $id)
 					.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 				."</div>";
 			}
-
-			/*else
-			{
-				$result = $wpdb->get_results($wpdb->prepare("SELECT post_date, post_modified FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND ID = '%d' LIMIT 0, 1", $id));
-
-				foreach($result as $r)
-				{
-					$post_date = $r->post_date;
-					$post_modified = $r->post_modified;
-
-					if($post_modified > $post_date)
-					{
-						echo "<i class='fa fa-close red fa-2x'></i>
-						<div class='row-actions'>".__("I have fetched from the source but there were no events", 'lang_calendar')."</div>";
-					}
-
-					else
-					{
-						$post_meta = get_post_meta($id, $meta_prefix.'calendar_id', true);
-
-						if($post_meta != '')
-						{
-							echo "<i class='fa fa-spinner fa-spin fa-2x'></i>
-							<div class='row-actions'>".__("I am waiting to get access to the calendar", 'lang_calendar')."</div>";
-						}
-
-						else
-						{
-							echo "0";
-						}
-					}
-				}
-			}*/
 		break;
 	}
 }

@@ -409,6 +409,27 @@ class mf_calendar
 
 	// Cron
 	##############################
+	function run_cron()
+	{
+		global $wpdb;
+
+		$obj_cron = new mf_cron();
+
+		$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
+
+		$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id' WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()");
+
+		foreach($result as $r)
+		{
+			if($obj_cron->has_expired(array('margin' => .9)))
+			{
+				break;
+			}
+
+			$this->fetch_source($r->ID);
+		}
+	}
+
 	function set_id($id)
 	{
 		$this->id = $id;
@@ -893,7 +914,7 @@ class mf_calendar
 		{
 			$post['uid'] = $post['type']." ".$post['id'];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status IN ('draft', 'publish') AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
 
 			switch($post['status'])
 			{
