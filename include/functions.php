@@ -468,7 +468,9 @@ function meta_calendar_info()
 
 function is_birthday_active()
 {
-	return is_plugin_active("mf_users/index.php") && in_array('profile_birthday', get_option('setting_add_profile_fields'));
+	$setting_add_profile_fields = get_option('setting_add_profile_fields');
+
+	return is_plugin_active("mf_users/index.php") && is_array($setting_add_profile_fields) && in_array('profile_birthday', $setting_add_profile_fields);
 }
 
 function meta_boxes_calendar($meta_boxes)
