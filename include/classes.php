@@ -124,16 +124,16 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		if(!isset($data['calendar_feeds']) || $data['calendar_feeds'] == ''){		$data['calendar_feeds'] = array();}
-		if(!isset($data['calendar_display_filter'])){								$data['calendar_display_filter'] = 'no';}
-		if(!isset($data['calendar_type'])){											$data['calendar_type'] = '';}
-		if(!isset($data['calendar_months']) || !($data['calendar_months'] > 0)){	$data['calendar_months'] = 6;}
+		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = array();}
+		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
+		if(!isset($data['type'])){								$data['type'] = '';}
+		if(!isset($data['months']) || !($data['months'] > 0)){	$data['months'] = 6;}
+		if(!isset($data['limit'])){								$data['limit'] = 0;}
 
 		$this->arr_data = $this->arr_events = array();
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
-			//'type' => $data['calendar_type'],
 			'date_start' => '',
 			'date_end' => '',
 			'week_start' => '',
@@ -149,18 +149,19 @@ class mf_calendar
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
 
-		if(count($data['calendar_feeds']) > 0)
+		if(count($data['feeds']) > 0)
 		{
-			$query_where .= " AND meta_calendar.meta_value IN('".implode("','", $data['calendar_feeds'])."')";
+			$query_where .= " AND meta_calendar.meta_value IN('".implode("','", $data['feeds'])."')";
 		}
 
-		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['calendar_months'] > 0 ? $data['calendar_months'] : 6)." MONTH)";
+		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] > 0 ? $data['months'] : 6)." MONTH)";
 
 		$result = $wpdb->get_results("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC");
 
 		if($wpdb->num_rows > 0)
 		{
 			$year_temp = $yearmonth_temp = $date_temp = "";
+			$i = 0;
 
 			foreach($result as $r)
 			{
@@ -210,7 +211,7 @@ class mf_calendar
 
 				$heading = "";
 
-				switch($data['calendar_type'])
+				switch($data['type'])
 				{
 					case 'week':
 						if($date_temp != $post_start_date)
@@ -265,7 +266,6 @@ class mf_calendar
 				if($post_content != '' || $post_location != '')
 				{
 					$content_class = 'toggler';
-					//$more_icon = "<i class='fa fa-caret-right'></i>";
 					$more_icon = "<i class='fa fa-lg fa-caret-right toggle_icon_closed'></i>
 					<i class='fa fa-lg fa-caret-down toggle_icon_open'></i>";
 
@@ -329,7 +329,7 @@ class mf_calendar
 
 					//display_filter == yes
 					'feed' => $post_feed,
-					'feed_name' => ($data['calendar_display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
+					'feed_name' => ($data['display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
 
 					//type == week
 					'start_week' => $post_start_week,
@@ -348,6 +348,13 @@ class mf_calendar
 
 				//week
 				$date_temp = $post_start_date;
+
+				$i++;
+
+				if($data['limit'] > 0 && $i >= $data['limit'])
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -1105,15 +1112,8 @@ class widget_calendar extends WP_Widget
 
 				if($instance['calendar_display_filter'] == 'yes')
 				{
-					$data = array('post_type' => 'mf_calendar');
-
-					if(count($instance['calendar_feeds']) > 0)
-					{
-						$data['include'] = $instance['calendar_feeds'];
-					}
-
 					$arr_data_feeds = array();
-					get_post_children($data, $arr_data_feeds);
+					get_post_children(array('post_type' => 'mf_calendar', 'include' => $instance['calendar_feeds']), $arr_data_feeds);
 
 					echo "<form action='' method='post' class='mf_form hide'>"
 						.show_select(array('data' => $arr_data_feeds, 'name' => "calendar_feeds[]", 'xtra' => "class='multiselect'".($instance['calendar_filter_label'] != '' ? " data-choose-here='".$instance['calendar_filter_label']."'" : "")))

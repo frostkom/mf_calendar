@@ -34,7 +34,7 @@ if($type == 'events')
 	}
 
 	$obj_calendar = new mf_calendar();
-	$obj_calendar->get_events(array('calendar_feeds' => $calendar_feeds, 'calendar_display_filter' => $calendar_display_filter, 'calendar_type' => $calendar_type, 'calendar_months' => $calendar_months));
+	$obj_calendar->get_events(array('feeds' => $calendar_feeds, 'display_filter' => $calendar_display_filter, 'type' => $calendar_type, 'months' => $calendar_months));
 
 	if(count($obj_calendar->arr_events) > 0)
 	{
