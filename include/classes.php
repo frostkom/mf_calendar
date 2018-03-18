@@ -124,11 +124,14 @@ class mf_calendar
 	{
 		global $wpdb;
 
+		if(!isset($data['id'])){								$data['id'] = 0;}
 		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = array();}
 		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
 		if(!isset($data['type'])){								$data['type'] = '';}
 		if(!isset($data['months']) || !($data['months'] > 0)){	$data['months'] = 6;}
 		if(!isset($data['limit'])){								$data['limit'] = 0;}
+
+		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
 
 		$this->arr_data = $this->arr_events = array();
 		$query_join = $query_where = "";
@@ -148,6 +151,11 @@ class mf_calendar
 		//$query_where .= " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
+
+		if($data['id'] > 0)
+		{
+			$query_where .= " AND ID = '".esc_sql($data['id'])."'";
+		}
 
 		if(count($data['feeds']) > 0)
 		{
@@ -173,6 +181,7 @@ class mf_calendar
 				$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
 				$post_start = get_post_meta($post_id, $this->meta_prefix.'start', true);
 				$post_end = get_post_meta($post_id, $this->meta_prefix.'end', true);
+				$post_registration = get_post_meta($post_id, $this->meta_prefix.'registration', true);
 				$post_uid = get_post_meta($post_id, $this->meta_prefix.'uid', true);
 
 				if(!($post_end > $post_start))
@@ -263,7 +272,7 @@ class mf_calendar
 
 				$content_class = $more_rel = $more_icon = $more_content = "";
 
-				if($post_content != '' || $post_location != '')
+				if($post_content != '' || $post_location != '' || $post_registration > 0 && $data['display_registration'] == true)
 				{
 					$content_class = 'toggler';
 					$more_icon = "<i class='fa fa-lg fa-caret-right toggle_icon_closed'></i>
@@ -314,6 +323,11 @@ class mf_calendar
 							</div>";*/
 						}
 
+						if($post_registration > 0 && $data['display_registration'] == true)
+						{
+							$more_content .= "<a href='".get_permalink($post_registration)."?calendar_id=".$post_id."'>".__("Register Here", 'lang_calendar')."</a>";
+						}
+
 					$more_content .= "</div>";
 				}
 
@@ -357,6 +371,96 @@ class mf_calendar
 				}
 			}
 		}
+	}
+
+	function get_next_event($data)
+	{
+		$out = "<div class='widget calendar'>
+			<div class='section'>
+				<ul>
+					<li><h4>".$data['array']['title']."</h4></li>";
+
+					foreach($data['array']['meta'] as $event)
+					{
+						$out .= "<li itemscope itemtype='//schema.org/Event'>
+							<div class='date' itemprop='startDate' content='".$event['start_date_c']."'><p>".$event['start_day']."</p></div>
+							<div class='content".$event['content_class']."' rel='".$event['id']."'>
+								<p>
+									<span";
+
+										if($event['more_icon'] != '')
+										{
+											$out .= " class='has_more'";
+										}
+
+									//$event['title']
+									$out .= " itemprop='name'>".$event['heading']."</span>
+									".$event['more_icon']
+								."</p>";
+
+								if($event['date_end'] != '')
+								{
+									$out .= "<span itemprop='endDate' content='".$event['end_date_c']."'>".$event['date_end']."</span>";
+								}
+
+								$out .= $event['more_content']
+							."</div>
+						</li>";
+					}
+
+				$out .= "</ul>
+			</div>
+		</div>";
+
+		return $out;
+	}
+
+	function filter_form_after_fields($out)
+	{
+		$calendar_id = check_var('calendar_id', 'int');
+
+		if($calendar_id > 0)
+		{
+			$this->get_events(array('id' => $calendar_id, 'display_registration' => false));
+
+			$data = array(
+				'title' => __("Event", 'lang_calendar'),
+				'meta' => $this->arr_events,
+			);
+
+			if(is_array($data['meta']) && count($data['meta']) > 0)
+			{
+				$out .= $this->get_next_event(array('array' => $data))
+				.input_hidden(array('name' => 'calendar_id', 'value' => $calendar_id));
+			}
+		}
+
+		return apply_filters('the_content', $out);
+	}
+
+	function filter_form_on_submit($data)
+	{
+		$calendar_id = check_var('calendar_id', 'int');
+
+		if($calendar_id > 0)
+		{
+			/*
+			if(!isset($data['arr_mail_content']['doc_types']))
+			{
+				$data['arr_mail_content']['doc_types'] = array();
+			}
+
+			$data['arr_mail_content']['doc_types'][] = array(
+				'label' => $key,
+				'value' => $value,
+			);
+
+			$data['arr_mail_content']['products'][$i]['id'] = $product_id;
+			$data['arr_mail_content']['products'][$i]['value'] = $product_title;
+			*/
+		}
+
+		return $data;
 	}
 
 	function get_footer()

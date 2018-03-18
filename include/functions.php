@@ -504,6 +504,12 @@ function meta_boxes_calendar($meta_boxes)
 				'id' => $meta_prefix.'end',
 				'type' => 'datetime', //Replace with 'date' and 'clock'
 			),
+			array(
+				'name' => __("Registration", 'lang_calendar'),
+				'id' => $meta_prefix.'registration',
+				'type' => 'select',
+				'options' => get_posts_for_select(array('post_type' => "mf_form")),
+			),
 		)
 	);
 
