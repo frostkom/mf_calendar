@@ -10,6 +10,408 @@ class mf_calendar
 		$this->meta_prefix = "mf_calendar_";
 	}
 
+	function column_header_calendar($cols)
+	{
+		unset($cols['date']);
+
+		$cols['calendar_id'] = __("Account", 'lang_calendar');
+		$cols['amount_of_posts'] = __("Amount", 'lang_calendar');
+
+		return $cols;
+	}
+
+	function column_cell_calendar($col, $id)
+	{
+		global $wpdb;
+
+		switch($col)
+		{
+			case 'calendar_id':
+				$post_meta = get_post_meta($id, $this->meta_prefix.$col, true);
+
+				if($post_meta == '' && $this->is_birthday_active())
+				{
+					$post_meta = "<em>(".__("birthdays", 'lang_calendar').")</em>";
+				}
+
+				if($post_meta != '')
+				{
+					$obj_calendar = new mf_calendar($id);
+
+					$fetch_link = "";
+
+					if(IS_SUPER_ADMIN)
+					{
+						$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar' AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id));
+
+						if($wpdb->num_rows > 0)
+						{
+							$intCalendarID = check_var('intCalendarID');
+
+							if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce'], 'calendar_fetch_'.$id))
+							{
+								$obj_calendar->fetch_source($id);
+							}
+
+							else
+							{
+								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=mf_calendar&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id)."'>".__("Fetch", 'lang_calendar')."</a> | ";
+							}
+						}
+					}
+
+					$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
+
+					$obj_calendar->get_calendar_url();
+
+					if($obj_calendar->calendar_url != '')
+					{
+						echo "<a href='".$obj_calendar->calendar_url."'>".$post_meta."</a>";
+					}
+
+					else
+					{
+						echo $post_meta;
+					}
+
+					echo "<div class='row-actions'>"
+						.$fetch_link
+						.__("Fetched", 'lang_calendar').": ".format_date($post_modified)
+					."</div>";
+				}
+			break;
+
+			case 'amount_of_posts':
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d'", $id));
+				$amount = $wpdb->num_rows;
+
+				if($amount > 0)
+				{
+					$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
+
+					echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilter=".$id)."'>".$amount."</a>"
+					."<div class='row-actions'>"
+						.__("Latest", 'lang_calendar').": ".format_date($post_latest)
+					."</div>";
+				}
+			break;
+		}
+	}
+
+	function row_actions_calendar($actions, $post)
+	{
+		if($post->post_type == 'mf_calendar_event')
+		{
+			$actions = array();
+		}
+
+		return $actions;
+	}
+
+	function filter_end_date($end_date)
+	{
+		return date("Y-m-d", strtotime($end_date." -1 day"));
+	}
+
+	function column_header_event($cols)
+	{
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
+
+		unset($cols['title']);
+		unset($cols['date']);
+
+		$cols['event_title'] = __("Title", 'lang_calendar');
+		$cols['location'] = __("Location", 'lang_calendar');
+		$cols['datetime'] = __("Date", 'lang_calendar');
+		$cols['registration'] = __("Registration", 'lang_calendar');
+		$cols['calendar'] = __("Calendar", 'lang_calendar');
+
+		return $cols;
+	}
+
+	function column_cell_event($col, $id)
+	{
+		global $done_text, $error_text;
+
+		switch($col)
+		{
+			case 'event_title':
+				$post_title = get_the_title($id);
+
+				$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
+
+				if($post_uid != '')
+				{
+					echo $post_title;
+
+					if(get_post_status($id) == 'draft')
+					{
+						echo "<span class='strong nowrap'> - ".__("Hidden", 'lang_calendar')."</span>";
+					}
+
+					else
+					{
+						echo "<div class='row-actions'>
+							<span class='calendar_action_hide'>
+								<a href='#id_".$id."' class='calendar_event_post_action calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
+							</span>
+						</div>";
+					}
+				}
+
+				else
+				{
+					$edit_url = admin_url("post.php?post=".$id."&action=edit");
+
+					echo "<a href='".$edit_url."'>".$post_title."</a>"
+					."<div class='row-actions'>";
+
+						if(get_post_status($id) == 'trash')
+						{
+							echo "<span class='untrash'>
+								<a href='".wp_nonce_url(admin_url("post.php?post=".$id."&action=untrash"), "untrash-post_".$id)."'>".__("Recover", 'lang_calendar')."</a>
+							</span>";
+						}
+
+						else
+						{
+							echo "<span class='edit'>
+								<a href='".$edit_url."'>".__("Edit", 'lang_calendar')."</a> | 
+							</span>
+							<span class='trash'>
+								<a href='".get_delete_post_link($id)."'>".__("Delete", 'lang_calendar')."</a>
+							</span>";
+						}
+
+					echo "</div>";
+				}
+			break;
+
+			case 'location':
+				$post_location = get_post_meta($id, $this->meta_prefix.'location', true);
+
+				$obj_calendar = new mf_calendar();
+
+				echo $obj_calendar->get_map_link($post_location);
+			break;
+
+			case 'datetime':
+				$post_start = get_post_meta($id, $this->meta_prefix.'start', true);
+				$post_end = get_post_meta($id, $this->meta_prefix.'end', true);
+
+				if(!($post_end > $post_start))
+				{
+					$post_end = $post_start;
+				}
+
+				$post_start_date = date("Y-m-d", strtotime($post_start));
+				$post_start_year = date("Y", strtotime($post_start));
+				$post_start_yearmonth = date("Y-m", strtotime($post_start));
+				$post_start_month = date("m", strtotime($post_start));
+				$post_start_day = date("d", strtotime($post_start));
+				$post_start_time = date("H:i", strtotime($post_start));
+
+				$post_end_date = date("Y-m-d", strtotime($post_end));
+				$post_end_time = date("H:i", strtotime($post_end));
+
+				if($post_start > DEFAULT_DATE)
+				{
+					if($post_start_date == $post_end_date)
+					{
+						echo $post_start_date;
+
+						if($post_start_time > "00:00")
+						{
+							echo "&nbsp;".$post_start_time;
+
+							if($post_end_time > "00:00" && $post_end_time != $post_start_time)
+							{
+								echo "&nbsp;-&nbsp;".$post_end_time;
+							}
+						}
+					}
+
+					else
+					{
+						$post_end_date = $this->filter_end_date($post_end_date);
+
+						if($post_start_date == $post_end_date)
+						{
+							echo $post_start_date;
+						}
+
+						else
+						{
+							echo $post_start_date."&nbsp;-&nbsp;".$post_end_date;
+						}
+					}
+				}
+			break;
+
+			case 'registration':
+				$arr_registration_meta = $this->get_registration_meta($id);
+
+				if($arr_registration_meta['registration'] > 0)
+				{
+					echo "<a href='".get_permalink($arr_registration_meta['registration'])."?calendar_id=".$id."'>".get_post_title($arr_registration_meta['registration'])."</a>";
+
+					if($arr_registration_meta['limit_participants'] > 0)
+					{
+						echo "<span> (".sprintf(__("%d of %d spots left", 'lang_calendar'), $arr_registration_meta['spots_left'], $arr_registration_meta['limit_participants']).")</span>";
+					}
+				}
+			break;
+
+			case 'calendar':
+				$post_meta = get_post_meta($id, $this->meta_prefix.$col, true);
+
+				$post_parent = $post_meta > 0 ? get_the_title($post_meta) : "";
+
+				echo "<a href='post.php?post=".$post_meta."&action=edit'>".$post_parent."</a>";
+
+				$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
+
+				if($post_uid != '')
+				{
+					echo "<div class='row-actions'>UID: ".$post_uid."</div>";
+				}
+			break;
+		}
+	}
+
+	function is_birthday_active()
+	{
+		$setting_add_profile_fields = get_option('setting_add_profile_fields');
+
+		return is_plugin_active("mf_users/index.php") && is_array($setting_add_profile_fields) && in_array('profile_birthday', $setting_add_profile_fields);
+	}
+
+	function meta_calendar_info()
+	{
+		$out = "<ol>
+			<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
+			<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
+			<li>".__("Click on My Calendar Settings", 'lang_calendar')."</li>
+			<li>".__("Choose which calendar to share if there are multiple", 'lang_calendar')."</li>
+			<li>".__("Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category", 'lang_calendar')."</li>
+		</ol>";
+
+		return $out;
+	}
+
+	function meta_boxes($meta_boxes)
+	{
+		global $wpdb;
+
+		$fields_settings = array(
+			array(
+				'name' => __("Calendar ID", 'lang_calendar'),
+				'id' => $this->meta_prefix.'calendar_id',
+				'type' => 'text',
+			),
+			array(
+				'id' => $this->meta_prefix.'info',
+				'type' => 'custom_html',
+				'callback' => array($this, 'meta_calendar_info'),
+			),
+		);
+
+		if($this->is_birthday_active())
+		{
+			$fields_settings[] = array(
+				'name' => __("Display Birthdays", 'lang_calendar'),
+				'id' => $this->meta_prefix.'display_birthdays',
+				'type' => 'select',
+				'options' => get_yes_no_for_select(),
+				'std' => 'yes',
+			);
+		}
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'settings',
+			'title' => __("Settings", 'lang_calendar'),
+			'post_types' => array('mf_calendar'),
+			//'context' => 'side',
+			'priority' => 'low',
+			'fields' => $fields_settings
+		);
+
+		$arr_data = array();
+		get_post_children(array('post_type' => 'mf_calendar', 'add_choose_here' => true), $arr_data);
+
+		$default_calendar = '';
+
+		/*if($default_calendar == '')
+		{
+			$default_calendar = check_var('list_id', 'int');
+		}*/
+
+		if($default_calendar == '')
+		{
+			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".$wpdb->postmeta." WHERE meta_key = %s ORDER BY meta_id DESC LIMIT 0, 1", $this->meta_prefix.'calendar'));
+		}
+
+		if($default_calendar == '')
+		{
+			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", 'mf_calendar', 'publish'));
+		}
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'settings',
+			'title' => __("Settings", 'lang_calendar'),
+			'post_types' => array('mf_calendar_event'),
+			'context' => 'side',
+			'priority' => 'low',
+			'fields' => array(
+				array(
+					'name' => __("Calendar", 'lang_calendar'),
+					'id' => $this->meta_prefix.'calendar',
+					'type' => 'select',
+					'options' => $arr_data,
+					'std' => $default_calendar,
+				),
+				array(
+					'name' => __("Location", 'lang_calendar'),
+					'id' => $this->meta_prefix.'location',
+					'type' => 'textarea', //Replace with 'gps'
+				),
+				array(
+					'name' => __("Start", 'lang_calendar'),
+					'id' => $this->meta_prefix.'start',
+					'type' => 'datetime', //Replace with 'date' and 'clock'
+				),
+				array(
+					'name' => __("End", 'lang_calendar'),
+					'id' => $this->meta_prefix.'end',
+					'type' => 'datetime', //Replace with 'date' and 'clock'
+				),
+				array(
+					'name' => __("Registration", 'lang_calendar'),
+					'id' => $this->meta_prefix.'registration',
+					'type' => 'select',
+					'options' => get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form")),
+					'attributes' => array(
+						'condition_type' => 'hide_if_empty',
+						'condition_field' => $this->meta_prefix.'limit_participants',
+					),
+				),
+				array(
+					'name' => __("Limit Participants", 'lang_calendar'),
+					'id' => $this->meta_prefix.'limit_participants',
+					'type' => 'number',
+					'attributes' => array(
+						'min' => 0,
+					),
+				),
+			)
+		);
+
+		return $meta_boxes;
+	}
+
 	function post_filter_select()
 	{
 		global $post_type, $wpdb;
@@ -181,8 +583,9 @@ class mf_calendar
 				$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
 				$post_start = get_post_meta($post_id, $this->meta_prefix.'start', true);
 				$post_end = get_post_meta($post_id, $this->meta_prefix.'end', true);
-				$post_registration = get_post_meta($post_id, $this->meta_prefix.'registration', true);
 				$post_uid = get_post_meta($post_id, $this->meta_prefix.'uid', true);
+
+				$arr_registration_meta = $this->get_registration_meta($post_id);
 
 				if(!($post_end > $post_start))
 				{
@@ -261,7 +664,7 @@ class mf_calendar
 				{
 					if($post_uid != '')
 					{
-						$post_end_date = filter_end_date($post_end_date);
+						$post_end_date = $this->filter_end_date($post_end_date);
 					}
 
 					if($post_start_date != $post_end_date)
@@ -272,63 +675,80 @@ class mf_calendar
 
 				$content_class = $more_rel = $more_icon = $more_content = "";
 
-				if($post_content != '' || $post_location != '' || $post_registration > 0 && $data['display_registration'] == true)
+				if($post_content != '')
+				{
+					$more_content .= "<p itemprop='description'>".$post_content."</p>";
+				}
+
+				if($post_location != '')
+				{
+					if(is_plugin_active("mf_maps/index.php"))
+					{
+						$more_content .= get_map(array('id' => $post_id, 'input' => $post_location)); //, 'coords' => $profile_search_coords
+					}
+
+					else
+					{
+						$more_content .= $this->get_map_link($post_location);
+					}
+
+					$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
+						<meta itemprop='address' content='".$post_location."'>
+					</div>";
+
+					/* Marknadsgatan 22 || Turning Torso, Lilla Varvsgatan 14, 211 15 Malmö, Sweden */
+					/*$location_name = $location_address = $location_locality = $location_region = $location_zip = '';
+
+					foreach(explode(",", $post_location) as $location_temp)
+					{
+						if(preg_match("/(\d\s){5-6}/", $location_temp))
+						{
+							list($location_zip, $location_locality) = explode(" ", $location_temp);
+						}
+					}
+
+					$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
+						<span itemprop='name'>".$location_name."</span>
+						<div itemprop='address' itemscope itemtype='//schema.org/PostalAddress'>
+							<span itemprop='streetAddress'>".$location_address."</span><br>
+							<span itemprop='addressLocality'>".$location_locality."</span>,
+							<span itemprop='addressRegion'>".$location_region."</span>
+							<span itemprop='postalCode'>".$location_zip."</span>
+						</div>
+					</div>";*/
+				}
+
+				if($arr_registration_meta['registration'] > 0)
+				{
+					if($arr_registration_meta['limit_participants'] == 0 || $arr_registration_meta['spots_left'] > 0)
+					{
+						if($data['display_registration'] == true)
+						{
+							$more_content .= "<a href='".get_permalink($arr_registration_meta['registration'])."?calendar_id=".$post_id."'>"
+								.__("Register Here", 'lang_calendar');
+
+								if($arr_registration_meta['limit_participants'] > 0)
+								{
+									$more_content .= " (".sprintf(__("%d of %d spots left", 'lang_calendar'), $arr_registration_meta['spots_left'], $arr_registration_meta['limit_participants']).")";
+								}
+
+							$more_content .= "</a>";
+						}
+					}
+
+					else
+					{
+						$more_content .= "<span>".__("I am sorry to tell you that the course is already full.", 'lang_calendar')."</span>";
+					}
+				}
+
+				if($more_content != '')
 				{
 					$content_class = 'toggler';
 					$more_icon = "<i class='fa fa-lg fa-caret-right toggle_icon_closed'></i>
 					<i class='fa fa-lg fa-caret-down toggle_icon_open'></i>";
 
-					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>";
-
-						if($post_content != '')
-						{
-							$more_content .= "<p itemprop='description'>".$post_content."</p>";
-						}
-
-						if($post_location != '')
-						{
-							if(is_plugin_active("mf_maps/index.php"))
-							{
-								$more_content .= get_map(array('id' => $post_id, 'input' => $post_location)); //, 'coords' => $profile_search_coords
-							}
-
-							else
-							{
-								$more_content .= $this->get_map_link($post_location);
-							}
-
-							$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
-								<meta itemprop='address' content='".$post_location."'>
-							</div>";
-
-							/* Marknadsgatan 22 || Turning Torso, Lilla Varvsgatan 14, 211 15 Malmö, Sweden */
-							/*$location_name = $location_address = $location_locality = $location_region = $location_zip = '';
-
-							foreach(explode(",", $post_location) as $location_temp)
-							{
-								if(preg_match("/(\d\s){5-6}/", $location_temp))
-								{
-									list($location_zip, $location_locality) = explode(" ", $location_temp);
-								}
-							}
-
-							$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
-								<span itemprop='name'>".$location_name."</span>
-								<div itemprop='address' itemscope itemtype='//schema.org/PostalAddress'>
-									<span itemprop='streetAddress'>".$location_address."</span><br>
-									<span itemprop='addressLocality'>".$location_locality."</span>,
-									<span itemprop='addressRegion'>".$location_region."</span>
-									<span itemprop='postalCode'>".$location_zip."</span>
-								</div>
-							</div>";*/
-						}
-
-						if($post_registration > 0 && $data['display_registration'] == true)
-						{
-							$more_content .= "<a href='".get_permalink($post_registration)."?calendar_id=".$post_id."'>".__("Register Here", 'lang_calendar')."</a>";
-						}
-
-					$more_content .= "</div>";
+					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>".$more_content."</div>";
 				}
 
 				$this->arr_events[] = array(
@@ -415,23 +835,55 @@ class mf_calendar
 		return $out;
 	}
 
+	function get_registration_meta($post_id)
+	{
+		$out = array(
+			'registration' => get_post_meta($post_id, $this->meta_prefix.'registration', true),
+			'limit_participants' => get_post_meta($post_id, $this->meta_prefix.'limit_participants', true),
+		);
+
+		if($out['limit_participants'] > 0)
+		{
+			$obj_form = new mf_form();
+			$obj_form->get_form_id($out['registration']);
+
+			$out['spots_left'] = $out['limit_participants'] - $obj_form->get_answer_amount(array('form_id' => $obj_form->id, 'meta_key' => 'calendar_id', 'meta_value' => $post_id));
+		}
+
+		return $out;
+	}
+
 	function filter_form_after_fields($out)
 	{
-		$calendar_id = check_var('calendar_id', 'int');
+		global $error_text;
 
-		if($calendar_id > 0)
+		$post_id = check_var('calendar_id', 'int');
+
+		if($post_id > 0)
 		{
-			$this->get_events(array('id' => $calendar_id, 'display_registration' => false));
+			$arr_registration_meta = $this->get_registration_meta($post_id);
 
-			$data = array(
-				'title' => __("Event", 'lang_calendar'),
-				'meta' => $this->arr_events,
-			);
-
-			if(is_array($data['meta']) && count($data['meta']) > 0)
+			if($arr_registration_meta['limit_participants'] == 0 || $arr_registration_meta['spots_left'] > 0)
 			{
-				$out .= $this->get_next_event(array('array' => $data))
-				.input_hidden(array('name' => 'calendar_id', 'value' => $calendar_id));
+				$this->get_events(array('id' => $post_id, 'display_registration' => false));
+
+				if(count($this->arr_events) > 0)
+				{
+					$data = array(
+						'title' => __("Event", 'lang_calendar'),
+						'meta' => $this->arr_events,
+					);
+
+					$out .= $this->get_next_event(array('array' => $data))
+					.input_hidden(array('name' => 'calendar_id', 'value' => $post_id));
+				}
+			}
+
+			else
+			{
+				$error_text = __("I am sorry to tell you that the course is already full.", 'lang_calendar');
+
+				$out .= get_notification();
 			}
 		}
 
@@ -440,24 +892,12 @@ class mf_calendar
 
 	function filter_form_on_submit($data)
 	{
-		$calendar_id = check_var('calendar_id', 'int');
+		$post_id = check_var('calendar_id', 'int');
 
-		if($calendar_id > 0)
+		if($post_id > 0)
 		{
-			/*
-			if(!isset($data['arr_mail_content']['doc_types']))
-			{
-				$data['arr_mail_content']['doc_types'] = array();
-			}
-
-			$data['arr_mail_content']['doc_types'][] = array(
-				'label' => $key,
-				'value' => $value,
-			);
-
-			$data['arr_mail_content']['products'][$i]['id'] = $product_id;
-			$data['arr_mail_content']['products'][$i]['value'] = $product_title;
-			*/
+			$obj_form = new mf_form();
+			$obj_form->set_meta(array('id' => $data['answer_id'], 'key' => 'calendar_id', 'value' => $post_id));
 		}
 
 		return $data;
