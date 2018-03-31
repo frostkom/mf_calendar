@@ -913,7 +913,7 @@ class mf_calendar
 		mf_enqueue_script('backbone');
 		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
 		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
-		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", $plugin_version);
+		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array('current_week' => date('W'), 'next_week' => date('W', strtotime("+1 week")), 'current_week_text' => __("Current Week", 'lang_calendar'), 'next_week_text' => __("Next Week", 'lang_calendar'), 'week_text' => __("w", 'lang_calendar')), $plugin_version);
 		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
 
 		$obj_base = new mf_base();
@@ -1168,7 +1168,7 @@ class mf_calendar
 										if($key == 'BYDAY')
 										{
 											$value = explode(",", $value);
-										}									
+										}
 
 										$arr_repeat[$key] = $value;
 									}
@@ -1254,11 +1254,11 @@ class mf_calendar
 													{
 														$by_day = $arr_repeat['BYDAY'][0];
 														$by_day_week_number = substr($by_day, 0, 1);
-														
+
 														$ordinal = $ordinal_array[$by_day_week_number];
-														
+
 														$by_day_weekday = substr($by_day, 1);
-														
+
 														$day_index = array_search($by_day_weekday, $weekday_short_array);
 														$dayname = $weekday_medium_array[$day_index];
 
@@ -1648,8 +1648,7 @@ class widget_calendar extends WP_Widget
 				{
 					echo "<h4 class='hide'>
 						<i class='fa fa-chevron-left controls previous'></i>
-						<span>".__("w", 'lang_calendar')."<span class='calendar_week'></span></span>
-						<span class='calendar_year'></span>
+						<span class='calendar_week'></span>
 						<i class='fa fa-chevron-right controls next'></i>
 					</h4>";
 				}

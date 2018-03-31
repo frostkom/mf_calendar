@@ -85,16 +85,27 @@ var CalendarView = Backbone.View.extend(
 
 		this.chosen_feeds = dom_obj.val() || [];
 
-		console.log('change_feeds');
-
-		/*this.update_current_week();*/
 		this.show_events();
 	},
 
 	update_current_week: function()
 	{
-		jQuery(this.el).find(".calendar_week").text(this.display_week);
-		jQuery(this.el).find(".calendar_year").text(this.display_year);
+		if(this.display_week == script_calendar_views.current_week)
+		{
+			var week_text = script_calendar_views.current_week_text;
+		}
+
+		else if(this.display_week == script_calendar_views.next_week)
+		{
+			var week_text = script_calendar_views.next_week_text;
+		}
+
+		else
+		{
+			var week_text = script_calendar_views.week_text + this.display_week + " - " + this.display_year;
+		}
+
+		jQuery(this.el).find(".calendar_week").text(week_text);
 	},
 
 	show_events: function()

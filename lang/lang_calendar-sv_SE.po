@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-19 10:49+0100\n"
+"POT-Creation-Date: 2018-03-31 08:51+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -169,6 +169,18 @@ msgstr "Jag är ledsen att behöva berätta det, men platserna är slut."
 msgid "Event"
 msgstr "Händelse"
 
+#: ../include/classes.php:916
+msgid "Current Week"
+msgstr "Nuvarande vecka"
+
+#: ../include/classes.php:916
+msgid "Next Week"
+msgstr "Nästa vecka"
+
+#: ../include/classes.php:916
+msgid "w"
+msgstr "v"
+
 #: ../include/classes.php:923
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
@@ -195,52 +207,48 @@ msgstr "%s fyller år"
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:1651
-msgid "w"
-msgstr "v"
-
-#: ../include/classes.php:1671
-#: ../include/classes.php:1743
+#: ../include/classes.php:1670
+#: ../include/classes.php:1742
 msgid "Read More"
 msgstr "Läs mer"
 
-#: ../include/classes.php:1703
+#: ../include/classes.php:1702
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:1704
+#: ../include/classes.php:1703
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:1711
+#: ../include/classes.php:1710
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:1716
+#: ../include/classes.php:1715
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:1721
+#: ../include/classes.php:1720
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:1725
+#: ../include/classes.php:1724
 msgid "Label"
 msgstr "Etikett"
 
-#: ../include/classes.php:1725
+#: ../include/classes.php:1724
 msgid "Choose here"
 msgstr "Välj här"
 
-#: ../include/classes.php:1738
+#: ../include/classes.php:1737
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:1741
+#: ../include/classes.php:1740
 msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:1741
+#: ../include/classes.php:1740
 msgid "months"
 msgstr "månader"
 
