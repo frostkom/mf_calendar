@@ -39,14 +39,6 @@ function init_calendar()
 	);
 
 	register_post_type('mf_calendar_event', $args);
-
-	if(!is_admin())
-	{
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
-
-		mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
-	}
 }
 
 function menu_calendar()

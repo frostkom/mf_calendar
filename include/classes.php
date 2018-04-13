@@ -10,6 +10,35 @@ class mf_calendar
 		$this->meta_prefix = "mf_calendar_";
 	}
 
+	function admin_init()
+	{
+		global $pagenow;
+
+		if($pagenow == 'edit.php' && check_var('post_type') == 'mf_calendar_event')
+		{
+			$plugin_include_url = plugin_dir_url(__FILE__);
+			$plugin_version = get_plugin_version(__FILE__);
+
+			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
+		}
+	}
+
+	function wp_head()
+	{
+		$plugin_base_include_url = plugins_url()."/mf_base/include/";
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
+
+		mf_enqueue_script('underscore');
+		mf_enqueue_script('backbone');
+		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
+		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
+		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array('current_week' => date('W'), 'next_week' => date('W', strtotime("+1 week")), 'current_week_text' => __("Current Week", 'lang_calendar'), 'next_week_text' => __("Next Week", 'lang_calendar'), 'week_text' => __("w", 'lang_calendar')), $plugin_version);
+		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+	}
+
 	function column_header_calendar($cols)
 	{
 		unset($cols['date']);
@@ -115,11 +144,6 @@ class mf_calendar
 
 	function column_header_event($cols)
 	{
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
-
-		mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
-
 		unset($cols['title']);
 		unset($cols['date']);
 
@@ -905,17 +929,6 @@ class mf_calendar
 
 	function get_footer()
 	{
-		$plugin_base_include_url = plugins_url()."/mf_base/include/";
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
-
-		mf_enqueue_script('underscore');
-		mf_enqueue_script('backbone');
-		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
-		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
-		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array('current_week' => date('W'), 'next_week' => date('W', strtotime("+1 week")), 'current_week_text' => __("Current Week", 'lang_calendar'), 'next_week_text' => __("Next Week", 'lang_calendar'), 'week_text' => __("w", 'lang_calendar')), $plugin_version);
-		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
-
 		$obj_base = new mf_base();
 		$out = $obj_base->get_templates(array('lost_connection'));
 
