@@ -521,9 +521,7 @@ class mf_calendar
 
 		else
 		{
-			$error_text = __("I could not hide the event for you. An admin has been notified about this issue", 'lang_calendar');
-
-			error_log($error_text." (".$wpdb->last_query.")");
+			$error_text = __("I could not hide the event for you. If the problem persist, please contact an admin regarding this", 'lang_calendar');
 		}
 
 		$out = get_notification();
@@ -1017,14 +1015,16 @@ class mf_calendar
 	{
 		$this->get_calendar_id();
 
+		$this->calendar_url = '';
+
 		if($this->calendar_id != '')
 		{
 			$google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
 
-			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
-
-			return $this->calendar_url;
+			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20	
 		}
+		
+		return $this->calendar_url;
 	}
 
 	function fetch_source($id)
@@ -1398,7 +1398,7 @@ class mf_calendar
 
 				if(count($json['items']) == 250)
 				{
-					error_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$calendar_url.")");
+					do_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$calendar_url.")");
 				}
 			}
 
@@ -1408,7 +1408,7 @@ class mf_calendar
 
 				if($content != '' && !preg_match("/Not Found/i", $content))
 				{
-					error_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".$calendar_url.")"); //, ".htmlspecialchars($content)."
+					do_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".$calendar_url.")"); //, ".htmlspecialchars($content)."
 				}
 			}
 		}
