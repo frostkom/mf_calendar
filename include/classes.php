@@ -1065,7 +1065,7 @@ class mf_calendar
 
 		$calendar_url = $this->get_calendar_url();
 
-		if($calendar_url != '')
+		if($calendar_url != '' && $this->calendar_id != '')
 		{
 			$content = get_url_content($calendar_url);
 			$json = json_decode($content, true);
