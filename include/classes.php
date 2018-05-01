@@ -1078,7 +1078,7 @@ class mf_calendar
 
 		$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
-		$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id' WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()");
+		$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()"); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
 
 		foreach($result as $r)
 		{
