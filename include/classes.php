@@ -1666,7 +1666,7 @@ class mf_calendar
 
 		foreach($this->arr_events as $post)
 		{
-			if($post['id'] != '' && $post['title'] != '')
+			if($post['id'] != '' && ($post['title'] != '' || $post['content'] != ''))
 			{
 				$post['uid'] = $post['type']." ".$post['id'];
 
