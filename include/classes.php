@@ -5,7 +5,8 @@ class mf_calendar
 	function __construct($id = 0)
 	{
 		$this->id = $id > 0 ? $id : 0;
-		$this->calendar_id = "";
+
+		$this->calendar_id = $this->custom_url = $this->display_birthdays = '';
 
 		$this->meta_prefix = "mf_calendar_";
 	}
@@ -1726,12 +1727,14 @@ class mf_calendar
 										'ID' => $r->ID,
 										'post_title' => $post['title'],
 										'post_content' => $post['content'],
-										'guid' => $post['link'],
+										'guid' => (isset($post['link']) ? $post['link'] : ''),
 										'post_parent' => $this->id,
 										'meta_input' => array(
 											$this->meta_prefix.'calendar' => $this->id,
 											$this->meta_prefix.'uid' => $post['uid'],
-											$this->meta_prefix.'location' => $post['location'],
+											$this->meta_prefix.'location' => (isset($post['location']) ? $post['location'] : ''),
+											$this->meta_prefix.'longitude' => (isset($post['longitude']) ? $post['longitude'] : ''),
+											$this->meta_prefix.'latitude' => (isset($post['latitude']) ? $post['latitude'] : ''),
 											$this->meta_prefix.'start' => $post['start'],
 											$this->meta_prefix.'end' => $post['end'],
 										),
