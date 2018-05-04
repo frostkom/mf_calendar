@@ -1153,14 +1153,17 @@ class mf_calendar
 			$this->fetch_birthdays();
 		}
 
-		else
+		/*else
 		{
 			do_log(sprintf(__("The calendar (%d) has no source", 'lang_calendar'), $this->id));
-		}
+		}*/
 
-		$this->insert_events();
-		$this->remove_deleted();
-		$this->set_date_modified();
+		if(count($this->arr_events) > 0)
+		{
+			$this->insert_events();
+			$this->remove_deleted();
+			$this->set_date_modified();
+		}
 	}
 
 	function fetch_google_calendar()
@@ -1773,19 +1776,16 @@ class mf_calendar
 
 		$arr_titles = array();
 
-		if(count($this->arr_events) > 0)
+		foreach($this->arr_events as $post)
 		{
-			foreach($this->arr_events as $post)
-			{
-				$arr_titles[] = $post['type']." ".$post['id'];
-			}
+			$arr_titles[] = $post['type']." ".$post['id'];
+		}
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND meta_key = '".$this->meta_prefix."uid' AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->id));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND meta_key = '".$this->meta_prefix."uid' AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->id));
 
-			foreach($result as $r)
-			{
-				wp_trash_post($r->ID);
-			}
+		foreach($result as $r)
+		{
+			wp_trash_post($r->ID);
 		}
 	}
 
