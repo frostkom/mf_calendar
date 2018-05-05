@@ -135,7 +135,7 @@ class mf_calendar
 				{
 					$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
 
-					echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilter=".$id)."'>".$amount."</a>"
+					echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilterCalendar=".$id)."'>".$amount."</a>"
 					."<div class='row-actions'>"
 						.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 					."</div>";
@@ -528,14 +528,15 @@ class mf_calendar
 
 		if($post_type == 'mf_calendar_event')
 		{
-			$strFilter = check_var('strFilter');
+			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar', 'save' => true));
+			$strFilterCalendar = check_var('strFilterCalendar');
 
 			$arr_data = array();
 			get_post_children(array('post_type' => 'mf_calendar', 'post_status' => '', 'add_choose_here' => true), $arr_data);
 
-			if(count($arr_data) > 1)
+			if(count($arr_data) > 2)
 			{
-				echo show_select(array('data' => $arr_data, 'name' => "strFilter", 'value' => $strFilter));
+				echo show_select(array('data' => $arr_data, 'name' => 'strFilterCalendar', 'value' => $strFilterCalendar));
 			}
 		}
 	}
@@ -548,14 +549,15 @@ class mf_calendar
 		{
 			if($post_type == 'mf_calendar_event')
 			{
-				$strFilter = check_var('strFilter');
+				//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar'));
+				$strFilterCalendar = check_var('strFilterCalendar');
 
-				if($strFilter != '')
+				if($strFilterCalendar != '')
 				{
 					$wp_query->query_vars['meta_query'] = array(
 						array(
 							'key' => $this->meta_prefix.'calendar',
-							'value' => $strFilter,
+							'value' => $strFilterCalendar,
 							'compare' => '=',
 						),
 					);
@@ -1669,7 +1671,7 @@ class mf_calendar
 
 		foreach($this->arr_events as $post)
 		{
-			if($post['id'] != '' && ($post['title'] != '' || $post['content'] != ''))
+			if($post['id'] != '' && $post['type'] != '')
 			{
 				$post['uid'] = $post['type']." ".$post['id'];
 
