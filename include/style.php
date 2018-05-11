@@ -91,7 +91,7 @@ echo "@media all
 
 					.widget.calendar .section > ul li .content
 					{
-						flex: 1 0 auto;
+						flex: 1 0 0;
 						margin-left: 2%;
 						text-align: left;
 					}
