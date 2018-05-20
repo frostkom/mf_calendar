@@ -36,7 +36,16 @@ class mf_calendar
 		mf_enqueue_script('backbone');
 		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
 		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
-		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array('current_week' => date('W'), 'next_week' => date('W', strtotime("+1 week")), 'current_week_text' => __("Current Week", 'lang_calendar'), 'next_week_text' => __("Next Week", 'lang_calendar'), 'week_text' => __("w", 'lang_calendar')), $plugin_version);
+		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
+			'last_week' => date('W', strtotime("-1 week")),
+			'last_week_text' => __("Previous Week", 'lang_calendar'),
+			'current_year' => date('Y'),
+			'current_week' => date('W'),
+			'current_week_text' => __("Current Week", 'lang_calendar'),
+			'next_week' => date('W', strtotime("+1 week")),
+			'next_week_text' => __("Next Week", 'lang_calendar'),
+			'week_text' => __("w", 'lang_calendar')
+		), $plugin_version);
 		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
 	}
 
@@ -638,16 +647,28 @@ class mf_calendar
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
-			'date_start' => '',
+			'date_start' => date('Y-m-d'),
 			'date_end' => '',
-			'week_start' => '',
+			'week_start' => date('W'),
 			'week_end' => '',
-			'year_start' => '',
+			'year_start' => date('Y'),
 			'year_end' => '',
 		);
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
-		$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10) OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10))";
+
+		switch($data['type'])
+		{
+			case 'week':
+				$date_limit_past = "SUBSTRING(DATE_SUB(NOW(), INTERVAL 1 MONTH), 1, 10)";
+			break;
+
+			default:
+				$date_limit_past = "SUBSTRING(NOW(), 1, 10)";
+			break;
+		}
+
+		$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= ".$date_limit_past." OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= ".$date_limit_past.")";
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
 
@@ -1129,7 +1150,7 @@ class mf_calendar
 		{
 			$google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
 
-			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20	
+			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
 		}
 	}
 
@@ -1662,7 +1683,10 @@ class mf_calendar
 			}
 		}
 
-		return (substr($post['start'], 0, 10) >= date("Y-m-d") || substr($post['end'], 0, 10) >= date("Y-m-d")) && $requrrence_exists == false;
+		$date_limit_past = date("Y-m-d", strtotime("-1 month"));
+		$date_limit_future = date("Y-m-d", strtotime("+1 year"));
+
+		return (substr($post['start'], 0, 10) >= $date_limit_past || substr($post['end'], 0, 10) >= $date_limit_past) && substr($post['start'], 0, 10) < $date_limit_future && $requrrence_exists == false;
 	}
 
 	function insert_events()

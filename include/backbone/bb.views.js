@@ -90,7 +90,12 @@ var CalendarView = Backbone.View.extend(
 
 	update_current_week: function()
 	{
-		if(this.display_week == script_calendar_views.current_week)
+		if(this.display_week == script_calendar_views.last_week)
+		{
+			var week_text = script_calendar_views.last_week_text;
+		}
+
+		else if(this.display_week == script_calendar_views.current_week)
 		{
 			var week_text = script_calendar_views.current_week_text;
 		}
@@ -175,8 +180,11 @@ var CalendarView = Backbone.View.extend(
 			{
 				if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
 				{
-					this.display_week = parseInt(response.week_start);
-					this.display_year = parseInt(response.year_start);
+					/*this.display_week = parseInt(response.week_start);
+					this.display_year = parseInt(response.year_start);*/
+
+					this.display_week = parseInt(script_calendar_views.current_week);
+					this.display_year = parseInt(script_calendar_views.current_year);
 
 					this.update_current_week();
 				}
