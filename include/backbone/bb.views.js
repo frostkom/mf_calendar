@@ -21,33 +21,30 @@ var CalendarView = Backbone.View.extend(
 	loadEvents: function()
 	{
 		var dom_obj = jQuery(this.el).find(".section"),
-			action_type = "type=events"; /*&time=" + Date.now()*/
+			action_type = "type=events";
+		
+		this.calendar_display_filter = dom_obj.attr('data-calendar_display_filter') || 'no';
+		this.calendar_type = dom_obj.attr('data-calendar_type') || '';
 
-		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined'){	action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');}
-
-		if(typeof dom_obj.attr('data-calendar_display_filter') != 'undefined')
+		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined')
 		{
-			action_type += "&calendar_display_filter=" + dom_obj.attr('data-calendar_display_filter');
-			this.calendar_display_filter = dom_obj.attr('data-calendar_display_filter');
+			action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');
 		}
 
-		else
+		if(this.calendar_display_filter == 'yes')
 		{
-			this.calendar_display_filter = 'no';
+			action_type += "&calendar_display_filter=" + this.calendar_display_filter;
 		}
 
-		if(typeof dom_obj.attr('data-calendar_type') != 'undefined')
+		if(this.calendar_type != '')
 		{
-			action_type += "&calendar_type=" + dom_obj.attr('data-calendar_type');
-			this.calendar_type = dom_obj.attr('data-calendar_type');
+			action_type += "&calendar_type=" + this.calendar_type;
 		}
 
-		else
+		if(typeof dom_obj.attr('data-calendar_months') != 'undefined')
 		{
-			this.calendar_type = '';
+			action_type += "&calendar_months=" + dom_obj.attr('data-calendar_months');
 		}
-
-		if(typeof dom_obj.attr('data-calendar_months') != 'undefined'){	action_type += "&calendar_months=" + dom_obj.attr('data-calendar_months');}
 
 		this.loadPage(action_type);
 	},
@@ -87,6 +84,27 @@ var CalendarView = Backbone.View.extend(
 
 		this.show_events();
 	},
+	
+	getDateOfWeek: function(w, y)
+	{
+		var d = (1 + (w - 1) * 7); /* 1st of January + 7 days for each week */
+
+	    return new Date(y, 0, d);
+	},
+
+	getDateRangeOfWeek: function(w, y)
+	{
+		var weekDate = this.getDateOfWeek(this.display_week, this.display_year),
+			first = weekDate.getDate() - weekDate.getDay(), /* First day is the day of the month - the day of the week */
+			firstdate = new Date(weekDate.setDate(first)),
+			firstDay = firstdate.getDate() + 1,
+			firstMonth = firstdate.getMonth() + 1,
+			lastdate = new Date(weekDate.setDate(first + 6)),
+			lastDay = lastdate.getDate() + 1,
+			lastMonth = lastdate.getMonth() + 1;
+
+		return firstDay + (firstMonth != lastMonth ? "/" + firstMonth : '') + "-" + lastDay + "/" + lastMonth;
+	},
 
 	update_current_week: function()
 	{
@@ -107,10 +125,17 @@ var CalendarView = Backbone.View.extend(
 
 		else
 		{
-			var week_text = script_calendar_views.week_text + this.display_week + " - " + this.display_year;
+			var week_text = script_calendar_views.week_text + this.display_week;
+			
+			week_text += "<span>" + this.getDateRangeOfWeek(this.display_week, this.display_year) + "</span>";
+
+			if(this.display_year != script_calendar_views.current_year)
+			{
+				week_text += "<span>" + this.display_year + "</span>";
+			}
 		}
 
-		jQuery(this.el).find(".calendar_week").text(week_text);
+		jQuery(this.el).find(".calendar_week").html(week_text);
 	},
 
 	show_events: function()
@@ -118,7 +143,11 @@ var CalendarView = Backbone.View.extend(
 		jQuery(this.el).find(".section .fa-spinner").addClass('hide');
 
 		this.show_filter();
-		this.show_arrows();
+
+		if(this.calendar_type == 'week')
+		{
+			this.show_arrows();
+		}
 
 		var response = this.model.get('response_events'),
 			amount = response.length,
@@ -172,51 +201,48 @@ var CalendarView = Backbone.View.extend(
 
 	show_arrows: function()
 	{
-		if(this.calendar_type == 'week')
+		var response = this.model.get('response_data');
+
+		if(typeof response != 'undefined')
 		{
-			var response = this.model.get('response_data');
-
-			if(typeof response != 'undefined')
+			if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
 			{
-				if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
-				{
-					/*this.display_week = parseInt(response.week_start);
-					this.display_year = parseInt(response.year_start);*/
+				/*this.display_week = parseInt(response.week_start);
+				this.display_year = parseInt(response.year_start);*/
 
-					this.display_week = parseInt(script_calendar_views.current_week);
-					this.display_year = parseInt(script_calendar_views.current_year);
+				this.display_week = parseInt(script_calendar_views.current_week);
+				this.display_year = parseInt(script_calendar_views.current_year);
 
-					this.update_current_week();
-				}
+				this.update_current_week();
+			}
 
-				var week_disabled = true;
+			var week_disabled = true;
 
-				if(response.week_start < this.display_week || response.year_start < this.display_year)
-				{
-					jQuery(this.el).find(".previous").removeClass('disabled');
-					week_disabled = false;
-				}
+			if(response.week_start < this.display_week || response.year_start < this.display_year)
+			{
+				jQuery(this.el).find(".previous").removeClass('disabled');
+				week_disabled = false;
+			}
 
-				else
-				{
-					jQuery(this.el).find(".previous").addClass('disabled');
-				}
+			else
+			{
+				jQuery(this.el).find(".previous").addClass('disabled');
+			}
 
-				if(response.week_end > this.display_week || response.year_end > this.display_year)
-				{
-					jQuery(this.el).find(".next").removeClass('disabled');
-					week_disabled = false;
-				}
+			if(response.week_end > this.display_week || response.year_end > this.display_year)
+			{
+				jQuery(this.el).find(".next").removeClass('disabled');
+				week_disabled = false;
+			}
 
-				else
-				{
-					jQuery(this.el).find(".next").addClass('disabled');
-				}
+			else
+			{
+				jQuery(this.el).find(".next").addClass('disabled');
+			}
 
-				if(week_disabled == false)
-				{
-					jQuery(this.el).find(".section > h4").removeClass('hide');
-				}
+			if(week_disabled == false)
+			{
+				jQuery(this.el).find(".section > h4").removeClass('hide');
 			}
 		}
 	}

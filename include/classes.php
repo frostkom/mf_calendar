@@ -1878,10 +1878,10 @@ class widget_calendar extends WP_Widget
 			}
 
 			echo "<div class='section'"
-				.(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $instance['calendar_feeds'])."'" : "")
-				.($instance['calendar_display_filter'] != '' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
+				.(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $instance['calendar_feeds'])."'" : '')
+				.($instance['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
 				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
-				.($instance['calendar_months'] > 0 ? " data-calendar_months='".$instance['calendar_months']."'" : 6)
+				.($instance['calendar_months'] > 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
@@ -1935,17 +1935,20 @@ class widget_calendar extends WP_Widget
 		return $instance;
 	}
 
+	function get_type_for_select()
+	{
+		return array(
+			'' => __("Normal", 'lang_calendar'),
+			'week' => __("Weekly", 'lang_calendar'),
+		);
+	}
+
 	function form($instance)
 	{
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data_feeds = array();
 		get_post_children(array('post_type' => 'mf_calendar'), $arr_data_feeds);
-
-		$arr_data_types = array(
-			'' => __("Normal", 'lang_calendar'),
-			'week' => __("Weekly", 'lang_calendar'),
-		);
 
 		$arr_data_pages = array();
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
@@ -1979,14 +1982,9 @@ class widget_calendar extends WP_Widget
 				echo "</div>";
 			}
 
-			echo "<div class='flex_flow'>";
-
-				if(count($arr_data_types) > 1)
-				{
-					echo show_select(array('data' => $arr_data_types, 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']));
-				}
-
-				echo show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Display", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
+			echo "<div class='flex_flow'>"
+				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
+				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Display", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
 			."</div>"
 			.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']))
 		."</div>";

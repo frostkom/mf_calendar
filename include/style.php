@@ -42,9 +42,9 @@ echo "@media all
 					opacity: .9;
 				}
 
-			.widget.calendar .section > h4 span + span
+			.widget.calendar .section > h4 .calendar_week > span
 			{
-				display: inline-block;
+				font-size: .7em;
 				margin-left: .5em;
 			}
 
