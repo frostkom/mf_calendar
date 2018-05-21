@@ -84,26 +84,10 @@ var CalendarView = Backbone.View.extend(
 
 		this.show_events();
 	},
-	
-	getDateOfWeek: function(w, y)
+
+	getHumanReadableDates: function()
 	{
-		var d = (1 + (w - 1) * 7); /* 1st of January + 7 days for each week */
-
-	    return new Date(y, 0, d);
-	},
-
-	getDateRangeOfWeek: function(w, y)
-	{
-		var weekDate = this.getDateOfWeek(this.display_week, this.display_year),
-			first = weekDate.getDate() - weekDate.getDay(), /* First day is the day of the month - the day of the week */
-			firstdate = new Date(weekDate.setDate(first)),
-			firstDay = firstdate.getDate() + 1,
-			firstMonth = firstdate.getMonth() + 1,
-			lastdate = new Date(weekDate.setDate(first + 6)),
-			lastDay = lastdate.getDate() + 1,
-			lastMonth = lastdate.getMonth() + 1;
-
-		return firstDay + (firstMonth != lastMonth ? "/" + firstMonth : '') + "-" + lastDay + "/" + lastMonth;
+		return this.week_dates[this.display_year + '-' + this.display_week];
 	},
 
 	update_current_week: function()
@@ -127,7 +111,7 @@ var CalendarView = Backbone.View.extend(
 		{
 			var week_text = script_calendar_views.week_text + this.display_week;
 			
-			week_text += "<span>" + this.getDateRangeOfWeek(this.display_week, this.display_year) + "</span>";
+			week_text += "<span>" + this.getHumanReadableDates() + "</span>";
 
 			if(this.display_year != script_calendar_views.current_year)
 			{
@@ -212,6 +196,8 @@ var CalendarView = Backbone.View.extend(
 
 				this.display_week = parseInt(script_calendar_views.current_week);
 				this.display_year = parseInt(script_calendar_views.current_year);
+
+				this.week_dates = response.week_dates;
 
 				this.update_current_week();
 			}

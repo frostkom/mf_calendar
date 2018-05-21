@@ -643,16 +643,17 @@ class mf_calendar
 
 		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
 
-		$this->arr_data = $this->arr_events = array();
+		$this->arr_events = array();
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
 			'date_start' => date('Y-m-d'),
-			'date_end' => '',
 			'week_start' => date('W'),
-			'week_end' => '',
 			'year_start' => date('Y'),
+			'date_end' => '',
+			'week_end' => '',
 			'year_end' => '',
+			'week_dates' => array(),
 		);
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
@@ -746,7 +747,7 @@ class mf_calendar
 					$this->arr_data['year_end'] = $post_start_year;
 				}
 
-				if($this->arr_data['date_start'] == '' || $post_start_date < $this->arr_data['date_start'])
+				if($post_start_date < $this->arr_data['date_start'])
 				{
 					$this->arr_data['date_start'] = $post_start_date;
 					$this->arr_data['week_start'] = $post_start_week;
@@ -937,6 +938,32 @@ class mf_calendar
 				}
 			}
 		}
+
+		$date_temp = $this->arr_data['date_start'];
+
+		while($date_temp < $this->arr_data['date_end'])
+		{
+			$year_temp = date('Y', strtotime($date_temp));
+			$week_temp = date('W', strtotime($date_temp));
+
+			$weekday_temp = date('w', strtotime($date_temp));
+
+			$date_start_temp = date('Y-m-d', strtotime($date_temp." -".($weekday_temp - 1)." day"));
+			$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
+
+			$day_start = date('j', strtotime($date_start_temp));
+			$month_start = date('n', strtotime($date_start_temp));
+
+			$day_end = date('j', strtotime($date_end_temp));
+			$month_end = date('n', strtotime($date_end_temp));
+
+			$this->arr_data['week_dates'][$year_temp."-".$week_temp] = $day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end;
+
+			$date_temp = date('Y-m-d', strtotime($date_temp." +1 week"));
+		}
+
+		unset($this->arr_data['date_start']);
+		unset($this->arr_data['date_end']);
 	}
 
 	function get_next_event($data)
