@@ -1232,9 +1232,14 @@ class mf_calendar
 			$content = get_url_content($this->calendar_url);
 			$json = json_decode($content, true);
 
+			if($setting_calendar_debug == 'yes')
+			{
+				do_log("Calendar URL: ".$this->calendar_url);
+			}
+
 			if(isset($json['items']))
 			{
-				$arr_debug = array('old' => array(), 'new' => array());
+				//$arr_debug = array('old' => array(), 'new' => array());
 
 				foreach($json['items'] as $item)
 				{
@@ -1469,10 +1474,10 @@ class mf_calendar
 															{
 																$out_of_bounds++;
 
-																if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+																/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
 																{
 																	echo "Outside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
-																}
+																}*/
 															}
 
 															else
@@ -1480,10 +1485,10 @@ class mf_calendar
 																$timestamp = $timestamp_temp;
 																$out_of_bounds = 0;
 
-																if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+																/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
 																{
 																	echo "Inside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
-																}
+																}*/
 															}
 														}
 													break;
@@ -1508,7 +1513,8 @@ class mf_calendar
 												{
 													if($out_of_bounds == 0)
 													{
-														$this->arr_events[] = $arr_debug['new'][] = array(
+														//$arr_debug['new'][] = 
+														$this->arr_events[] = array(
 															'type' => "gcal",
 															'id' => $item_id."_req_".$count,
 															'status' => $item_status,
@@ -1553,10 +1559,10 @@ class mf_calendar
 					}
 				}
 
-				if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+				/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
 				{
 					echo "Debug: ".var_export($arr_debug, true);
-				}
+				}*/
 
 				if(count($json['items']) == 250)
 				{
@@ -1595,7 +1601,7 @@ class mf_calendar
 
 		if(isset($json[$custom_url_container]))
 		{
-			$arr_debug = array('old' => array(), 'new' => array());
+			//$arr_debug = array('old' => array(), 'new' => array());
 
 			foreach($json[$custom_url_container] as $item)
 			{
@@ -1647,10 +1653,10 @@ class mf_calendar
 				);
 			}
 
-			if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+			/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
 			{
 				echo "Debug: ".var_export($arr_debug, true);
-			}
+			}*/
 		}
 	}
 
