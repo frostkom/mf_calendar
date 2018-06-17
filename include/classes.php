@@ -98,14 +98,14 @@ class mf_calendar
 						{
 							$intCalendarID = check_var('intCalendarID');
 
-							if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce'], 'calendar_fetch_'.$id))
+							if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
 							{
 								$obj_calendar->fetch_source($id);
 							}
 
 							else
 							{
-								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=mf_calendar&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id)."'>".__("Fetch", 'lang_calendar')."</a> | ";
+								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=mf_calendar&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
 							}
 						}
 					}
@@ -222,7 +222,7 @@ class mf_calendar
 						if(get_post_status($id) == 'trash')
 						{
 							echo "<span class='untrash'>
-								<a href='".wp_nonce_url(admin_url("post.php?post=".$id."&action=untrash"), "untrash-post_".$id)."'>".__("Recover", 'lang_calendar')."</a>
+								<a href='".wp_nonce_url(admin_url("post.php?post=".$id."&action=untrash"), 'untrash-post_'.$id)."'>".__("Recover", 'lang_calendar')."</a>
 							</span>";
 						}
 
@@ -1069,7 +1069,7 @@ class mf_calendar
 		if($post_id > 0)
 		{
 			$obj_form = new mf_form();
-			$obj_form->set_meta(array('id' => $data['answer_id'], 'key' => 'calendar_id', 'value' => $post_id));
+			$obj_form->set_meta(array('id' => $data['obj_form']->answer_id, 'key' => 'calendar_id', 'value' => $post_id));
 		}
 
 		return $data;
@@ -2001,7 +2001,7 @@ class widget_calendar extends WP_Widget
 
 							if($instance['calendar_display_filter'] == 'yes' && is_plugin_active('mf_multiselect/index.php'))
 							{
-								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose here", 'lang_calendar')));
+								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose Here", 'lang_calendar')));
 							}
 
 							/*else

@@ -22,7 +22,7 @@ var CalendarView = Backbone.View.extend(
 	{
 		var dom_obj = jQuery(this.el).find(".section"),
 			action_type = "type=events";
-		
+
 		this.calendar_display_filter = dom_obj.attr('data-calendar_display_filter') || 'no';
 		this.calendar_type = dom_obj.attr('data-calendar_type') || '';
 
@@ -110,7 +110,7 @@ var CalendarView = Backbone.View.extend(
 		else
 		{
 			var week_text = script_calendar_views.week_text + this.display_week;
-			
+
 			week_text += "<span>" + this.getHumanReadableDates() + "</span>";
 
 			if(this.display_year != script_calendar_views.current_year)
