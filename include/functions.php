@@ -45,7 +45,7 @@ function menu_calendar()
 {
 	$menu_root = 'mf_calendar/';
 	$menu_start = "edit.php?post_type=mf_calendar";
-	$menu_capability = "edit_pages";
+	$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_pages'));
 
 	$menu_title = __("Calendar", 'lang_calendar');
 	add_menu_page("", $menu_title, $menu_capability, $menu_start, '', 'dashicons-calendar', 21);
