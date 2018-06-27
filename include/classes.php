@@ -69,6 +69,8 @@ class mf_calendar
 				$post_calendar_id = get_post_meta($id, $this->meta_prefix.'calendar_id', true);
 				$post_custom_url = get_post_meta($id, $this->meta_prefix.'custom_url', true);
 
+				$post_meta = '';
+
 				if($post_calendar_id != '')
 				{
 					$post_meta = $post_calendar_id;
