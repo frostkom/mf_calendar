@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 09:44+0100\n"
+"POT-Creation-Date: 2018-06-28 08:03+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -40,43 +40,43 @@ msgstr "Konto"
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:84
+#: ../include/classes.php:86
 msgid "birthdays"
 msgstr "födelsedagar"
 
-#: ../include/classes.php:108
+#: ../include/classes.php:110
 msgid "Fetch"
 msgstr "Hämta"
 
-#: ../include/classes.php:134
+#: ../include/classes.php:136
 msgid "Fetched"
 msgstr "Hämtad"
 
-#: ../include/classes.php:149
+#: ../include/classes.php:151
 msgid "Latest"
 msgstr "Senaste"
 
-#: ../include/classes.php:176
+#: ../include/classes.php:178
 msgid "Title"
 msgstr "Titel"
 
-#: ../include/classes.php:177
-#: ../include/classes.php:496
+#: ../include/classes.php:179
+#: ../include/classes.php:498
 msgid "Location"
 msgstr "Plats"
 
-#: ../include/classes.php:178
+#: ../include/classes.php:180
 msgid "Date"
 msgstr "Datum"
 
-#: ../include/classes.php:179
-#: ../include/classes.php:511
+#: ../include/classes.php:181
+#: ../include/classes.php:513
 msgid "Registration"
 msgstr "Anmälan"
 
-#: ../include/classes.php:180
-#: ../include/classes.php:489
-#: ../include/classes.php:1854
+#: ../include/classes.php:182
+#: ../include/classes.php:491
+#: ../include/classes.php:1889
 #: ../include/functions.php:6
 #: ../include/functions.php:7
 #: ../include/functions.php:8
@@ -86,213 +86,213 @@ msgstr "Anmälan"
 msgid "Calendar"
 msgstr "Kalender"
 
-#: ../include/classes.php:202
+#: ../include/classes.php:204
 msgid "Hidden"
 msgstr "Dold"
 
-#: ../include/classes.php:209
+#: ../include/classes.php:211
 msgid "Are you sure?"
 msgstr "Är du säker?"
 
-#: ../include/classes.php:209
+#: ../include/classes.php:211
 msgid "Hide"
 msgstr "Dölj"
 
-#: ../include/classes.php:225
+#: ../include/classes.php:227
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:232
+#: ../include/classes.php:234
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:235
+#: ../include/classes.php:237
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:323
-#: ../include/classes.php:878
+#: ../include/classes.php:325
+#: ../include/classes.php:881
 #, php-format
 msgid "%d of %d spots left"
 msgstr "%d av %d platser kvar"
 
-#: ../include/classes.php:356
+#: ../include/classes.php:358
 #, php-format
 msgid "Go to %sGoogle Calendar%s and login"
 msgstr "Gå till %sGoogle Calendar%s och logga in"
 
-#: ../include/classes.php:357
+#: ../include/classes.php:359
 msgid "Click on Settings (The grey gear icon to the right)"
 msgstr "Klicka på Inställningar (Det grå kugghulet till höger)"
 
-#: ../include/classes.php:358
+#: ../include/classes.php:360
 msgid "Click on My Calendar Settings"
 msgstr "Klicka på Mina kalenderinställningar"
 
-#: ../include/classes.php:359
+#: ../include/classes.php:361
 msgid "Choose which calendar to share if there are multiple"
 msgstr "Välj vilken kalender att dela om det finns flera"
 
-#: ../include/classes.php:360
+#: ../include/classes.php:362
 msgid "Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category"
 msgstr "Gör kalendern tillgänglig för alla i Behörighetskategorin och kopiera e-posten som visas i Integreringskategorin"
 
-#: ../include/classes.php:372
+#: ../include/classes.php:374
 msgid "Calendar ID"
 msgstr "Kalender-ID"
 
-#: ../include/classes.php:386
+#: ../include/classes.php:388
 msgid "Custom URL"
 msgstr "Egen URL"
 
-#: ../include/classes.php:395
+#: ../include/classes.php:397
 msgid "Field for Container"
 msgstr "Fält för behållare"
 
-#: ../include/classes.php:400
+#: ../include/classes.php:402
 msgid "Field for ID"
 msgstr "Fält för ID"
 
-#: ../include/classes.php:405
+#: ../include/classes.php:407
 msgid "Field for Title"
 msgstr "Fält för rubrik"
 
-#: ../include/classes.php:410
+#: ../include/classes.php:412
 msgid "Field for Description"
 msgstr "Fält för beskrivning"
 
-#: ../include/classes.php:415
+#: ../include/classes.php:417
 msgid "Field for Longitude"
 msgstr "Fält för longitud"
 
-#: ../include/classes.php:420
+#: ../include/classes.php:422
 msgid "Field for Latitude"
 msgstr "Fält för latitud"
 
-#: ../include/classes.php:425
+#: ../include/classes.php:427
 msgid "Field for Created"
 msgstr "Fält för skapad"
 
-#: ../include/classes.php:430
+#: ../include/classes.php:432
 msgid "Field for Start Date"
 msgstr "Fält för startdatum"
 
-#: ../include/classes.php:435
+#: ../include/classes.php:437
 msgid "Field for End Date"
 msgstr "Fält för slutdatum"
 
-#: ../include/classes.php:444
+#: ../include/classes.php:446
 msgid "Display Birthdays"
 msgstr "Visa födelsedagar"
 
-#: ../include/classes.php:454
-#: ../include/classes.php:483
+#: ../include/classes.php:456
+#: ../include/classes.php:485
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../include/classes.php:501
+#: ../include/classes.php:503
 msgid "Start"
 msgstr "Start"
 
-#: ../include/classes.php:506
+#: ../include/classes.php:508
 msgid "End"
 msgstr "Slut"
 
-#: ../include/classes.php:521
+#: ../include/classes.php:523
 msgid "Limit Participants"
 msgstr "Begränsa deltagare"
 
-#: ../include/classes.php:605
+#: ../include/classes.php:607
 msgid "I have hidden the event for you now"
 msgstr "Jag har dolt händelsen åt dig nu"
 
-#: ../include/classes.php:610
+#: ../include/classes.php:612
 msgid "I could not hide the event for you. If the problem persist, please contact an admin regarding this"
 msgstr "Jag kunde inte dölja händelsen åt dig. Om problemet kvarstår, vänligen kontakta en administratör angående detta"
 
-#: ../include/classes.php:874
+#: ../include/classes.php:877
 msgid "Register Here"
 msgstr "Anmäl dig här"
 
-#: ../include/classes.php:887
-#: ../include/classes.php:1029
+#: ../include/classes.php:890
+#: ../include/classes.php:1058
 msgid "I am sorry to tell you that the course is already full."
 msgstr "Jag är ledsen att behöva berätta det, men platserna är slut."
 
-#: ../include/classes.php:1018
+#: ../include/classes.php:1047
 #: ../include/functions.php:26
 #: ../include/functions.php:27
 msgid "Event"
 msgstr "Händelse"
 
-#: ../include/classes.php:1057
+#: ../include/classes.php:1086
 msgid "There are no events to display"
 msgstr "Det finns inga händelser att visa"
 
-#: ../include/classes.php:1536
+#: ../include/classes.php:1571
 msgid "The Calendar API returned the maximum number of events"
 msgstr "Kalender-APIet svarade med maxantalet av händelser"
 
-#: ../include/classes.php:1546
+#: ../include/classes.php:1581
 msgid "Something went wrong when fetching the calendar source"
 msgstr "Något gick fel vid hämtning av kalenderkällan"
 
-#: ../include/classes.php:1641
+#: ../include/classes.php:1676
 #, php-format
 msgid "It is %s' birthday"
 msgstr "%s fyller år"
 
-#: ../include/classes.php:1794
+#: ../include/classes.php:1829
 #, php-format
 msgid "I tried to save an event for you (%s)"
 msgstr "Jag försöker spara en händelse åt dig (%s)"
 
-#: ../include/classes.php:1841
+#: ../include/classes.php:1876
 msgid "Display Calendar"
 msgstr "Visa kalender"
 
-#: ../include/classes.php:1914
-#: ../include/classes.php:1989
+#: ../include/classes.php:1949
+#: ../include/classes.php:2024
 msgid "Read More"
 msgstr "Läs mer"
 
-#: ../include/classes.php:1941
+#: ../include/classes.php:1976
 msgid "Normal"
 msgstr "Normal"
 
-#: ../include/classes.php:1942
+#: ../include/classes.php:1977
 msgid "Weekly"
 msgstr "Veckovis"
 
-#: ../include/classes.php:1957
+#: ../include/classes.php:1992
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:1962
+#: ../include/classes.php:1997
 msgid "Feeds"
 msgstr "Flöden"
 
-#: ../include/classes.php:1967
+#: ../include/classes.php:2002
 msgid "Display Filter"
 msgstr "Visa filter"
 
-#: ../include/classes.php:1971
+#: ../include/classes.php:2006
 msgid "Label"
 msgstr "Etikett"
 
-#: ../include/classes.php:1971
-msgid "Choose here"
+#: ../include/classes.php:2006
+msgid "Choose Here"
 msgstr "Välj här"
 
-#: ../include/classes.php:1986
+#: ../include/classes.php:2021
 msgid "Design"
 msgstr "Utseende"
 
-#: ../include/classes.php:1987
+#: ../include/classes.php:2022
 msgid "Display"
 msgstr "Visa"
 
-#: ../include/classes.php:1987
+#: ../include/classes.php:2022
 msgid "months"
 msgstr "månader"
 
@@ -332,8 +332,8 @@ msgstr "Skapa ett nytt projekt"
 
 #: ../include/functions.php:93
 #, php-format
-msgid "Choose '%s', '%s', '%s' and '%s'"
-msgstr "Välj '%s', '%s', '%s' och '%s'"
+msgid "Choose %s, %s, %s and %s"
+msgstr "Välj %s, %s, %s och %s"
 
 #: ../include/functions.php:112
 msgid "Minutes between each API request"

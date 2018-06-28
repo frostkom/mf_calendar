@@ -90,7 +90,7 @@ function setting_google_calendar_api_key_callback()
 	$description = "<ol>
 		<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
 		<li>".__("Create a new project", 'lang_calendar')."</li>
-		<li>".sprintf(__("Choose '%s', '%s', '%s' and '%s'", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
+		<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
 	</ol>";
 
 	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
