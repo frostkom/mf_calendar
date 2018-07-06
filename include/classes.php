@@ -1555,8 +1555,12 @@ class mf_calendar
 							);
 						break;
 
+						case 'tentative':
+							//Do nothing for now
+						break;
+
 						default:
-							do_log("Calendar Status: ".var_export($item, true));
+							do_log(__("Calendar Status Missing", 'lang_calendar').": ".var_export($item, true));
 						break;
 					}
 				}
