@@ -1515,7 +1515,7 @@ class mf_calendar
 												{
 													if($out_of_bounds == 0)
 													{
-														//$arr_debug['new'][] = 
+														//$arr_debug['new'][] =
 														$this->arr_events[] = array(
 															'type' => "gcal",
 															'id' => $item_id."_req_".$count,

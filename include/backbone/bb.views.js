@@ -140,6 +140,8 @@ var CalendarView = Backbone.View.extend(
 
 		if(amount > 0)
 		{
+			var dom_template = jQuery("#template_calendar_events").html();
+
 			for(var i = 0; i < amount; i++)
 			{
 				if(this.calendar_type == 'week')
@@ -158,7 +160,7 @@ var CalendarView = Backbone.View.extend(
 					}
 				}
 
-				html += _.template(jQuery("#template_calendar_events").html())(response[i]);
+				html += _.template(dom_template)(response[i]);
 			}
 		}
 
