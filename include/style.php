@@ -9,6 +9,13 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
+else
+{
+	global $wpdb;
+}
+
+$obj_calendar = new mf_calendar();
+
 $setting_calendar_date_color = get_option_or_default('setting_calendar_date_color', "#019cdb");
 
 echo "@media all
@@ -87,9 +94,22 @@ echo "@media all
 							padding: .4em .5em;
 							text-align: center;
 							min-width: 2.12em;
+						}";
+
+						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", 'mf_calendar', $obj_calendar->meta_prefix.'color'));
+
+						foreach($result as $r)
+						{
+							$post_id = $r->ID;
+							$post_color = $r->meta_value;
+
+							echo ".widget.calendar .section > ul li.calendar_feed_".$post_id." .date p
+							{
+								background: ".$post_color.";
+							}";
 						}
 
-					.widget.calendar .section > ul li .content
+					echo ".widget.calendar .section > ul li .content
 					{
 						flex: 1 0 0;
 						margin-left: 2%;

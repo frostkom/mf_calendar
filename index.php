@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.2.14
+Version: 4.3.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -15,21 +15,21 @@ GitHub Plugin URI: frostkom/mf_calendar
 */
 
 include_once("include/classes.php");
-include_once("include/functions.php");
+//include_once("include/functions.php");
 
 $obj_calendar = new mf_calendar();
 
 add_action('cron_base', array($obj_calendar, 'run_cron'), mt_rand(1, 10));
 
-add_action('init', 'init_calendar');
+add_action('init', array($obj_calendar, 'init'));
 
 if(is_admin())
 {
 	register_activation_hook(__FILE__, 'activate_calendar');
 	register_uninstall_hook(__FILE__, 'uninstall_calendar');
 
-	add_action('admin_init', 'settings_calendar');
-	add_action('admin_menu', 'menu_calendar');
+	add_action('admin_init', array($obj_calendar, 'settings_calendar'));
+	add_action('admin_menu', array($obj_calendar, 'admin_menu'));
 
 	add_filter('manage_mf_calendar_posts_columns', array($obj_calendar, 'column_header_calendar'), 5);
 	add_action('manage_mf_calendar_posts_custom_column', array($obj_calendar, 'column_cell_calendar'), 5, 2);
@@ -56,7 +56,7 @@ else
 	//add_action('wp_footer', array($obj_calendar, 'get_footer'), 0);
 }
 
-add_action('widgets_init', 'widgets_calendar');
+add_action('widgets_init', array($obj_calendar, 'widgets_init'));
 
 add_action('wp_ajax_calendar_action_hide', array($obj_calendar, 'action_hide'));
 

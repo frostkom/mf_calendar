@@ -11,48 +11,133 @@ class mf_calendar
 		$this->meta_prefix = "mf_calendar_";
 	}
 
-	function admin_init()
+	function init()
 	{
-		global $pagenow;
+		$labels = array(
+			'name' => _x(__("Calendar", 'lang_calendar'), 'post type general name'),
+			'singular_name' => _x(__("Calendar", 'lang_calendar'), 'post type singular name'),
+			'menu_name' => __("Calendar", 'lang_calendar')
+		);
 
-		if($pagenow == 'edit.php' && check_var('post_type') == 'mf_calendar_event')
-		{
-			$plugin_include_url = plugin_dir_url(__FILE__);
-			$plugin_version = get_plugin_version(__FILE__);
+		$args = array(
+			'labels' => $labels,
+			'public' => true,
+			'show_in_menu' => false,
+			'show_in_nav_menus' => false,
+			'exclude_from_search' => true,
+			'supports' => array('title'),
+			'hierarchical' => true,
+			'has_archive' => false,
+		);
 
-			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
-		}
+		register_post_type('mf_calendar', $args);
+
+		$labels = array(
+			'name' => _x(__("Events", 'lang_calendar'), 'post type general name'),
+			'singular_name' => _x(__("Event", 'lang_calendar'), 'post type singular name'),
+			'menu_name' => __("Event", 'lang_calendar')
+		);
+
+		$args = array(
+			'labels' => $labels,
+			'public' => true,
+			'show_in_menu' => false,
+			'show_in_nav_menus' => false,
+			'exclude_from_search' => true,
+			'supports' => array('title', 'editor', 'excerpt'),
+			'hierarchical' => true,
+			'has_archive' => false,
+		);
+
+		register_post_type('mf_calendar_event', $args);
 	}
 
-	function wp_head()
+	function settings_calendar()
 	{
-		$plugin_base_include_url = plugins_url()."/mf_base/include/";
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
+		$options_area = __FUNCTION__;
 
-		mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
+		add_settings_section($options_area, "", array($this, $options_area."_callback"), BASE_OPTIONS_PAGE);
 
-		mf_enqueue_script('underscore');
-		mf_enqueue_script('backbone');
-		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
-		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
-		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
-			'last_week' => date('W', strtotime("-1 week")),
-			'last_week_text' => __("Previous Week", 'lang_calendar'),
-			'current_year' => date('Y'),
-			'current_week' => date('W'),
-			'current_week_text' => __("Current Week", 'lang_calendar'),
-			'next_week' => date('W', strtotime("+1 week")),
-			'next_week_text' => __("Next Week", 'lang_calendar'),
-			'week_text' => __("w", 'lang_calendar')
-		), $plugin_version);
-		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+		$arr_settings = array();
+		$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
+		$arr_settings['setting_calendar_date_color'] = __("Date Color", 'lang_calendar');
+		$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
+		$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
+
+		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
+	}
+
+	function settings_calendar_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+
+		echo settings_header($setting_key, __("Calendar", 'lang_calendar'));
+	}
+
+	function setting_google_calendar_api_key_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option($setting_key);
+
+		$description = "<ol>
+			<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
+			<li>".__("Create a new project", 'lang_calendar')."</li>
+			<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
+		</ol>";
+
+		echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
+	}
+
+	function setting_calendar_date_color_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option($setting_key);
+
+		echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
+	}
+
+	function setting_calendar_time_limit_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option_or_default($setting_key, 30);
+
+		$description = __("Minutes between each API request", 'lang_calendar');
+
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => $description));
+	}
+
+	function setting_calendar_debug_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option($setting_key, 'no');
+
+		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
+	}
+
+	function admin_menu()
+	{
+		$menu_root = 'mf_calendar/';
+		$menu_start = "edit.php?post_type=mf_calendar";
+		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_pages'));
+
+		$menu_title = __("Calendar", 'lang_calendar');
+		add_menu_page("", $menu_title, $menu_capability, $menu_start, '', 'dashicons-calendar', 21);
+
+		$menu_title = __("Calendar", 'lang_calendar');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
+
+		$menu_title = __("Events", 'lang_calendar');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
+
+		$menu_title = __("Add New", 'lang_calendar');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");
 	}
 
 	function column_header_calendar($cols)
 	{
 		unset($cols['date']);
 
+		$cols['color'] = __("Color", 'lang_calendar');
 		$cols['account'] = __("Account", 'lang_calendar');
 		$cols['amount_of_posts'] = __("Amount", 'lang_calendar');
 
@@ -65,6 +150,15 @@ class mf_calendar
 
 		switch($col)
 		{
+			case 'color':
+				$post_color = get_post_meta($id, $this->meta_prefix.$col, true);
+
+				if($post_color != '')
+				{
+					echo "<i class='fa fa-circle fa-2x' style='color: ".$post_color."'></i>";
+				}
+			break;
+
 			case 'account':
 				$post_calendar_id = get_post_meta($id, $this->meta_prefix.'calendar_id', true);
 				$post_custom_url = get_post_meta($id, $this->meta_prefix.'custom_url', true);
@@ -344,6 +438,49 @@ class mf_calendar
 		}
 	}
 
+	function admin_init()
+	{
+		global $pagenow;
+
+		if($pagenow == 'edit.php' && check_var('post_type') == 'mf_calendar_event')
+		{
+			$plugin_include_url = plugin_dir_url(__FILE__);
+			$plugin_version = get_plugin_version(__FILE__);
+
+			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
+		}
+	}
+
+	function wp_head()
+	{
+		$plugin_base_include_url = plugins_url()."/mf_base/include/";
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
+
+		mf_enqueue_script('underscore');
+		mf_enqueue_script('backbone');
+		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
+		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
+		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
+			'last_week' => date('W', strtotime("-1 week")),
+			'last_week_text' => __("Previous Week", 'lang_calendar'),
+			'current_year' => date('Y'),
+			'current_week' => date('W'),
+			'current_week_text' => __("Current Week", 'lang_calendar'),
+			'next_week' => date('W', strtotime("+1 week")),
+			'next_week_text' => __("Next Week", 'lang_calendar'),
+			'week_text' => __("w", 'lang_calendar')
+		), $plugin_version);
+		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+	}
+
+	function widgets_init()
+	{
+		register_widget('widget_calendar');
+	}
+
 	function is_birthday_active()
 	{
 		$setting_add_profile_fields = get_option('setting_add_profile_fields');
@@ -370,6 +507,11 @@ class mf_calendar
 		global $wpdb;
 
 		$fields_settings = array(
+			array(
+				'name' => __("Color", 'lang_calendar'),
+				'id' => $this->meta_prefix.'color',
+				'type' => 'color',
+			),
 			array(
 				'name' => __("Calendar ID", 'lang_calendar'),
 				'id' => $this->meta_prefix.'calendar_id',
@@ -639,6 +781,7 @@ class mf_calendar
 		if(!isset($data['id'])){								$data['id'] = 0;}
 		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = array();}
 		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
+		if(!isset($data['display_categories'])){				$data['display_categories'] = 'no';}
 		if(!isset($data['type'])){								$data['type'] = '';}
 		if(!isset($data['months']) || !($data['months'] > 0)){	$data['months'] = 6;}
 		if(!isset($data['limit'])){								$data['limit'] = 0;}
@@ -910,9 +1053,9 @@ class mf_calendar
 					'more_icon' => $more_icon,
 					'more_content' => $more_content,
 
-					//display_filter == yes
+					//display_filter == yes/no
 					'feed' => $post_feed,
-					'feed_name' => ($data['display_filter'] == 'yes' ? get_post_title($post_feed) : ''),
+					'feed_name' => ($data['display_filter'] == 'yes' || $data['display_categories'] == 'yes' ? get_post_title($post_feed) : ''),
 
 					//type == week
 					'start_week' => $post_start_week,
@@ -977,7 +1120,7 @@ class mf_calendar
 
 					foreach($data['array']['meta'] as $event)
 					{
-						$out .= "<li itemscope itemtype='//schema.org/Event'>
+						$out .= "<li itemscope itemtype='//schema.org/Event' class='calendar_feed_".$event['feed'].">
 							<div class='date' itemprop='startDate' content='".$event['start_date_c']."'><p>".$event['start_day']."</p></div>
 							<div class='content".$event['content_class']."' rel='".$event['id']."'>
 								<p>
@@ -1091,7 +1234,7 @@ class mf_calendar
 			{ %>
 				<li><h4><%= heading %></h4></li>
 			<% } %>
-			<li itemscope itemtype='//schema.org/Event'>
+			<li itemscope itemtype='//schema.org/Event' class='calendar_feed_<%= feed %>'>
 				<div class='date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
 				<div class='content<%= content_class %>' rel='<%= id %>'>
 					<% if(feed_name != '')
@@ -1885,6 +2028,7 @@ class widget_calendar extends WP_Widget
 			'calendar_feeds' => array(),
 			'calendar_display_filter' => 'no',
 			'calendar_filter_label' => "",
+			'calendar_display_categories' => 'no',
 			'calendar_type' => '',
 			'calendar_months' => 6,
 			'calendar_page' => 0,
@@ -1919,6 +2063,7 @@ class widget_calendar extends WP_Widget
 			echo "<div class='section'"
 				.(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $instance['calendar_feeds'])."'" : '')
 				.($instance['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
+				.($instance['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$instance['calendar_display_categories']."'" : '')
 				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
 				.($instance['calendar_months'] > 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
 			.">
@@ -1967,6 +2112,7 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
 		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
 		$instance['calendar_filter_label'] = sanitize_text_field($new_instance['calendar_filter_label']);
+		$instance['calendar_display_categories'] = sanitize_text_field($new_instance['calendar_display_categories']);
 		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
 		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
 		$instance['calendar_page'] = sanitize_text_field($new_instance['calendar_page']);
@@ -2010,10 +2156,10 @@ class widget_calendar extends WP_Widget
 								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose Here", 'lang_calendar')));
 							}
 
-							/*else
+							else
 							{
-								echo input_hidden(array('name' => $this->get_field_name('calendar_filter_label'), 'value' => '', 'allow_empty' => true));
-							}*/
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_categories'), 'text' => __("Display Categories", 'lang_calendar'), 'value' => $instance['calendar_display_categories']));
+							}
 
 						echo "</div>";
 					}
