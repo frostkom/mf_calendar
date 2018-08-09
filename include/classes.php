@@ -1293,11 +1293,11 @@ class mf_calendar
 					switch($item_status)
 					{
 						case 'confirmed':
-							$item_link = $item['htmlLink'];
+							$item_link = isset($item['htmlLink']) ? trim($item['htmlLink']) : '';
 							$item_title = isset($item['summary']) ? trim($item['summary']) : '';
 							$item_content = isset($item['description']) ? trim($item['description']) : '';
 							$item_location = isset($item['location']) ? trim($item['location']) : '';
-							$item_created = date("Y-m-d H:i:s", strtotime($item['created']));
+							$item_created = isset($item['created']) ? date("Y-m-d H:i:s", strtotime($item['created'])) : '';
 
 							if(isset($item['start']['dateTime']))
 							{
