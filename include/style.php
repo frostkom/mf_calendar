@@ -49,7 +49,7 @@ echo "@media all
 					opacity: .9;
 				}
 
-			.widget.calendar .section > h4 .calendar_week > span
+			.widget.calendar .section .calendar_week > span
 			{
 				font-size: .7em;
 				margin-left: .5em;

@@ -21,20 +21,20 @@ $json_output = array(
 );
 
 $type = check_var('type', 'char');
-$calendar_feeds = check_var('calendar_feeds', 'char');
-$calendar_display_filter = check_var('calendar_display_filter', 'char');
-$calendar_display_categories = check_var('calendar_display_categories', 'char');
-$calendar_type = check_var('calendar_type', 'char');
-$calendar_months = check_var('calendar_months', 'int');
 
 if($type == 'events')
 {
+	$calendar_feeds = check_var('calendar_feeds', 'char');
+	$calendar_display_filter = check_var('calendar_display_filter', 'char');
+	$calendar_display_categories = check_var('calendar_display_categories', 'char');
+	$calendar_type = check_var('calendar_type', 'char');
+	$calendar_months = check_var('calendar_months', 'int');
+
 	if($calendar_feeds != '')
 	{
 		$calendar_feeds = explode(",", $calendar_feeds);
 	}
 
-	$obj_calendar = new mf_calendar();
 	$obj_calendar->get_events(array('feeds' => $calendar_feeds, 'display_filter' => $calendar_display_filter, 'display_categories' => $calendar_display_categories, 'type' => $calendar_type, 'months' => $calendar_months));
 
 	if(count($obj_calendar->arr_events) > 0)

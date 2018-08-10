@@ -115,9 +115,7 @@ var CalendarView = Backbone.View.extend(
 
 		else
 		{
-			var week_text = script_calendar_views.week_text + this.display_week;
-
-			week_text += "<span>" + this.getHumanReadableDates() + "</span>";
+			var week_text = script_calendar_views.week_text + this.display_week + "<span>" + this.getHumanReadableDates() + "</span>";
 
 			if(this.display_year != script_calendar_views.current_year)
 			{
@@ -199,9 +197,6 @@ var CalendarView = Backbone.View.extend(
 		{
 			if(typeof this.display_week == 'undefined' || typeof this.display_year == 'undefined')
 			{
-				/*this.display_week = parseInt(response.week_start);
-				this.display_year = parseInt(response.year_start);*/
-
 				this.display_week = parseInt(script_calendar_views.current_week);
 				this.display_year = parseInt(script_calendar_views.current_year);
 

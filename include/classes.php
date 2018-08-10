@@ -774,6 +774,35 @@ class mf_calendar
 
 	// Public
 	##############################
+	function get_week_dates()
+	{
+		$date_temp = $this->arr_data['date_start'];
+
+		while($date_temp < $this->arr_data['date_end'])
+		{
+			$year_temp = date('Y', strtotime($date_temp));
+			$week_temp = date('W', strtotime($date_temp));
+
+			$weekday_temp = date('w', strtotime($date_temp));
+
+			$date_start_temp = date('Y-m-d', strtotime($date_temp." -".($weekday_temp - 1)." day"));
+			$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
+
+			$day_start = date('j', strtotime($date_start_temp));
+			$month_start = date('n', strtotime($date_start_temp));
+
+			$day_end = date('j', strtotime($date_end_temp));
+			$month_end = date('n', strtotime($date_end_temp));
+
+			$this->arr_data['week_dates'][$year_temp."-".$week_temp] = $day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end;
+
+			$date_temp = date('Y-m-d', strtotime($date_temp." +1 week"));
+		}
+
+		unset($this->arr_data['date_start']);
+		unset($this->arr_data['date_end']);
+	}
+
 	function get_events($data)
 	{
 		global $wpdb;
@@ -834,7 +863,7 @@ class mf_calendar
 
 		if($wpdb->num_rows > 0)
 		{
-			$year_temp = $yearmonth_temp = $date_temp = "";
+			$year_temp = $yearmonth_temp = $week_temp = $date_temp = "";
 			$i = 0;
 
 			foreach($result as $r)
@@ -911,13 +940,56 @@ class mf_calendar
 					break;
 
 					default:
-						if($yearmonth_temp != $post_start_yearmonth)
+						if($data['months'] > 2)
 						{
-							$heading = month_name($post_start_month);
-
-							if($post_start_year != $year_temp && $year_temp != '')
+							if($post_start_yearmonth != $yearmonth_temp)
 							{
-								$heading .= "&nbsp;".$post_start_year;
+								$heading = month_name($post_start_month);
+
+								if($post_start_year != $year_temp && $year_temp != '')
+								{
+									$heading .= "&nbsp;".$post_start_year;
+								}
+							}
+						}
+
+						else
+						{
+							if($post_start_week != $week_temp)
+							{
+								if($post_start_week == date('W'))
+								{
+									$heading = __("Current Week", 'lang_calendar');
+								}
+
+								else if($post_start_week == date('W', strtotime("+1 week")))
+								{
+									$heading = __("Next Week", 'lang_calendar');
+								}
+
+								else
+								{
+									$year_temp = date('Y', strtotime($post_start_date));
+									$week_temp = date('W', strtotime($post_start_date));
+
+									$weekday_temp = date('w', strtotime($post_start_date));
+
+									$date_start_temp = date('Y-m-d', strtotime($post_start_date." -".($weekday_temp - 1)." day"));
+									$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
+
+									$day_start = date('j', strtotime($date_start_temp));
+									$month_start = date('n', strtotime($date_start_temp));
+
+									$day_end = date('j', strtotime($date_end_temp));
+									$month_end = date('n', strtotime($date_end_temp));
+
+									$heading = "<span class='calendar_week'>".__("w", 'lang_calendar').$post_start_week."<span>".$day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end."</span></span>";
+
+									if($post_start_year != $year_temp && $year_temp != '')
+									{
+										$heading .= "&nbsp;".$post_start_year;
+									}
+								}
 							}
 						}
 					break;
@@ -1071,6 +1143,7 @@ class mf_calendar
 
 				$year_temp = $post_start_year;
 				$yearmonth_temp = $post_start_yearmonth;
+				$week_temp = $post_start_week;
 
 				//week
 				$date_temp = $post_start_date;
@@ -1084,31 +1157,7 @@ class mf_calendar
 			}
 		}
 
-		$date_temp = $this->arr_data['date_start'];
-
-		while($date_temp < $this->arr_data['date_end'])
-		{
-			$year_temp = date('Y', strtotime($date_temp));
-			$week_temp = date('W', strtotime($date_temp));
-
-			$weekday_temp = date('w', strtotime($date_temp));
-
-			$date_start_temp = date('Y-m-d', strtotime($date_temp." -".($weekday_temp - 1)." day"));
-			$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
-
-			$day_start = date('j', strtotime($date_start_temp));
-			$month_start = date('n', strtotime($date_start_temp));
-
-			$day_end = date('j', strtotime($date_end_temp));
-			$month_end = date('n', strtotime($date_end_temp));
-
-			$this->arr_data['week_dates'][$year_temp."-".$week_temp] = $day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end;
-
-			$date_temp = date('Y-m-d', strtotime($date_temp." +1 week"));
-		}
-
-		unset($this->arr_data['date_start']);
-		unset($this->arr_data['date_end']);
+		$this->get_week_dates();
 	}
 
 	function get_next_event($data)
@@ -2169,7 +2218,7 @@ class widget_calendar extends WP_Widget
 
 			echo "<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
-				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Display", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
+				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Search", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
 			."</div>"
 			.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']))
 		."</div>";

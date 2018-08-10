@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.3.4
+Version: 4.3.8
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -71,5 +71,6 @@ function uninstall_calendar()
 {
 	mf_uninstall_plugin(array(
 		'post_types' => array('mf_calendar', 'mf_calendar_event'),
+		'options' => array('setting_google_calendar_api_key', 'setting_calendar_date_color', 'setting_calendar_time_limit', 'setting_calendar_debug'),
 	));
 }
