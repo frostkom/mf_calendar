@@ -1431,6 +1431,8 @@ class mf_calendar
 				do_log("Calendar URL: ".$this->calendar_url);
 			}
 
+			$log_message = __("Something went wrong when fetching the calendar source", 'lang_calendar');
+
 			if(isset($json['items']))
 			{
 				//$arr_debug = array('old' => array(), 'new' => array());
@@ -1766,6 +1768,8 @@ class mf_calendar
 				{
 					do_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$this->calendar_url.")");
 				}
+
+				do_log($log_message, 'trash');
 			}
 
 			else
@@ -1774,7 +1778,7 @@ class mf_calendar
 
 				if($content != '' && !preg_match("/Not Found/i", $content))
 				{
-					do_log(__("Something went wrong when fetching the calendar source", 'lang_calendar')." (".$this->calendar_url.")"); //, ".htmlspecialchars($content)."
+					do_log($log_message." (".$this->calendar_url.")"); //, ".htmlspecialchars($content)."
 				}
 			}
 		}
