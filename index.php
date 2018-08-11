@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.3.9
+Version: 4.3.11
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -31,11 +31,11 @@ if(is_admin())
 	add_action('admin_init', array($obj_calendar, 'admin_init'), 0);
 	add_action('admin_menu', array($obj_calendar, 'admin_menu'));
 
-	add_filter('manage_mf_calendar_posts_columns', array($obj_calendar, 'column_header_calendar'), 5);
-	add_action('manage_mf_calendar_posts_custom_column', array($obj_calendar, 'column_cell_calendar'), 5, 2);
+	add_filter('manage_mf_calendar_posts_columns', array($obj_calendar, 'column_header'), 5);
+	add_action('manage_mf_calendar_posts_custom_column', array($obj_calendar, 'column_cell'), 5, 2);
 
-	add_filter('post_row_actions', array($obj_calendar, 'row_actions_calendar'), 10, 2);
-	add_filter('page_row_actions', array($obj_calendar, 'row_actions_calendar'), 10, 2);
+	add_filter('post_row_actions', array($obj_calendar, 'row_actions'), 10, 2);
+	add_filter('page_row_actions', array($obj_calendar, 'row_actions'), 10, 2);
 	add_filter('manage_mf_calendar_event_posts_columns', array($obj_calendar, 'column_header_event'), 5);
 	add_action('manage_mf_calendar_event_posts_custom_column', array($obj_calendar, 'column_cell_event'), 5, 2);
 

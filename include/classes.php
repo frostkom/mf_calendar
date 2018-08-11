@@ -11,6 +11,14 @@ class mf_calendar
 		$this->meta_prefix = "mf_calendar_";
 	}
 
+	function get_calendar_amount()
+	{
+		$arr_data = array();
+		get_post_children(array('post_type' => 'mf_calendar', 'add_choose_here' => false), $arr_data);
+
+		return count($arr_data);
+	}
+
 	function init()
 	{
 		$labels = array(
@@ -126,14 +134,17 @@ class mf_calendar
 		$menu_title = __("Calendar", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
-		$menu_title = __("Events", 'lang_calendar');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
+		if($this->get_calendar_amount() > 0)
+		{
+			$menu_title = __("Events", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
 
-		$menu_title = __("Add New", 'lang_calendar');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");
+			$menu_title = __("Add New", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");
+		}
 	}
 
-	function column_header_calendar($cols)
+	function column_header($cols)
 	{
 		unset($cols['date']);
 
@@ -144,7 +155,7 @@ class mf_calendar
 		return $cols;
 	}
 
-	function column_cell_calendar($col, $id)
+	function column_cell($col, $id)
 	{
 		global $wpdb;
 
@@ -249,7 +260,7 @@ class mf_calendar
 		}
 	}
 
-	function row_actions_calendar($actions, $post)
+	function row_actions($actions, $post)
 	{
 		if($post->post_type == 'mf_calendar_event')
 		{
@@ -490,7 +501,6 @@ class mf_calendar
 
 	function meta_calendar_info()
 	{
-		// condition_type='show_this_if' condition_selector='".$this->meta_prefix."calendar_id'
 		$out = "<ol id='".$this->meta_prefix."info'>
 			<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
 			<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
@@ -515,7 +525,7 @@ class mf_calendar
 			array(
 				'name' => __("Calendar ID", 'lang_calendar'),
 				'id' => $this->meta_prefix.'calendar_id',
-				'type' => 'text',
+				'type' => 'email',
 				'attributes' => array(
 					'condition_type' => 'show_if',
 					'condition_field' => $this->meta_prefix.'custom_url, #'.$this->meta_prefix.'custom_url_container, #'.$this->meta_prefix.'custom_url_id, #'.$this->meta_prefix.'custom_url_title, #'.$this->meta_prefix.'custom_url_description, #'.$this->meta_prefix.'custom_url_longitude, #'.$this->meta_prefix.'custom_url_latitude, #'.$this->meta_prefix.'custom_url_created, #'.$this->meta_prefix.'custom_url_start, #'.$this->meta_prefix.'custom_url_end',
