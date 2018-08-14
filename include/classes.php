@@ -1433,7 +1433,7 @@ class mf_calendar
 
 		if($this->calendar_url != '' && $this->calendar_id != '')
 		{
-			$content = get_url_content($this->calendar_url);
+			$content = get_url_content(array('url' => $this->calendar_url));
 			$json = json_decode($content, true);
 
 			if($setting_calendar_debug == 'yes')
@@ -1798,7 +1798,7 @@ class mf_calendar
 	{
 		$setting_calendar_debug = get_option('setting_calendar_debug');
 
-		$content = get_url_content($this->custom_url);
+		$content = get_url_content(array('url' => $this->custom_url));
 		$json = json_decode($content, true);
 
 		$custom_url_container = get_post_meta($this->id, $this->meta_prefix.'custom_url_container', true);
