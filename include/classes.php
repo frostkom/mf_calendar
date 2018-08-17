@@ -1381,7 +1381,8 @@ class mf_calendar
 		{
 			$google_calendar_api_key = get_option_or_default('setting_google_calendar_api_key', 'AIzaSyDpSo4p2C3k6PRu0YsF360zWd1pfJ9PTnU');
 
-			$this->calendar_url = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
+			$this->calendar_url_clean = "https://www.googleapis.com/calendar/v3/calendars/".$this->calendar_id."/events?key=".$google_calendar_api_key;
+			$this->calendar_url = $this->calendar_url_clean."&timeMin=".date("Y-m-d\TH:i:s.000\Z", strtotime("-1 month")); //&maxResults=20
 		}
 	}
 
@@ -1780,7 +1781,7 @@ class mf_calendar
 
 						if(count($json['items']) == 250)
 						{
-							do_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$this->calendar_url.")");
+							do_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$this->calendar_url_clean.")");
 						}
 
 						do_log($log_message, 'trash');
@@ -1792,13 +1793,13 @@ class mf_calendar
 
 						if($content != '' && !preg_match("/Not Found/i", $content))
 						{
-							do_log($log_message." (".$this->calendar_url.", ".htmlspecialchars($content).")");
+							do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
 						}
 					}
 				break;
 
 				default:
-					do_log($log_message." (".$this->calendar_url.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
+					do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
 				break;
 			}
 		}
