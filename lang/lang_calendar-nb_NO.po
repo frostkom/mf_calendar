@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-09-07 13:21+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Martin Fors\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: nb_NO\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: esc_html__;esc_html_e;esc_attr__;esc_attr_e;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+msgid "Event"
+msgstr "Hendelse"
+
+msgid "Add New"
+msgstr "Legg Til Ny"
+
+msgid "Date"
+msgstr "Dato"
+
+msgid "Hidden"
+msgstr "Skjult"
+
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+msgid "Edit"
+msgstr "Redigere"
+
+msgid "Delete"
+msgstr "Slett"
+
+msgid "Settings"
+msgstr "Innstillinger"
+
+msgid "Read More"
+msgstr "Les Mer"
+
+msgid "Display Filter"
+msgstr "Vis Filter"
+
+msgid "Choose Here"
+msgstr "Velg Her"
+
+msgid "Search"
+msgstr "Søk"
+
+msgid "months"
+msgstr "Måneder"
+
