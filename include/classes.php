@@ -166,7 +166,7 @@ class mf_calendar
 
 				if($post_color != '')
 				{
-					echo "<i class='fa fa-circle fa-2x' style='color: ".$post_color."'></i>";
+					echo "<i class='far fa-circle fa-2x' style='color: ".$post_color."'></i>";
 				}
 			break;
 
@@ -1119,8 +1119,8 @@ class mf_calendar
 				if($more_content != '')
 				{
 					$content_class = 'toggler';
-					$more_icon = "<i class='fa fa-lg fa-caret-right toggle_icon_closed'></i>
-					<i class='fa fa-lg fa-caret-down toggle_icon_open'></i>";
+					$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon_closed'></i>
+					<i class='fa fa-caret-down fa-lg toggle_icon_open'></i>";
 
 					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>".$more_content."</div>";
 				}
