@@ -685,7 +685,7 @@ class mf_calendar
 		return $meta_boxes;
 	}
 
-	function post_filter_select()
+	function restrict_manage_posts()
 	{
 		global $post_type, $wpdb;
 
@@ -704,27 +704,24 @@ class mf_calendar
 		}
 	}
 
-	function post_filter_query($wp_query)
+	function pre_get_posts($wp_query)
 	{
 		global $post_type, $pagenow;
 
-		if($pagenow == 'edit.php')
+		if($pagenow == 'edit.php' && $post_type == 'mf_calendar_event')
 		{
-			if($post_type == 'mf_calendar_event')
-			{
-				//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar'));
-				$strFilterCalendar = check_var('strFilterCalendar');
+			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar'));
+			$strFilterCalendar = check_var('strFilterCalendar');
 
-				if($strFilterCalendar != '')
-				{
-					$wp_query->query_vars['meta_query'] = array(
-						array(
-							'key' => $this->meta_prefix.'calendar',
-							'value' => $strFilterCalendar,
-							'compare' => '=',
-						),
-					);
-				}
+			if($strFilterCalendar != '')
+			{
+				$wp_query->query_vars['meta_query'] = array(
+					array(
+						'key' => $this->meta_prefix.'calendar',
+						'value' => $strFilterCalendar,
+						'compare' => '=',
+					),
+				);
 			}
 		}
 	}
