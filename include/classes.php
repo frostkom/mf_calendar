@@ -166,7 +166,7 @@ class mf_calendar
 
 				if($post_color != '')
 				{
-					echo "<i class='far fa-circle fa-2x' style='color: ".$post_color."'></i>";
+					echo "<i class='fa fa-circle fa-2x' style='color: ".$post_color."'></i>";
 				}
 			break;
 
