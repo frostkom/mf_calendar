@@ -1322,7 +1322,7 @@ class mf_calendar
 
 	// Cron
 	##############################
-	function run_cron()
+	function cron_base()
 	{
 		global $wpdb;
 
