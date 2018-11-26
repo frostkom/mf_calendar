@@ -1327,20 +1327,26 @@ class mf_calendar
 		global $wpdb;
 
 		$obj_cron = new mf_cron();
+		$obj_cron->start(__CLASS__);
 
-		$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
-
-		$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()"); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
-
-		foreach($result as $r)
+		if($obj_cron->is_running == false)
 		{
-			if($obj_cron->has_expired(array('margin' => .9)))
-			{
-				break;
-			}
+			$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
-			$this->fetch_source($r->ID);
+			$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()"); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
+
+			foreach($result as $r)
+			{
+				/*if($obj_cron->has_expired(array('margin' => .9)))
+				{
+					break;
+				}*/
+
+				$this->fetch_source($r->ID);
+			}
 		}
+
+		$obj_cron->end();
 	}
 
 	function set_id($id)
