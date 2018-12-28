@@ -19,6 +19,13 @@ class mf_calendar
 		return count($arr_data);
 	}
 
+	function get_calendar_colors()
+	{
+		global $wpdb;
+
+		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", 'mf_calendar', $this->meta_prefix.'color'));
+	}
+
 	function init()
 	{
 		$labels = array(

@@ -82,6 +82,9 @@ echo "@media all
 
 					.widget.calendar .section > ul li .date
 					{
+						-webkit-box-flex: 0 0 3.1em;
+						-webkit-flex: 0 0 3.1em;
+						-ms-flex: 0 0 3.1em;
 						flex: 0 0 3.1em;
 					}
 
@@ -96,7 +99,7 @@ echo "@media all
 							min-width: 2.12em;
 						}";
 
-						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", 'mf_calendar', $obj_calendar->meta_prefix.'color'));
+						$result = $obj_calendar->get_calendar_colors();
 
 						foreach($result as $r)
 						{
@@ -111,6 +114,9 @@ echo "@media all
 
 					echo ".widget.calendar .section > ul li .content
 					{
+						-webkit-box-flex: 1 0 0;
+						-webkit-flex: 1 0 0;
+						-ms-flex: 1 0 0;
 						flex: 1 0 0;
 						margin-left: 2%;
 						text-align: left;
