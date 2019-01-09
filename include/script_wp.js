@@ -46,10 +46,10 @@ jQuery(function($)
 			});
 		}
 
-		else
+		/*else
 		{
 			console.log("No action_type: " , dom_obj);
-		}
+		}*/
 
 		return false;
 	});

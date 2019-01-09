@@ -162,6 +162,28 @@ class mf_calendar
 		return $cols;
 	}
 
+	function get_amount_of_posts_for_td($id)
+	{
+		global $wpdb;
+
+		$out = "";
+
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d'", $id));
+		$amount = $wpdb->num_rows;
+
+		if($amount > 0)
+		{
+			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
+
+			$out .= "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilterCalendar=".$id)."'>".$amount."</a>"
+			."<div class='row-actions'>"
+				.__("Latest", 'lang_calendar').": ".format_date($post_latest)
+			."</div>";
+		}
+
+		return $out;
+	}
+
 	function column_cell($col, $id)
 	{
 		global $wpdb;
@@ -251,18 +273,7 @@ class mf_calendar
 			break;
 
 			case 'amount_of_posts':
-				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d'", $id));
-				$amount = $wpdb->num_rows;
-
-				if($amount > 0)
-				{
-					$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
-
-					echo "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilterCalendar=".$id)."'>".$amount."</a>"
-					."<div class='row-actions'>"
-						.__("Latest", 'lang_calendar').": ".format_date($post_latest)
-					."</div>";
-				}
+				echo $this->get_amount_of_posts_for_td($id);
 			break;
 		}
 	}
@@ -277,9 +288,20 @@ class mf_calendar
 		return $actions;
 	}
 
-	function filter_end_date($end_date)
+	// Because gCal displays whole-day-events with the end date the day after start date
+	function filter_end_date($datetime)
 	{
-		return date("Y-m-d", strtotime($end_date." -1 day"));
+		$date = date("Y-m-d", strtotime($datetime));
+
+		if($datetime == $date)
+		{
+			return date("Y-m-d", strtotime($datetime." -1 day"));
+		}
+
+		else
+		{
+			return $date;
+		}
 	}
 
 	function column_header_event($cols)
@@ -393,6 +415,8 @@ class mf_calendar
 
 				if($post_start > DEFAULT_DATE)
 				{
+					$post_end_date = $this->filter_end_date($post_end);
+
 					if($post_start_date == $post_end_date)
 					{
 						echo $post_start_date;
@@ -410,16 +434,18 @@ class mf_calendar
 
 					else
 					{
-						$post_end_date = $this->filter_end_date($post_end_date);
+						echo $post_start_date;
 
-						if($post_start_date == $post_end_date)
+						if($post_start_time != '' && $post_start_time != '00:00')
 						{
-							echo $post_start_date;
+							echo "&nbsp;".$post_start_time;
 						}
 
-						else
+						echo "&nbsp;-&nbsp;".$post_end_date;
+
+						if($post_end_time != '' && $post_end_time != '00:00')
 						{
-							echo $post_start_date."&nbsp;-&nbsp;".$post_end_date;
+							echo "&nbsp;".$post_end_time;
 						}
 					}
 				}
@@ -1011,6 +1037,11 @@ class mf_calendar
 
 				$date_end = "";
 
+				if($post_uid != '')
+				{
+					$post_end_date = $this->filter_end_date($post_end);
+				}
+
 				if($post_start_date == $post_end_date)
 				{
 					if($post_start_time > "00:00")
@@ -1026,14 +1057,18 @@ class mf_calendar
 
 				else
 				{
-					if($post_uid != '')
-					{
-						$post_end_date = $this->filter_end_date($post_end_date);
-					}
+					/*echo $post_start_date;
 
-					if($post_start_date != $post_end_date)
+					if($post_start_time != '' && $post_start_time != '00:00')
 					{
-						$date_end .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+						echo "&nbsp;".$post_start_time;
+					}*/
+
+					$date_end .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+
+					if($post_end_time != '' && $post_end_time != '00:00')
+					{
+						$date_end .= "&nbsp;".$post_end_time;
 					}
 				}
 
