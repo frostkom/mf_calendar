@@ -16,7 +16,12 @@ else
 
 $obj_calendar = new mf_calendar();
 
-$setting_calendar_date_color = get_option_or_default('setting_calendar_date_color', "#019cdb");
+$setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
+
+$rgb = $obj_calendar->HTMLToRGB($setting_calendar_date_bg);
+$hsl = $obj_calendar->RGBToHSL($rgb);
+
+$setting_calendar_date_text_color = ($hsl->lightness > 200 ? "#333" : "#fff");
 
 echo "@media all
 {
@@ -90,9 +95,9 @@ echo "@media all
 
 						.widget.calendar .section > ul li .date p
 						{
-							background: ".$setting_calendar_date_color.";
+							background: ".$setting_calendar_date_bg.";
 							border-radius: .3em;
-							color: #fff;
+							color: ".$setting_calendar_date_text_color.";
 							font-size: 1.5em;
 							padding: .4em .5em;
 							text-align: center;
