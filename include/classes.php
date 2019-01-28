@@ -8,7 +8,9 @@ class mf_calendar
 
 		$this->calendar_id = $this->custom_url = $this->display_birthdays = '';
 
-		$this->meta_prefix = "mf_calendar_";
+		$this->post_type = 'mf_calendar';
+		$this->post_type_event = 'mf_calendar_event';
+		$this->meta_prefix = $this->post_type."_";
 	}
 
 	function HTMLToRGB($hex)
@@ -90,7 +92,7 @@ class mf_calendar
 	function get_calendar_amount()
 	{
 		$arr_data = array();
-		get_post_children(array('post_type' => 'mf_calendar', 'add_choose_here' => false), $arr_data);
+		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data);
 
 		return count($arr_data);
 	}
@@ -99,11 +101,13 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", 'mf_calendar', $this->meta_prefix.'color'));
+		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", $this->post_type, $this->meta_prefix.'color'));
 	}
 
 	function init()
 	{
+		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
+
 		$labels = array(
 			'name' => _x(__("Calendar", 'lang_calendar'), 'post type general name'),
 			'singular_name' => _x(__("Calendar", 'lang_calendar'), 'post type singular name'),
@@ -121,7 +125,7 @@ class mf_calendar
 			'has_archive' => false,
 		);
 
-		register_post_type('mf_calendar', $args);
+		register_post_type($this->post_type, $args);
 
 		$labels = array(
 			'name' => _x(__("Events", 'lang_calendar'), 'post type general name'),
@@ -134,13 +138,13 @@ class mf_calendar
 			'public' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
-			'exclude_from_search' => true,
+			'exclude_from_search' => ($setting_calendar_events_searchable == 'no'),
 			'supports' => array('title', 'editor', 'excerpt'),
 			'hierarchical' => true,
 			'has_archive' => false,
 		);
 
-		register_post_type('mf_calendar_event', $args);
+		register_post_type($this->post_type_event, $args);
 	}
 
 	function settings_calendar()
@@ -151,6 +155,7 @@ class mf_calendar
 
 		$arr_settings = array();
 		$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
+		$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
 		$arr_settings['setting_calendar_date_bg'] = __("Date Background", 'lang_calendar');
 		$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
 		$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
@@ -177,6 +182,14 @@ class mf_calendar
 		</ol>";
 
 		echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
+	}
+
+	function setting_calendar_events_searchable_callback()
+	{
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option($setting_key, 'no');
+
+		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
 	}
 
 	function setting_calendar_date_bg_callback()
@@ -208,7 +221,7 @@ class mf_calendar
 	function admin_menu()
 	{
 		$menu_root = 'mf_calendar/';
-		$menu_start = "edit.php?post_type=mf_calendar";
+		$menu_start = "edit.php?post_type=".$this->post_type;
 		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_pages'));
 
 		$menu_title = __("Calendar", 'lang_calendar');
@@ -244,12 +257,12 @@ class mf_calendar
 
 		$out = "";
 
-		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d'", $id));
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, 'publish', $this->meta_prefix.'calendar', $id));
 		$amount = $wpdb->num_rows;
 
 		if($amount > 0)
 		{
-			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."calendar' AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $id));
+			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, 'publish', $this->meta_prefix.'calendar', $id));
 
 			$out .= "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilterCalendar=".$id)."'>".$amount."</a>"
 			."<div class='row-actions'>"
@@ -304,7 +317,7 @@ class mf_calendar
 
 					if(IS_SUPER_ADMIN)
 					{
-						$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar' AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id));
+						$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
 
 						if($wpdb->num_rows > 0)
 						{
@@ -317,12 +330,12 @@ class mf_calendar
 
 							else
 							{
-								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=mf_calendar&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
+								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
 							}
 						}
 					}
 
-					$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_calendar'", $id));
+					$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $id, $this->post_type));
 
 					if($post_calendar_id != '')
 					{
@@ -356,7 +369,7 @@ class mf_calendar
 
 	function row_actions($actions, $post)
 	{
-		if($post->post_type == 'mf_calendar_event')
+		if($post->post_type == $this->post_type_event)
 		{
 			$actions = array();
 		}
@@ -562,7 +575,7 @@ class mf_calendar
 	{
 		global $pagenow;
 
-		if($pagenow == 'edit.php' && check_var('post_type') == 'mf_calendar_event')
+		if($pagenow == 'edit.php' && check_var('post_type') == $this->post_type_event)
 		{
 			$plugin_include_url = plugin_dir_url(__FILE__);
 			$plugin_version = get_plugin_version(__FILE__);
@@ -715,14 +728,14 @@ class mf_calendar
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_calendar'),
-			'post_types' => array('mf_calendar'),
+			'post_types' => array($this->post_type),
 			//'context' => 'side',
 			'priority' => 'low',
 			'fields' => $fields_settings
 		);
 
 		$arr_data = array();
-		get_post_children(array('post_type' => 'mf_calendar', 'add_choose_here' => true), $arr_data);
+		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => true), $arr_data);
 
 		$default_calendar = '';
 
@@ -738,13 +751,13 @@ class mf_calendar
 
 		if($default_calendar == '')
 		{
-			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", 'mf_calendar', 'publish'));
+			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", $this->post_type, 'publish'));
 		}
 
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_calendar'),
-			'post_types' => array('mf_calendar_event'),
+			'post_types' => array($this->post_type_event),
 			'context' => 'side',
 			'priority' => 'low',
 			'fields' => array(
@@ -798,13 +811,13 @@ class mf_calendar
 	{
 		global $post_type, $wpdb;
 
-		if($post_type == 'mf_calendar_event')
+		if($post_type == $this->post_type_event)
 		{
 			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar', 'save' => true));
 			$strFilterCalendar = check_var('strFilterCalendar');
 
 			$arr_data = array();
-			get_post_children(array('post_type' => 'mf_calendar', 'post_status' => '', 'add_choose_here' => true), $arr_data);
+			get_post_children(array('post_type' => $this->post_type, 'post_status' => '', 'add_choose_here' => true), $arr_data);
 
 			if(count($arr_data) > 2)
 			{
@@ -817,7 +830,7 @@ class mf_calendar
 	{
 		global $post_type, $pagenow;
 
-		if($pagenow == 'edit.php' && $post_type == 'mf_calendar_event')
+		if($pagenow == 'edit.php' && $post_type == $this->post_type_event)
 		{
 			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar'));
 			$strFilterCalendar = check_var('strFilterCalendar');
@@ -839,9 +852,9 @@ class mf_calendar
 	{
 		global $wpdb, $post_type;
 
-		if($post_type == 'mf_calendar')
+		if($post_type == $this->post_type)
 		{
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND meta_key = '".$this->meta_prefix."calendar' AND meta_value = '%d'", $post_id));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = '%d'", $this->post_type_event, $this->meta_prefix.'calendar', $post_id));
 
 			foreach($result as $r)
 			{
@@ -858,7 +871,7 @@ class mf_calendar
 
 		$result = array();
 
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'draft' WHERE post_type = 'mf_calendar_event' AND ID = '%d'", $action_id));
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = %s WHERE post_type = %s AND ID = '%d'", 'draft', $this->post_type_event, $action_id));
 
 		if($wpdb->rows_affected > 0)
 		{
@@ -975,7 +988,7 @@ class mf_calendar
 
 		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] > 0 ? $data['months'] : 6)." MONTH)";
 
-		$result = $wpdb->get_results("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC");
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status = %s AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event, 'publish'));
 
 		if($wpdb->num_rows > 0)
 		{
@@ -1451,7 +1464,7 @@ class mf_calendar
 		{
 			$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
-			$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_calendar' AND post_status = 'publish' AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()"); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()", $this->post_type, 'publish')); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
 
 			foreach($result as $r)
 			{
@@ -2047,7 +2060,7 @@ class mf_calendar
 		{
 			$post['uid_temp'] = $post['type']." ".$post['recurringEventId'];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid_temp']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_parent = '%d' AND meta_key = %s AND meta_value = %s", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid_temp']));
 
 			foreach($result as $r)
 			{
@@ -2076,7 +2089,7 @@ class mf_calendar
 			{
 				$post['uid'] = $post['type']." ".$post['id'];
 
-				$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status IN ('draft', 'publish') AND post_parent = '%d' AND meta_key = '".$this->meta_prefix."uid' AND meta_value = %s", $this->id, $post['uid']));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN ('draft', 'publish') AND post_parent = '%d' AND meta_key = %s AND meta_value = %s", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid']));
 
 				switch($post['status'])
 				{
@@ -2086,7 +2099,7 @@ class mf_calendar
 							if($this->check_before_insert($post))
 							{
 								$post_data = array(
-									'post_type' => 'mf_calendar_event',
+									'post_type' => $this->post_type_event,
 									'post_status' => 'publish',
 									'post_title' => $post['title'],
 									'post_content' => $post['content'],
@@ -2184,7 +2197,7 @@ class mf_calendar
 			$arr_titles[] = $post['type']." ".$post['id'];
 		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_calendar_event' AND post_status = 'publish' AND meta_key = '".$this->meta_prefix."uid' AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->id));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->post_type_event, 'publish', $this->meta_prefix.'uid', $this->id));
 
 		foreach($result as $r)
 		{
@@ -2196,7 +2209,7 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_modified = NOW() WHERE ID = '%d' AND post_type = 'mf_calendar'", $this->id));
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_modified = NOW() WHERE ID = '%d' AND post_type = %s", $this->id, $this->post_type));
 	}
 	##############################
 
@@ -2230,8 +2243,8 @@ class widget_calendar extends WP_Widget
 		);
 
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops);
-
-		//$this->meta_prefix = "mf_calendar_";
+		
+		$this->obj_calendar = new mf_calendar();
 	}
 
 	function widget($args, $instance)
@@ -2242,9 +2255,7 @@ class widget_calendar extends WP_Widget
 
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
-		$obj_calendar = new mf_calendar();
-
-		add_action('wp_footer', array($obj_calendar, 'get_footer'), 0);
+		add_action('wp_footer', array($this->obj_calendar, 'get_footer'), 0);
 
 		echo $before_widget;
 
@@ -2276,12 +2287,12 @@ class widget_calendar extends WP_Widget
 				if($instance['calendar_display_filter'] == 'yes')
 				{
 					$arr_data_feeds = array();
-					get_post_children(array('post_type' => 'mf_calendar', 'include' => $instance['calendar_feeds']), $arr_data_feeds);
+					get_post_children(array('post_type' => $this->obj_calendar->post_type, 'include' => $instance['calendar_feeds']), $arr_data_feeds);
 
 					if(count($arr_data_feeds) > 1)
 					{
 						echo "<form action='' method='post' class='mf_form hide'>"
-							.show_select(array('data' => $arr_data_feeds, 'name' => "calendar_feeds[]", 'xtra' => "class='multiselect'".($instance['calendar_filter_label'] != '' ? " data-choose-here='".$instance['calendar_filter_label']."'" : "")))
+							.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($instance['calendar_filter_label'] != '' ? " data-choose-here='".$instance['calendar_filter_label']."'" : "")))
 						."</form>";
 					}
 				}
@@ -2328,7 +2339,7 @@ class widget_calendar extends WP_Widget
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data_feeds = array();
-		get_post_children(array('post_type' => 'mf_calendar'), $arr_data_feeds);
+		get_post_children(array('post_type' => $this->obj_calendar->post_type), $arr_data_feeds);
 
 		$arr_data_pages = array();
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
