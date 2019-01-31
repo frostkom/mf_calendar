@@ -597,12 +597,12 @@ class mf_calendar
 		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
 		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
 		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
-			'last_week' => date('W', strtotime("-1 week")),
+			'last_week' => date("W", strtotime("-1 week")),
 			'last_week_text' => __("Previous Week", 'lang_calendar'),
-			'current_year' => date('Y'),
-			'current_week' => date('W'),
+			'current_year' => date("Y"),
+			'current_week' => date("W"),
 			'current_week_text' => __("Current Week", 'lang_calendar'),
-			'next_week' => date('W', strtotime("+1 week")),
+			'next_week' => date("W", strtotime("+1 week")),
 			'next_week_text' => __("Next Week", 'lang_calendar'),
 			'week_text' => __("w", 'lang_calendar')
 		), $plugin_version);
@@ -809,7 +809,7 @@ class mf_calendar
 
 	function restrict_manage_posts()
 	{
-		global $post_type, $wpdb;
+		global $post_type;
 
 		if($post_type == $this->post_type_event)
 		{
@@ -909,23 +909,23 @@ class mf_calendar
 
 		while($date_temp < $this->arr_data['date_end'])
 		{
-			$year_temp = date('Y', strtotime($date_temp));
-			$week_temp = date('W', strtotime($date_temp));
+			$year_temp = date("Y", strtotime($date_temp));
+			$week_temp = date("W", strtotime($date_temp));
 
-			$weekday_temp = date('w', strtotime($date_temp));
+			$weekday_temp = date("w", strtotime($date_temp));
 
-			$date_start_temp = date('Y-m-d', strtotime($date_temp." -".($weekday_temp - 1)." day"));
-			$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
+			$date_start_temp = date("Y-m-d", strtotime($date_temp." -".($weekday_temp - 1)." day"));
+			$date_end_temp = date("Y-m-d", strtotime($date_start_temp." +6 day"));
 
-			$day_start = date('j', strtotime($date_start_temp));
-			$month_start = date('n', strtotime($date_start_temp));
+			$day_start = date("j", strtotime($date_start_temp));
+			$month_start = date("n", strtotime($date_start_temp));
 
-			$day_end = date('j', strtotime($date_end_temp));
-			$month_end = date('n', strtotime($date_end_temp));
+			$day_end = date("j", strtotime($date_end_temp));
+			$month_end = date("n", strtotime($date_end_temp));
 
 			$this->arr_data['week_dates'][$year_temp."-".$week_temp] = $day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end;
 
-			$date_temp = date('Y-m-d', strtotime($date_temp." +1 week"));
+			$date_temp = date("Y-m-d", strtotime($date_temp." +1 week"));
 		}
 
 		unset($this->arr_data['date_start']);
@@ -950,9 +950,9 @@ class mf_calendar
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
-			'date_start' => date('Y-m-d'),
-			'week_start' => date('W'),
-			'year_start' => date('Y'),
+			'date_start' => date("Y-m-d"),
+			'week_start' => date("W"),
+			'year_start' => date("Y"),
 			'date_end' => '',
 			'week_end' => '',
 			'year_end' => '',
@@ -1086,31 +1086,31 @@ class mf_calendar
 						{
 							if($post_start_week != $week_temp)
 							{
-								if($post_start_week == date('W'))
+								if($post_start_week == date("W"))
 								{
 									$heading = __("Current Week", 'lang_calendar');
 								}
 
-								else if($post_start_week == date('W', strtotime("+1 week")))
+								else if($post_start_week == date("W", strtotime("+1 week")))
 								{
 									$heading = __("Next Week", 'lang_calendar');
 								}
 
 								else
 								{
-									$year_temp = date('Y', strtotime($post_start_date));
-									$week_temp = date('W', strtotime($post_start_date));
+									$year_temp = date("Y", strtotime($post_start_date));
+									$week_temp = date("W", strtotime($post_start_date));
 
-									$weekday_temp = date('w', strtotime($post_start_date));
+									$weekday_temp = date("w", strtotime($post_start_date));
 
-									$date_start_temp = date('Y-m-d', strtotime($post_start_date." -".($weekday_temp - 1)." day"));
-									$date_end_temp = date('Y-m-d', strtotime($date_start_temp." +6 day"));
+									$date_start_temp = date("Y-m-d", strtotime($post_start_date." -".($weekday_temp - 1)." day"));
+									$date_end_temp = date("Y-m-d", strtotime($date_start_temp." +6 day"));
 
-									$day_start = date('j', strtotime($date_start_temp));
-									$month_start = date('n', strtotime($date_start_temp));
+									$day_start = date("j", strtotime($date_start_temp));
+									$month_start = date("n", strtotime($date_start_temp));
 
-									$day_end = date('j', strtotime($date_end_temp));
-									$month_end = date('n', strtotime($date_end_temp));
+									$day_end = date("j", strtotime($date_end_temp));
+									$month_end = date("n", strtotime($date_end_temp));
 
 									$heading = "<span class='calendar_week'>".__("w", 'lang_calendar').$post_start_week."<span>".$day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end."</span></span>";
 
@@ -1542,11 +1542,6 @@ class mf_calendar
 			$this->fetch_birthdays();
 		}
 
-		/*else
-		{
-			do_log(sprintf(__("The calendar (%d) has no source", 'lang_calendar'), $this->id));
-		}*/
-
 		if(count($this->arr_events) > 0)
 		{
 			$this->insert_events();
@@ -1737,7 +1732,7 @@ class mf_calendar
 															case 'WEEKLY':
 																unset($next_day);
 
-																$day = date('w', $timestamp);
+																$day = date("w", $timestamp);
 
 																if(isset($arr_repeat['BYDAY']))
 																{
@@ -1789,31 +1784,31 @@ class mf_calendar
 																	$day_index = array_search($by_day_weekday, $weekday_short_array);
 																	$dayname = $weekday_medium_array[$day_index];
 
-																	$timestamp_temp = strtotime(date('c', $timestamp)." +".$interval." month");
-																	$month = date('F', $timestamp_temp);
-																	$year = date('Y', $timestamp_temp);
+																	$timestamp_temp = strtotime(date("c", $timestamp)." +".$interval." month");
+																	$month = date("F", $timestamp_temp);
+																	$year = date("Y", $timestamp_temp);
 
 																	$timestamp = strtotime($ordinal." ".$dayname." of ".$month." ".$year);
 																}
 
 																else
 																{
-																	$year = date('Y', $timestamp);
-																	$month = date('m', $timestamp);
+																	$year = date("Y", $timestamp);
+																	$month = date("m", $timestamp);
 
-																	$hour = date('H', $timestamp);
-																	$minute = date('i', $timestamp);
-																	$second = date('s', $timestamp);
+																	$hour = date("H", $timestamp);
+																	$minute = date("i", $timestamp);
+																	$second = date("s", $timestamp);
 
-																	$first_date_of_month = date('Y-m-d H:i:s', mktime($hour, $minute, $second, $month, 1, $year));
-																	$first_date_next_month = date('Y-m-d H:i:s', strtotime($first_date_of_month." +".($interval * ($out_of_bounds + 1))." month"));
-																	$days_next_month = date('t', strtotime($first_date_next_month));
-																	$month_next_month = date('m', strtotime($first_date_next_month));
-																	$year_next_month = date('Y', strtotime($first_date_next_month));
+																	$first_date_of_month = date("Y-m-d H:i:s", mktime($hour, $minute, $second, $month, 1, $year));
+																	$first_date_next_month = date("Y-m-d H:i:s", strtotime($first_date_of_month." +".($interval * ($out_of_bounds + 1))." month"));
+																	$days_next_month = date("t", strtotime($first_date_next_month));
+																	$month_next_month = date("m", strtotime($first_date_next_month));
+																	$year_next_month = date("Y", strtotime($first_date_next_month));
 
 																	$last_timestamp_next_month = mktime($hour, $minute, $second, $month_next_month, $days_next_month, $year_next_month);
 
-																	$timestamp_temp = strtotime(date('c', $timestamp)." +".($interval * ($out_of_bounds + 1))." month");
+																	$timestamp_temp = strtotime(date("c", $timestamp)." +".($interval * ($out_of_bounds + 1))." month");
 
 																	if(date("Y-m-d", $timestamp_temp) > date("Y-m-d", $last_timestamp_next_month))
 																	{
@@ -1841,7 +1836,7 @@ class mf_calendar
 															case 'YEARLY':
 																$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
 
-																$timestamp = strtotime(date('c', $timestamp)." +".$interval." year");
+																$timestamp = strtotime(date("c", $timestamp)." +".$interval." year");
 															break;
 
 															default:
@@ -2029,11 +2024,11 @@ class mf_calendar
 			{
 				$item_id = $user->ID;
 				$item_title = sprintf(__("It is %s' birthday", 'lang_calendar'), $user->display_name);
-				$item_birthday = date('Y')."-".date('m-d', strtotime($user_birthday));
+				$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
 
-				if($item_birthday < date('Y-m-d'))
+				if($item_birthday < date("Y-m-d"))
 				{
-					$item_birthday = date('Y', strtotime("+1 year"))."-".date('m-d', strtotime($user_birthday));
+					$item_birthday = date("Y", strtotime("+1 year"))."-".date("m-d", strtotime($user_birthday));
 				}
 
 				$this->arr_events[] = array(
@@ -2044,7 +2039,7 @@ class mf_calendar
 					'content' => '',
 					'start' => $item_birthday,
 					'end' => $item_birthday,
-					'created' => date('Y-m-d H:i:s'),
+					'created' => date("Y-m-d H:i:s"),
 				);
 			}
 		}
@@ -2243,14 +2238,12 @@ class widget_calendar extends WP_Widget
 		);
 
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops);
-		
+
 		$this->obj_calendar = new mf_calendar();
 	}
 
 	function widget($args, $instance)
 	{
-		global $wpdb;
-
 		extract($args);
 
 		$instance = wp_parse_args((array)$instance, $this->arr_default);

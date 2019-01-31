@@ -9,10 +9,10 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
-else
+/*else
 {
 	global $wpdb;
-}
+}*/
 
 $obj_calendar = new mf_calendar();
 
