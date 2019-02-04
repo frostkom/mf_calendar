@@ -754,54 +754,58 @@ class mf_calendar
 			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", $this->post_type, 'publish'));
 		}
 
+		$arr_fields = array(
+			array(
+				'name' => __("Calendar", 'lang_calendar'),
+				'id' => $this->meta_prefix.'calendar',
+				'type' => 'select',
+				'options' => $arr_data,
+				'std' => $default_calendar,
+			),
+			array(
+				'name' => __("Location", 'lang_calendar'),
+				'id' => $this->meta_prefix.'location',
+				'type' => 'textarea', //Replace with 'gps'
+			),
+			array(
+				'name' => __("Start", 'lang_calendar'),
+				'id' => $this->meta_prefix.'start',
+				'type' => 'datetime', //Replace with 'date' and 'clock'
+			),
+			array(
+				'name' => __("End", 'lang_calendar'),
+				'id' => $this->meta_prefix.'end',
+				'type' => 'datetime', //Replace with 'date' and 'clock'
+			),
+			array(
+				'name' => __("Registration", 'lang_calendar'),
+				'id' => $this->meta_prefix.'registration',
+				'type' => 'select',
+				'options' => get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form")),
+				'attributes' => array(
+					'condition_type' => 'hide_if_empty',
+					'condition_field' => $this->meta_prefix.'limit_participants',
+				),
+			),
+			array(
+				'name' => __("Limit Participants", 'lang_calendar'),
+				'id' => $this->meta_prefix.'limit_participants',
+				'type' => 'number',
+				'attributes' => array(
+					'min' => 0,
+				),
+			),
+		);
+
+		$arr_fields = apply_filters('before_meta_box_fields', $arr_fields);
+
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_calendar'),
 			'post_types' => array($this->post_type_event),
 			'context' => 'side',
 			'priority' => 'low',
-			'fields' => array(
-				array(
-					'name' => __("Calendar", 'lang_calendar'),
-					'id' => $this->meta_prefix.'calendar',
-					'type' => 'select',
-					'options' => $arr_data,
-					'std' => $default_calendar,
-				),
-				array(
-					'name' => __("Location", 'lang_calendar'),
-					'id' => $this->meta_prefix.'location',
-					'type' => 'textarea', //Replace with 'gps'
-				),
-				array(
-					'name' => __("Start", 'lang_calendar'),
-					'id' => $this->meta_prefix.'start',
-					'type' => 'datetime', //Replace with 'date' and 'clock'
-				),
-				array(
-					'name' => __("End", 'lang_calendar'),
-					'id' => $this->meta_prefix.'end',
-					'type' => 'datetime', //Replace with 'date' and 'clock'
-				),
-				array(
-					'name' => __("Registration", 'lang_calendar'),
-					'id' => $this->meta_prefix.'registration',
-					'type' => 'select',
-					'options' => get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form")),
-					'attributes' => array(
-						'condition_type' => 'hide_if_empty',
-						'condition_field' => $this->meta_prefix.'limit_participants',
-					),
-				),
-				array(
-					'name' => __("Limit Participants", 'lang_calendar'),
-					'id' => $this->meta_prefix.'limit_participants',
-					'type' => 'number',
-					'attributes' => array(
-						'min' => 0,
-					),
-				),
-			)
+			'fields' => $arr_fields,
 		);
 
 		return $meta_boxes;
