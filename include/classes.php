@@ -1942,7 +1942,7 @@ class mf_calendar
 	{
 		$setting_calendar_debug = get_option('setting_calendar_debug');
 
-		$content = get_url_content(array('url' => $this->custom_url));
+		list($content, $headers) = get_url_content(array('url' => $this->custom_url, 'catch_head' => true));
 		$json = json_decode($content, true);
 
 		$custom_url_container = get_post_meta($this->id, $this->meta_prefix.'custom_url_container', true);
