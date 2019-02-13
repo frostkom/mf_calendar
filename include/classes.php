@@ -378,19 +378,17 @@ class mf_calendar
 	}
 
 	// Because gCal displays whole-day-events with the end date the day after start date
-	function filter_end_date($datetime)
+	function filter_end_date($post_start, $post_end)
 	{
-		$date = date("Y-m-d", strtotime($datetime));
+		$post_start_date = date("Y-m-d", strtotime($post_start));
+		$post_end_date = date("Y-m-d", strtotime($post_end));
 
-		if($datetime == $date)
+		if($post_end == $post_end_date && $post_end_date > $post_start_date)
 		{
-			return date("Y-m-d", strtotime($datetime." -1 day"));
+			$post_end_date = date("Y-m-d", strtotime($post_end." -1 day"));
 		}
 
-		else
-		{
-			return $date;
-		}
+		return $post_end_date;
 	}
 
 	function column_header_event($cols)
@@ -504,7 +502,7 @@ class mf_calendar
 
 				if($post_start > DEFAULT_DATE)
 				{
-					$post_end_date = $this->filter_end_date($post_end);
+					$post_end_date = $this->filter_end_date($post_start, $post_end);
 
 					if($post_start_date == $post_end_date)
 					{
@@ -907,23 +905,34 @@ class mf_calendar
 
 	// Public
 	##############################
+	function get_first_date_of_week($date)
+	{
+		$weekday = date("w", strtotime($date));
+
+		return date("Y-m-d", strtotime($date." -".($weekday - 1)." day"));
+	}
+
+	function get_last_date_of_week($date)
+	{
+		$weekday = date("w", strtotime($date));
+
+		return date("Y-m-d", strtotime($date." +".(6 - $weekday)." day"));
+	}
+
 	function get_week_dates()
 	{
 		$date_temp = $this->arr_data['date_start'];
 
-		while($date_temp < $this->arr_data['date_end'])
+		while($date_temp <= $this->get_last_date_of_week($this->arr_data['date_end']))
 		{
 			$year_temp = date("Y", strtotime($date_temp));
 			$week_temp = date("W", strtotime($date_temp));
 
-			$weekday_temp = date("w", strtotime($date_temp));
-
-			$date_start_temp = date("Y-m-d", strtotime($date_temp." -".($weekday_temp - 1)." day"));
-			$date_end_temp = date("Y-m-d", strtotime($date_start_temp." +6 day"));
-
+			$date_start_temp = $this->get_first_date_of_week($date_temp);
 			$day_start = date("j", strtotime($date_start_temp));
 			$month_start = date("n", strtotime($date_start_temp));
 
+			$date_end_temp = $this->get_last_date_of_week($date_temp);
 			$day_end = date("j", strtotime($date_end_temp));
 			$month_end = date("n", strtotime($date_end_temp));
 
@@ -1132,7 +1141,7 @@ class mf_calendar
 
 				if($post_uid != '')
 				{
-					$post_end_date = $this->filter_end_date($post_end);
+					$post_end_date = $this->filter_end_date($post_start, $post_end);
 				}
 
 				if($post_start_date == $post_end_date)
@@ -1150,13 +1159,6 @@ class mf_calendar
 
 				else
 				{
-					/*echo $post_start_date;
-
-					if($post_start_time != '' && $post_start_time != '00:00')
-					{
-						echo "&nbsp;".$post_start_time;
-					}*/
-
 					$date_end .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
 
 					if($post_end_time != '' && $post_end_time != '00:00')

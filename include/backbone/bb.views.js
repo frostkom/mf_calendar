@@ -93,7 +93,7 @@ var CalendarView = Backbone.View.extend(
 
 	getHumanReadableDates: function()
 	{
-		return this.week_dates[this.display_year + '-' + this.display_week];
+		return this.week_dates[this.display_year + '-' + (this.display_week > 9 ? '' : '0') + this.display_week];
 	},
 
 	update_current_week: function()
