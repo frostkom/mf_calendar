@@ -89,10 +89,13 @@ class mf_calendar
 		return (object) array('hue' => $h, 'saturation' => $s, 'lightness' => $l);
 	}
 
-	function get_calendar_amount()
+	function get_calendar_amount($data = array())
 	{
+		if(!isset($data['post_type'])){			$data['post_type'] = $this->post_type;}
+		if(!isset($data['add_choose_here'])){	$data['add_choose_here'] = false;}
+
 		$arr_data = array();
-		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data);
+		get_post_children($data, $arr_data);
 
 		return count($arr_data);
 	}
@@ -230,7 +233,7 @@ class mf_calendar
 		$menu_title = __("Calendar", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
-		if($this->get_calendar_amount() > 0)
+		if($this->get_calendar_amount(array('post_status' => '')) > 0)
 		{
 			$menu_title = __("Events", 'lang_calendar');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
@@ -1474,11 +1477,6 @@ class mf_calendar
 
 			foreach($result as $r)
 			{
-				/*if($obj_cron->has_expired(array('margin' => .9)))
-				{
-					break;
-				}*/
-
 				$this->fetch_source($r->ID);
 			}
 		}
