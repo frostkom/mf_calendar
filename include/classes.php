@@ -408,6 +408,115 @@ class mf_calendar
 		return $cols;
 	}
 
+	function format_date($data)
+	{
+		$out = "";
+
+		if(!isset($data['post_id'])){		$data['post_id'] = 0;}
+		if(!isset($data['post_start'])){	$data['post_start'] = get_post_meta($data['post_id'], $this->meta_prefix.'start', true);}
+		if(!isset($data['post_end'])){		$data['post_end'] = get_post_meta($data['post_id'], $this->meta_prefix.'end', true);}
+
+		if(!($data['post_end'] > $data['post_start']))
+		{
+			$data['post_end'] = $data['post_start'];
+		}
+
+		$post_start_date = date("Y-m-d", strtotime($data['post_start']));
+		$post_start_time = date("H:i", strtotime($data['post_start']));
+
+		$post_end_date = date("Y-m-d", strtotime($data['post_end']));
+		$post_end_time = date("H:i", strtotime($data['post_end']));
+
+		if(is_admin())
+		{
+			if($data['post_start'] > DEFAULT_DATE)
+			{
+				$post_end_date = $this->filter_end_date($data['post_start'], $data['post_end']);
+
+				if($post_start_date == $post_end_date)
+				{
+					$out .= $post_start_date;
+
+					if($post_start_time > "00:00")
+					{
+						$out .= "&nbsp;".$post_start_time;
+
+						if($post_end_time > "00:00" && $post_end_time != $post_start_time)
+						{
+							$out .= "&nbsp;-&nbsp;".$post_end_time;
+						}
+					}
+				}
+
+				else
+				{
+					$out .= $post_start_date;
+
+					if($post_start_time != '' && $post_start_time != '00:00')
+					{
+						$out .= "&nbsp;".$post_start_time;
+					}
+
+					$out .= "&nbsp;-&nbsp;".$post_end_date;
+
+					if($post_end_time != '' && $post_end_time != '00:00')
+					{
+						$out .= "&nbsp;".$post_end_time;
+					}
+				}
+			}
+		}
+
+		else
+		{
+			$post_start_month_name = substr(month_name(date("m", strtotime($data['post_start']))), 0, 3);
+			$post_start_day = date("d", strtotime($data['post_start']));
+
+			$post_end_month_name = substr(month_name(date("m", strtotime($data['post_end']))), 0, 3);
+			$post_end_day = date("j", strtotime($data['post_end']));
+
+			if($post_start_time != "00:00")
+			{
+				/*if($post_end_date != $post_start_date)
+				{*/
+					$out .= "(".$post_start_day." ".$post_start_month_name.") ";
+				//}
+
+				$out .= $post_start_time;
+			}
+
+			else
+			{
+				/*if($post_end_date != $post_start_date)
+				{*/
+					$out .= $post_start_day." ".$post_start_month_name;
+				//}
+			}
+
+			if($post_end_time != "00:00")
+			{
+				$out .= " - ";
+
+				if($post_end_date != $post_start_date)
+				{
+					$out .= "(".$post_end_day." ".$post_end_month_name.") ";
+				}
+
+				$out .= $post_end_time;
+			}
+
+			else
+			{
+				if($post_end_date != $post_start_date)
+				{
+					$out .= " - ".$post_end_day." ".$post_end_month_name;
+				}
+			}
+		}
+
+		return $out;
+	}
+
 	function column_cell_event($col, $id)
 	{
 		global $done_text, $error_text;
@@ -485,60 +594,7 @@ class mf_calendar
 			break;
 
 			case 'datetime':
-				$post_start = get_post_meta($id, $this->meta_prefix.'start', true);
-				$post_end = get_post_meta($id, $this->meta_prefix.'end', true);
-
-				if(!($post_end > $post_start))
-				{
-					$post_end = $post_start;
-				}
-
-				$post_start_date = date("Y-m-d", strtotime($post_start));
-				$post_start_year = date("Y", strtotime($post_start));
-				$post_start_yearmonth = date("Y-m", strtotime($post_start));
-				$post_start_month = date("m", strtotime($post_start));
-				$post_start_day = date("d", strtotime($post_start));
-				$post_start_time = date("H:i", strtotime($post_start));
-
-				$post_end_date = date("Y-m-d", strtotime($post_end));
-				$post_end_time = date("H:i", strtotime($post_end));
-
-				if($post_start > DEFAULT_DATE)
-				{
-					$post_end_date = $this->filter_end_date($post_start, $post_end);
-
-					if($post_start_date == $post_end_date)
-					{
-						echo $post_start_date;
-
-						if($post_start_time > "00:00")
-						{
-							echo "&nbsp;".$post_start_time;
-
-							if($post_end_time > "00:00" && $post_end_time != $post_start_time)
-							{
-								echo "&nbsp;-&nbsp;".$post_end_time;
-							}
-						}
-					}
-
-					else
-					{
-						echo $post_start_date;
-
-						if($post_start_time != '' && $post_start_time != '00:00')
-						{
-							echo "&nbsp;".$post_start_time;
-						}
-
-						echo "&nbsp;-&nbsp;".$post_end_date;
-
-						if($post_end_time != '' && $post_end_time != '00:00')
-						{
-							echo "&nbsp;".$post_end_time;
-						}
-					}
-				}
+				echo $this->format_date(array('post_id' => $id));
 			break;
 
 			case 'registration':
@@ -587,27 +643,30 @@ class mf_calendar
 
 	function wp_head()
 	{
-		$plugin_base_include_url = plugins_url()."/mf_base/include/";
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
+		if(apply_filters('get_widget_search', 'gcal-widget') > 0)
+		{
+			$plugin_base_include_url = plugins_url()."/mf_base/include/";
+			$plugin_include_url = plugin_dir_url(__FILE__);
+			$plugin_version = get_plugin_version(__FILE__);
 
-		mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
+			mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
 
-		mf_enqueue_script('underscore');
-		mf_enqueue_script('backbone');
-		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
-		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
-		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
-			'last_week' => date("W", strtotime("-1 week")),
-			'last_week_text' => __("Previous Week", 'lang_calendar'),
-			'current_year' => date("Y"),
-			'current_week' => date("W"),
-			'current_week_text' => __("Current Week", 'lang_calendar'),
-			'next_week' => date("W", strtotime("+1 week")),
-			'next_week_text' => __("Next Week", 'lang_calendar'),
-			'week_text' => __("w", 'lang_calendar')
-		), $plugin_version);
-		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+			mf_enqueue_script('underscore');
+			mf_enqueue_script('backbone');
+			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
+			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
+			mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
+				'last_week' => date("W", strtotime("-1 week")),
+				'last_week_text' => __("Previous Week", 'lang_calendar'),
+				'current_year' => date("Y"),
+				'current_week' => date("W"),
+				'current_week_text' => __("Current Week", 'lang_calendar'),
+				'next_week' => date("W", strtotime("+1 week")),
+				'next_week_text' => __("Next Week", 'lang_calendar'),
+				'week_text' => __("w", 'lang_calendar')
+			), $plugin_version);
+			mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+		}
 	}
 
 	function widgets_init()
