@@ -825,7 +825,11 @@ class mf_calendar
 			array(
 				'name' => __("Location", 'lang_calendar'),
 				'id' => $this->meta_prefix.'location',
-				'type' => 'textarea', //Replace with 'gps'
+				'type' => 'text',
+			),
+			array(
+				'id' => $this->meta_prefix.'coordinates',
+				'type' => 'hidden',
 			),
 			array(
 				'name' => __("Start", 'lang_calendar'),
@@ -869,6 +873,37 @@ class mf_calendar
 		);
 
 		return $meta_boxes;
+	}
+
+	function rwmb_enqueue_scripts()
+	{
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_script('script_calendar_meta', $plugin_include_url."script_meta.js", array('meta_prefix' => $this->meta_prefix), $plugin_version);
+	}
+
+	function rwmb_after_save_post($post_id)
+	{
+		if(get_post_type($post_id) == $this->post_type_event)
+		{
+			$post_coordinates = get_post_meta($post_id, $this->meta_prefix.'coordinates', true);
+
+			if($post_coordinates == '')
+			{
+				$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
+
+				if($post_location != '')
+				{
+					$post_coordinates = get_coordinates_from_location($post_location);
+
+					if($post_coordinates != '')
+					{
+						update_post_meta($post_id, $this->meta_prefix.'coordinates', $post_coordinates);
+					}
+				}
+			}
+		}
 	}
 
 	function restrict_manage_posts()

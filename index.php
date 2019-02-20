@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.4.10
+Version: 4.5.0
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -41,6 +41,12 @@ if(is_admin())
 	add_action('manage_mf_calendar_event_posts_custom_column', array($obj_calendar, 'column_cell_event'), 5, 2);
 
 	add_action('rwmb_meta_boxes', array($obj_calendar, 'rwmb_meta_boxes'));
+
+	if(is_plugin_active("mf_maps/index.php"))
+	{
+		add_action('rwmb_enqueue_scripts', array($obj_calendar, 'rwmb_enqueue_scripts'));
+		add_action('rwmb_after_save_post', array($obj_calendar, 'rwmb_after_save_post'));
+	}
 
 	add_action('restrict_manage_posts', array($obj_calendar, 'restrict_manage_posts'));
 	add_action('pre_get_posts', array($obj_calendar, 'pre_get_posts'));
