@@ -883,6 +883,19 @@ class mf_calendar
 		mf_enqueue_script('script_calendar_meta', $plugin_include_url."script_meta.js", array('meta_prefix' => $this->meta_prefix), $plugin_version);
 	}
 
+	function split_coordinates($in)
+	{
+		if($in != '')
+		{
+			return array_map('trim', explode(",", trim(trim($in, "("), ")")));
+		}
+
+		else
+		{
+			return array('', '');
+		}
+	}
+
 	function rwmb_after_save_post($post_id)
 	{
 		if(get_post_type($post_id) == $this->post_type_event)
@@ -900,6 +913,11 @@ class mf_calendar
 					if($post_coordinates != '')
 					{
 						update_post_meta($post_id, $this->meta_prefix.'coordinates', $post_coordinates);
+
+						list($latitude, $longitude) = $this->split_coordinates($post_coordinates);
+
+						update_post_meta($post_id, $this->meta_prefix.'latitude', $latitude);
+						update_post_meta($post_id, $this->meta_prefix.'longitude', $longitude);
 					}
 				}
 			}
@@ -947,11 +965,11 @@ class mf_calendar
 		}
 	}
 
-	function delete_post($post_id)
+	function wp_trash_post($post_id)
 	{
-		global $wpdb, $post_type;
+		global $wpdb;
 
-		if($post_type == $this->post_type)
+		if(get_post_type($post_id) == $this->post_type)
 		{
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = '%d'", $this->post_type_event, $this->meta_prefix.'calendar', $post_id));
 
