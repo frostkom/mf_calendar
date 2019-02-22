@@ -469,28 +469,36 @@ class mf_calendar
 
 		else
 		{
+			$post_start_year = date("Y", strtotime($data['post_start']));
 			$post_start_month_name = substr(month_name(date("m", strtotime($data['post_start']))), 0, 3);
 			$post_start_day = date("d", strtotime($data['post_start']));
 
+			$post_end_year = date("Y", strtotime($data['post_end']));
 			$post_end_month_name = substr(month_name(date("m", strtotime($data['post_end']))), 0, 3);
 			$post_end_day = date("j", strtotime($data['post_end']));
 
+			$post_start_date_format = $post_start_day." ".$post_start_month_name;
+
+			if($post_start_year != date("Y"))
+			{
+				$post_start_date_format .= " ".$post_start_year;
+			}
+
+			$post_end_date_format = $post_end_day." ".$post_end_month_name;
+
+			if($post_end_year != $post_start_year)
+			{
+				$post_end_date_format .= " ".$post_start_year;
+			}
+
 			if($post_start_time != "00:00")
 			{
-				/*if($post_end_date != $post_start_date)
-				{*/
-					$out .= "(".$post_start_day." ".$post_start_month_name.") ";
-				//}
-
-				$out .= $post_start_time;
+				$out .= "(".$post_start_date_format.") ".$post_start_time;
 			}
 
 			else
 			{
-				/*if($post_end_date != $post_start_date)
-				{*/
-					$out .= $post_start_day." ".$post_start_month_name;
-				//}
+				$out .= $post_start_date_format;
 			}
 
 			if($post_end_time != "00:00")
@@ -499,7 +507,7 @@ class mf_calendar
 
 				if($post_end_date != $post_start_date)
 				{
-					$out .= "(".$post_end_day." ".$post_end_month_name.") ";
+					$out .= "(".$post_end_date_format.") ";
 				}
 
 				$out .= $post_end_time;
@@ -509,7 +517,7 @@ class mf_calendar
 			{
 				if($post_end_date != $post_start_date)
 				{
-					$out .= " - ".$post_end_day." ".$post_end_month_name;
+					$out .= " - ".$post_end_date_format;
 				}
 			}
 		}
