@@ -651,7 +651,7 @@ class mf_calendar
 
 	function wp_head()
 	{
-		if(apply_filters('get_widget_search', 'gcal-widget') > 0)
+		if(!is_plugin_active("mf_widget_logic_select/index.php") || apply_filters('get_widget_search', 'gcal-widget') > 0)
 		{
 			$plugin_base_include_url = plugins_url()."/mf_base/include/";
 			$plugin_include_url = plugin_dir_url(__FILE__);
