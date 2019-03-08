@@ -48,7 +48,7 @@ if($type == 'events')
 
 else
 {
-	$json_output['message'] = sprintf(__("I have never seen the type '%s' before", 'lang_calendar'), $type);
+	$json_output['message'] = sprintf(__("I have never seen the type %s before", 'lang_calendar'), $type);
 }
 
 echo json_encode($json_output);

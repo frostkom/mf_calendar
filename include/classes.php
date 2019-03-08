@@ -2022,7 +2022,7 @@ class mf_calendar
 								break;
 
 								default:
-									do_log(__("Calendar Status Missing", 'lang_calendar').": ".var_export($item, true));
+									do_log("Calendar Status Missing: ".var_export($item, true));
 								break;
 							}
 						}
@@ -2034,7 +2034,7 @@ class mf_calendar
 
 						if(count($json['items']) == 250)
 						{
-							do_log(__("The Calendar API returned the maximum number of events", 'lang_calendar')." (".$this->calendar_url_clean.")");
+							do_log("The Calendar API returned the maximum number of events (".$this->calendar_url_clean.")");
 						}
 
 						do_log($log_message, 'trash');
@@ -2147,7 +2147,7 @@ class mf_calendar
 			if($user_birthday != '')
 			{
 				$item_id = $user->ID;
-				$item_title = sprintf(__("It is %s' birthday", 'lang_calendar'), $user->display_name);
+				$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user->display_name);
 				$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
 
 				if($item_birthday < date("Y-m-d"))
@@ -2300,7 +2300,7 @@ class mf_calendar
 
 			else
 			{
-				do_log(sprintf(__("I tried to save an event for you (%s)", 'lang_calendar'), htmlspecialchars(var_export($post, true))));
+				do_log(sprintf("I tried to save an event for you (%s)", htmlspecialchars(var_export($post, true))));
 			}
 		}
 	}
