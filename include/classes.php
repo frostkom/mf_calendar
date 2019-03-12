@@ -13,7 +13,7 @@ class mf_calendar
 		$this->meta_prefix = $this->post_type."_";
 	}
 
-	function HTMLToRGB($hex)
+	/*function HTMLToRGB($hex)
 	{
 		if($hex[0] == '#')
 		{
@@ -87,7 +87,7 @@ class mf_calendar
 		$l = (int)round(255.0 * $l);
 
 		return (object) array('hue' => $h, 'saturation' => $s, 'lightness' => $l);
-	}
+	}*/
 
 	function get_calendar_amount($data = array())
 	{

@@ -18,10 +18,13 @@ $obj_calendar = new mf_calendar();
 
 $setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
 
-$rgb = $obj_calendar->HTMLToRGB($setting_calendar_date_bg);
+/*$rgb = $obj_calendar->HTMLToRGB($setting_calendar_date_bg);
 $hsl = $obj_calendar->RGBToHSL($rgb);
 
-$setting_calendar_date_text_color = ($hsl->lightness > 200 ? "#333" : "#fff");
+$setting_calendar_date_text_color = ($hsl->lightness > 200 ? "#333" : "#fff");*/
+
+$obj_base = new mf_base();
+$setting_calendar_date_text_color = $obj_base->get_text_color_from_background($setting_calendar_date_bg);
 
 echo "@media all
 {
