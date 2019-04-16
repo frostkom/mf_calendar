@@ -10,7 +10,7 @@ class mf_calendar
 
 		$this->post_type = 'mf_calendar';
 		$this->post_type_event = 'mf_calendar_event';
-		$this->meta_prefix = $this->post_type."_";
+		$this->meta_prefix = $this->post_type.'_';
 	}
 
 	/*function HTMLToRGB($hex)
