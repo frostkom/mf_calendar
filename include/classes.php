@@ -2467,7 +2467,7 @@ class widget_calendar extends WP_Widget
 				echo "<div class='flex_flow'>"
 					.show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
 
-					if(count($instance['calendar_feeds']) != 1)
+					if(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) != 1)
 					{
 						echo "<div>"
 							.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
