@@ -139,7 +139,9 @@ echo "@media all
 
 						.widget.calendar .section > ul li .content > span
 						{
+							display: inline-block;
 							font-weight: bold;
+							margin-top: .2em;
 						}
 
 						.widget.calendar .section > ul li .content p
