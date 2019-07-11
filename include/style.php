@@ -25,8 +25,12 @@ echo "@media all
 
 		.widget.calendar .section > h4
 		{
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
 			font-size: 1.2em;
-			text-align: left;
+			text-align: center;
 		}
 
 			.widget.calendar .section > h4 .controls.fa
@@ -34,6 +38,11 @@ echo "@media all
 				display: inline-block;
 				padding: 0 .5em .5em;
 				opacity: .5;
+
+				-webkit-box-flex: 0 1 auto;
+				-webkit-flex: 0 1 auto;
+				-ms-flex: 0 1 auto;
+				flex: 0 1 auto;
 			}
 
 				.widget.calendar .section > h4 .controls.fa.disabled
@@ -47,11 +56,19 @@ echo "@media all
 					opacity: .9;
 				}
 
-			.widget.calendar .section .calendar_week > span
+			.widget.calendar .section .calendar_week
 			{
-				font-size: .7em;
-				margin-left: .5em;
+				-webkit-box-flex: 1 0 auto;
+				-webkit-flex: 1 0 auto;
+				-ms-flex: 1 0 auto;
+				flex: 1 0 auto;
 			}
+
+				.widget.calendar .section .calendar_week > span
+				{
+					font-size: .7em;
+					margin-left: .5em;
+				}
 
 		.widget.calendar .section > ul
 		{
