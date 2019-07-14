@@ -2377,6 +2377,8 @@ class widget_calendar extends WP_Widget
 
 			if($instance['calendar_heading'] != '')
 			{
+				$instance['calendar_heading'] = apply_filters('widget_title', $instance['calendar_heading'], $instance, $this->id_base);
+
 				echo $before_title
 					.$instance['calendar_heading']
 				.$after_title;
