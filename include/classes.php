@@ -13,82 +13,6 @@ class mf_calendar
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
-	/*function HTMLToRGB($hex)
-	{
-		if($hex[0] == '#')
-		{
-			$hex = substr($hex, 1);
-		}
-
-		if(strlen($hex) == 3)
-		{
-			$hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
-		}
-
-		$r = hexdec($hex[0].$hex[1]);
-		$g = hexdec($hex[2].$hex[3]);
-		$b = hexdec($hex[4].$hex[5]);
-
-		return $b + ($g << 0x8) + ($r << 0x10);
-	}
-
-	function RGBToHSL($RGB)
-	{
-		$r = 0xFF & ($RGB >> 0x10);
-		$g = 0xFF & ($RGB >> 0x8);
-		$b = 0xFF & $RGB;
-
-		$r = ((float)$r) / 255.0;
-		$g = ((float)$g) / 255.0;
-		$b = ((float)$b) / 255.0;
-
-		$maxC = max($r, $g, $b);
-		$minC = min($r, $g, $b);
-
-		$l = ($maxC + $minC) / 2.0;
-
-		if($maxC == $minC)
-		{
-			$s = $h = 0;
-		}
-
-		else
-		{
-			if($l < .5)
-			{
-				$s = ($maxC - $minC) / ($maxC + $minC);
-			}
-
-			else
-			{
-				$s = ($maxC - $minC) / (2.0 - $maxC - $minC);
-			}
-
-			if($r == $maxC)
-			{
-				$h = ($g - $b) / ($maxC - $minC);
-			}
-
-			if($g == $maxC)
-			{
-				$h = 2.0 + ($b - $r) / ($maxC - $minC);
-			}
-
-			if($b == $maxC)
-			{
-				$h = 4.0 + ($r - $g) / ($maxC - $minC);
-			}
-
-			$h = $h / 6.0; 
-		}
-
-		$h = (int)round(255.0 * $h);
-		$s = (int)round(255.0 * $s);
-		$l = (int)round(255.0 * $l);
-
-		return (object) array('hue' => $h, 'saturation' => $s, 'lightness' => $l);
-	}*/
-
 	function get_calendar_amount($data = array())
 	{
 		if(!isset($data['post_type'])){			$data['post_type'] = $this->post_type;}
@@ -1030,16 +954,16 @@ class mf_calendar
 	##############################
 	function get_first_date_of_week($date)
 	{
-		$weekday = date("w", strtotime($date));
+		$weekday = date("N", strtotime($date));
 
 		return date("Y-m-d", strtotime($date." -".($weekday - 1)." day"));
 	}
 
 	function get_last_date_of_week($date)
 	{
-		$weekday = date("w", strtotime($date));
+		$weekday = date("N", strtotime($date));
 
-		return date("Y-m-d", strtotime($date." +".(6 - $weekday)." day"));
+		return date("Y-m-d", strtotime($date." +".(7 - $weekday)." day"));
 	}
 
 	function get_week_dates()
@@ -1431,30 +1355,35 @@ class mf_calendar
 	{
 		$out = "<div class='widget calendar'>
 			<div class='section'>
-				<ul>
-					<li><h4>".$data['array']['title']."</h4></li>";
+				<ul>";
+
+					//$out .= "<li><h4>".$data['array']['title']."</h4></li>";
 
 					foreach($data['array']['meta'] as $event)
 					{
 						$out .= "<li itemscope itemtype='//schema.org/Event' class='calendar_feed_".$event['feed'].">
-							<div class='date' itemprop='startDate' content='".$event['start_date_c']."'><p>".$event['start_day']."</p></div>
+							<div class='start_date' itemprop='startDate' content='".$event['start_date_c']."'><p>".$event['start_day']."</p></div>
 							<div class='content".$event['content_class']."' rel='".$event['id']."'>
-								<p>
-									<span";
+								<p>";
+
+									$out .= "<span class='heading'>".$data['array']['title']."</span>";
+
+									$out .= "<span class='title";
 
 										if($event['more_icon'] != '')
 										{
-											$out .= " class='has_more'";
+											$out .= " has_more";
 										}
 
-									$out .= " itemprop='name'>".$event['heading']."</span>
-									".$event['more_icon']
-								."</p>";
+									$out .= "' itemprop='name'>".$event['heading']."</span>"
+									.$event['more_icon'];
 
-								if($event['date_end'] != '')
-								{
-									$out .= "<span itemprop='endDate' content='".$event['end_date_c']."'>".$event['date_end']."</span>";
-								}
+									if($event['date_end'] != '')
+									{
+										$out .= "<span class='end_date' itemprop='endDate' content='".$event['end_date_c']."'>".$event['date_end']."</span>";
+									}
+
+								$out .= "</p>";
 
 								$out .= $event['more_content']
 							."</div>
@@ -1545,33 +1474,40 @@ class mf_calendar
 			<li>".__("There are no events to display", 'lang_calendar')."</li>
 		</script>
 
-		<script type='text/template' id='template_calendar_events'>
-			<% if(heading != '')
+		<script type='text/template' id='template_calendar_events'>";
+
+			/*echo "<% if(heading != '')
 			{ %>
 				<li><h4><%= heading %></h4></li>
-			<% } %>
-			<li itemscope itemtype='//schema.org/Event' class='calendar_feed_<%= feed %>'>
-				<div class='date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
-				<div class='content<%= content_class %>' rel='<%= id %>'>
-					<% if(feed_name != '')
-					{ %>
-						<span><%= feed_name %></span>
-					<% } %>
+			<% } %>";*/
 
+			echo "<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
+				<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
+				<div class='content<%= content_class %>' rel='<%= id %>'>
 					<p>
-						<span
+						<% if(feed_name != '')
+						{ %>
+							<span class='feed_name'><%= feed_name %></span>
+						<% } %>";
+
+						echo "<% if(heading != '')
+						{ %>
+							<span class='heading'><%= heading %></span>
+						<% } %>";
+
+						echo "<span class='title
 							<% if(more_icon != '')
 							{ %>
-								 class='has_more'
+								 has_more
 							<% } %>
-						 itemprop='name'><%= title %></span>
+						' itemprop='name'><%= title %></span>
 						<%= more_icon %>
-					</p>
 
-					<% if(date_end != '')
-					{ %>
-						<span itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span>
-					<% } %>
+						<% if(date_end != '')
+						{ %>
+							<span class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span>
+						<% } %>
+					</p>
 
 					<%= more_content %>
 				</div>
