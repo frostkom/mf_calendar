@@ -1467,7 +1467,13 @@ class mf_calendar
 
 	function get_footer()
 	{
-		$obj_base = new mf_base();
+		global $obj_base;
+
+		if(!isset($obj_base))
+		{
+			$obj_base = new mf_base();
+		}
+
 		$out = $obj_base->get_templates(array('lost_connection'));
 
 		echo "<script type='text/template' id='template_calendar_message'>
