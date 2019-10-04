@@ -1,0 +1,92 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-18 09:41+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Martin Fors\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: da_DK\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: esc_html__;esc_html_e;esc_attr__;esc_attr_e;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+msgid "Calendar"
+msgstr "Kalender"
+
+msgid "Events"
+msgstr "Begivenheder"
+
+msgid "Event"
+msgstr "Begivenhed"
+
+msgid "API Key"
+msgstr "API nøgle"
+
+msgid "Add New"
+msgstr "Opret ny"
+
+msgid "Color"
+msgstr "Farve"
+
+msgid "Amount"
+msgstr "Antal"
+
+msgid "Latest"
+msgstr "Seneste"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Location"
+msgstr "Lokation"
+
+msgid "Date"
+msgstr "Dato"
+
+msgid "Hidden"
+msgstr "Skjult"
+
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+msgid "Edit"
+msgstr "Rediger"
+
+msgid "Delete"
+msgstr "Slet"
+
+msgid "Settings"
+msgstr "Indstillinger"
+
+msgid "Read More"
+msgstr "Læs mere"
+
+msgid "Weekly"
+msgstr "Ugentlig"
+
+msgid "Heading"
+msgstr "Overskrift"
+
+msgid "Display Filter"
+msgstr "Vis filter"
+
+msgid "Label"
+msgstr "Etiket"
+
+msgid "Choose Here"
+msgstr "Vælg her"
+
+msgid "Display Categories"
+msgstr "Vis kategorier"
+
+msgid "Search"
+msgstr "Søg"
+
+msgid "months"
+msgstr "måneder"
+

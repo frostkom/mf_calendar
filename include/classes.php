@@ -840,9 +840,9 @@ class mf_calendar
 
 				if($post_location != '')
 				{
-					$post_coordinates = get_coordinates_from_location($post_location);
+					$post_coordinates = apply_filters('get_coordinates_from_location', $post_location);
 
-					if($post_coordinates != '')
+					if($post_coordinates != '' && $post_coordinates != $post_location)
 					{
 						update_post_meta($post_id, $this->meta_prefix.'coordinates', $post_coordinates);
 
@@ -1239,7 +1239,8 @@ class mf_calendar
 							$data_temp['input'] = $post_location;
 						}
 
-						$more_content .= get_map($data_temp);
+						//$more_content .= get_map($data_temp);
+						$more_content .= apply_filters('get_map', '', $data_temp);
 					}
 
 					else
