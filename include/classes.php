@@ -242,23 +242,20 @@ class mf_calendar
 
 					$fetch_link = "";
 
-					if(IS_SUPER_ADMIN)
+					$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
+
+					if($wpdb->num_rows > 0)
 					{
-						$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
+						$intCalendarID = check_var('intCalendarID');
 
-						if($wpdb->num_rows > 0)
+						if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
 						{
-							$intCalendarID = check_var('intCalendarID');
+							$obj_calendar->fetch_source($id);
+						}
 
-							if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
-							{
-								$obj_calendar->fetch_source($id);
-							}
-
-							else
-							{
-								$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
-							}
+						else
+						{
+							$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
 						}
 					}
 
@@ -731,19 +728,24 @@ class mf_calendar
 
 		$default_calendar = '';
 
-		/*if($default_calendar == '')
-		{
-			$default_calendar = check_var('list_id', 'int');
-		}*/
+		$post_id = check_var('post');
 
-		if($default_calendar == '')
+		if(!($post_id > 0))
 		{
-			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".$wpdb->postmeta." WHERE meta_key = %s ORDER BY meta_id DESC LIMIT 0, 1", $this->meta_prefix.'calendar'));
-		}
+			/*if($default_calendar == '')
+			{
+				$default_calendar = check_var('list_id', 'int');
+			}*/
 
-		if($default_calendar == '')
-		{
-			$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", $this->post_type, 'publish'));
+			if($default_calendar == '')
+			{
+				$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".$wpdb->postmeta." WHERE meta_key = %s ORDER BY meta_id DESC LIMIT 0, 1", $this->meta_prefix.'calendar'));
+			}
+
+			if($default_calendar == '')
+			{
+				$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY post_modified DESC LIMIT 0, 1", $this->post_type, 'publish'));
+			}
 		}
 
 		$arr_fields = array(
