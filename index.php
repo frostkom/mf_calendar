@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.5.21
+Version: 4.5.22
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -73,12 +73,6 @@ load_plugin_textdomain('lang_calendar', false, dirname(plugin_basename(__FILE__)
 function activate_calendar()
 {
 	require_plugin("meta-box/meta-box.php", "Meta Box");
-
-	mf_uninstall_plugin(array(
-		'options' => array('setting_calendar_events_exclude_from_search'),
-	));
-
-	replace_option(array('old' => 'setting_calendar_date_color', 'new' => 'setting_calendar_date_bg'));
 }
 
 function uninstall_calendar()
