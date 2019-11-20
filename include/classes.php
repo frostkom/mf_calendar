@@ -1008,13 +1008,19 @@ class mf_calendar
 
 		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
 
+		if(!isset($data['date'])){								$data['date'] = date("Y-m-d");}
+
+		$date_start = date("Y-m-d", strtotime($data['date']));
+		$week_start = date("W", strtotime($data['date']));
+		$year_start = date("Y", strtotime($data['date']));
+
 		$this->arr_events = array();
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
-			'date_start' => date("Y-m-d"),
-			'week_start' => date("W"),
-			'year_start' => date("Y"),
+			'date_start' => $date_start,
+			'week_start' => $week_start,
+			'year_start' => $year_start,
 			'date_end' => '',
 			'week_end' => '',
 			'year_end' => '',
@@ -1148,12 +1154,12 @@ class mf_calendar
 						{
 							if($post_start_week != $week_temp)
 							{
-								if($post_start_week == date("W"))
+								if($post_start_week == $week_start)
 								{
 									$heading = __("Current Week", 'lang_calendar');
 								}
 
-								else if($post_start_week == date("W", strtotime("+1 week")))
+								else if($post_start_week == date("W", strtotime($date_start." +1 week")))
 								{
 									$heading = __("Next Week", 'lang_calendar');
 								}
@@ -2095,7 +2101,7 @@ class mf_calendar
 				$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user->display_name);
 				$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
 
-				if($item_birthday < date("Y-m-d"))
+				if($item_birthday < date("Y-m-d", strtotime("-1 month")))
 				{
 					$item_birthday = date("Y", strtotime("+1 year"))."-".date("m-d", strtotime($user_birthday));
 				}
