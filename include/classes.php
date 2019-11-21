@@ -162,8 +162,8 @@ class mf_calendar
 			$menu_title = __("Events", 'lang_calendar');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
 
-			$menu_title = __("Add New", 'lang_calendar');
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");
+			/*$menu_title = __("Add New", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");*/
 		}
 	}
 
