@@ -157,23 +157,43 @@ class mf_calendar
 		$menu_title = __("Calendar", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
+		$menu_title = " - ".__("Add New", 'lang_calendar');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
+
 		if($this->get_calendar_amount(array('post_status' => '')) > 0)
 		{
 			$menu_title = __("Events", 'lang_calendar');
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=mf_calendar_event");
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type_event);
 
-			/*$menu_title = __("Add New", 'lang_calendar');
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=mf_calendar_event");*/
+			$menu_title = " - ".__("Add New", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_event);
 		}
 	}
 
 	function column_header($cols)
 	{
+		global $post_type;
+		
 		unset($cols['date']);
 
-		$cols['color'] = __("Color", 'lang_calendar');
-		$cols['account'] = __("Account", 'lang_calendar');
-		$cols['amount_of_posts'] = __("Amount", 'lang_calendar');
+		switch($post_type)
+		{
+			case $this->post_type:
+				$cols['color'] = __("Color", 'lang_calendar');
+				$cols['account'] = __("Account", 'lang_calendar');
+				$cols['amount_of_posts'] = __("Amount", 'lang_calendar');
+			break;
+
+			case $this->post_type_event:
+				unset($cols['title']);
+
+				$cols['event_title'] = __("Title", 'lang_calendar');
+				$cols['location'] = __("Location", 'lang_calendar');
+				$cols['datetime'] = __("Date", 'lang_calendar');
+				$cols['registration'] = __("Registration", 'lang_calendar');
+				$cols['calendar'] = __("Calendar", 'lang_calendar');
+			break;
+		}
 
 		return $cols;
 	}
@@ -191,7 +211,7 @@ class mf_calendar
 		{
 			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, 'publish', $this->meta_prefix.'calendar', $id));
 
-			$out .= "<a href='".admin_url("edit.php?post_type=mf_calendar_event&strFilterCalendar=".$id)."'>".$amount."</a>"
+			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$amount."</a>"
 			."<div class='row-actions'>"
 				.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 			."</div>";
@@ -202,91 +222,207 @@ class mf_calendar
 
 	function column_cell($col, $id)
 	{
-		global $wpdb;
+		global $wpdb, $post;
 
-		switch($col)
+		switch($post->post_type)
 		{
-			case 'color':
-				$post_color = get_post_meta($id, $this->meta_prefix.$col, true);
-
-				if($post_color != '')
+			case $this->post_type:
+				switch($col)
 				{
-					echo "<i class='fa fa-circle fa-2x' style='color: ".$post_color."'></i>";
+					case 'color':
+						$post_color = get_post_meta($id, $this->meta_prefix.$col, true);
+
+						if($post_color != '')
+						{
+							echo "<i class='fa fa-circle fa-2x' style='color: ".$post_color."'></i>";
+						}
+					break;
+
+					case 'account':
+						$post_calendar_id = get_post_meta($id, $this->meta_prefix.'calendar_id', true);
+						$post_custom_url = get_post_meta($id, $this->meta_prefix.'custom_url', true);
+						$post_display_birthdays = get_post_meta($id, $this->meta_prefix.'display_birthdays', true);
+
+						$post_meta = '';
+
+						if($post_calendar_id != '')
+						{
+							$post_meta = $post_calendar_id;
+						}
+
+						else if($post_custom_url != '')
+						{
+							$post_meta = $post_custom_url;
+						}
+
+						else if($post_display_birthdays == 'yes') //$this->is_birthday_active()
+						{
+							$post_meta = "<em>(".__("birthdays", 'lang_calendar').")</em>";
+						}
+
+						if($post_meta != '')
+						{
+							$obj_calendar = new mf_calendar($id);
+
+							$fetch_link = "";
+
+							$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
+
+							if($wpdb->num_rows > 0)
+							{
+								$intCalendarID = check_var('intCalendarID');
+
+								if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
+								{
+									$obj_calendar->fetch_source($id);
+								}
+
+								else
+								{
+									$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
+								}
+							}
+
+							$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $id, $this->post_type));
+
+							if($post_calendar_id != '')
+							{
+								$obj_calendar->get_calendar_url();
+
+								echo "<a href='".$obj_calendar->calendar_url."'>".$post_meta."</a>";
+							}
+
+							else if($post_custom_url != '')
+							{
+								echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 40))."</a>";
+							}
+
+							else
+							{
+								echo $post_meta;
+							}
+
+							echo "<div class='row-actions'>"
+								.$fetch_link
+								.__("Fetched", 'lang_calendar').": ".format_date($post_modified)
+							."</div>";
+						}
+					break;
+
+					case 'amount_of_posts':
+						echo $this->get_amount_of_posts_for_td($id);
+					break;
 				}
 			break;
 
-			case 'account':
-				$post_calendar_id = get_post_meta($id, $this->meta_prefix.'calendar_id', true);
-				$post_custom_url = get_post_meta($id, $this->meta_prefix.'custom_url', true);
+			case $this->post_type_event:
+				global $done_text, $error_text;
 
-				$post_meta = '';
-
-				if($post_calendar_id != '')
+				switch($col)
 				{
-					$post_meta = $post_calendar_id;
-				}
+					case 'event_title':
+						$post_title = get_the_title($id);
 
-				else if($post_custom_url != '')
-				{
-					$post_meta = $post_custom_url;
-				}
+						$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
 
-				else if($this->is_birthday_active())
-				{
-					$post_meta = "<em>(".__("birthdays", 'lang_calendar').")</em>";
-				}
-
-				if($post_meta != '')
-				{
-					$obj_calendar = new mf_calendar($id);
-
-					$fetch_link = "";
-
-					$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
-
-					if($wpdb->num_rows > 0)
-					{
-						$intCalendarID = check_var('intCalendarID');
-
-						if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
+						if($post_uid != '')
 						{
-							$obj_calendar->fetch_source($id);
+							echo $post_title;
+
+							if(get_post_status($id) == 'draft')
+							{
+								echo "<span class='strong nowrap'> - ".__("Hidden", 'lang_calendar')."</span>";
+							}
+
+							else
+							{
+								echo "<div class='row-actions'>
+									<span class='calendar_action_hide'>
+										<a href='#id_".$id."' class='calendar_event_post_action calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
+									</span>
+								</div>";
+							}
 						}
 
 						else
 						{
-							$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$id), 'calendar_fetch_'.$id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
+							$edit_url = admin_url("post.php?post=".$id."&action=edit");
+
+							echo "<a href='".$edit_url."'>".$post_title."</a>"
+							."<div class='row-actions'>";
+
+								if(get_post_status($id) == 'trash')
+								{
+									echo "<span class='untrash'>
+										<a href='".wp_nonce_url(admin_url("post.php?post=".$id."&action=untrash"), 'untrash-post_'.$id)."'>".__("Recover", 'lang_calendar')."</a>
+									</span>";
+								}
+
+								else
+								{
+									echo "<span class='edit'>
+										<a href='".$edit_url."'>".__("Edit", 'lang_calendar')."</a> | 
+									</span>
+									<span class='trash'>
+										<a href='".get_delete_post_link($id)."'>".__("Delete", 'lang_calendar')."</a>
+									</span>";
+								}
+
+							echo "</div>";
 						}
-					}
+					break;
 
-					$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $id, $this->post_type));
+					case 'location':
+						$post_location = get_post_meta($id, $this->meta_prefix.'location', true);
 
-					if($post_calendar_id != '')
-					{
-						$obj_calendar->get_calendar_url();
+						if($post_location == '')
+						{
+							$post_longitude = get_post_meta($id, $this->meta_prefix.'longitude', true);
+							$post_latitude = get_post_meta($id, $this->meta_prefix.'latitude', true);
 
-						echo "<a href='".$obj_calendar->calendar_url."'>".$post_meta."</a>";
-					}
+							if($post_longitude != '' && $post_latitude != '')
+							{
+								$post_location = $post_longitude.",".$post_latitude;
+							}
+						}
 
-					else if($post_custom_url != '')
-					{
-						echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 40))."</a>";
-					}
+						$obj_calendar = new mf_calendar();
+						echo $obj_calendar->get_map_link($post_location);
+					break;
 
-					else
-					{
-						echo $post_meta;
-					}
+					case 'datetime':
+						echo $this->format_date(array('post_id' => $id));
+					break;
 
-					echo "<div class='row-actions'>"
-						.$fetch_link
-						.__("Fetched", 'lang_calendar').": ".format_date($post_modified)
-					."</div>";
+					case 'registration':
+						$arr_registration_meta = $this->get_registration_meta($id);
+
+						if($arr_registration_meta['registration'] > 0)
+						{
+							echo "<a href='".get_permalink($arr_registration_meta['registration'])."?calendar_id=".$id."'>".get_post_title($arr_registration_meta['registration'])."</a>";
+
+							if($arr_registration_meta['limit_participants'] > 0)
+							{
+								echo "<span> (".sprintf(__("%d of %d spots left", 'lang_calendar'), $arr_registration_meta['spots_left'], $arr_registration_meta['limit_participants']).")</span>";
+							}
+						}
+					break;
+
+					case 'calendar':
+						$post_meta = get_post_meta($id, $this->meta_prefix.$col, true);
+
+						$post_parent = $post_meta > 0 ? get_the_title($post_meta) : "";
+
+						echo "<a href='post.php?post=".$post_meta."&action=edit'>".$post_parent."</a>";
+
+						$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
+
+						if($post_uid != '')
+						{
+							echo "<div class='row-actions'>UID: ".$post_uid."</div>";
+						}
+					break;
 				}
-			break;
-
-			case 'amount_of_posts':
-				echo $this->get_amount_of_posts_for_td($id);
 			break;
 		}
 	}
@@ -313,20 +449,6 @@ class mf_calendar
 		}
 
 		return $post_end_date;
-	}
-
-	function column_header_event($cols)
-	{
-		unset($cols['title']);
-		unset($cols['date']);
-
-		$cols['event_title'] = __("Title", 'lang_calendar');
-		$cols['location'] = __("Location", 'lang_calendar');
-		$cols['datetime'] = __("Date", 'lang_calendar');
-		$cols['registration'] = __("Registration", 'lang_calendar');
-		$cols['calendar'] = __("Calendar", 'lang_calendar');
-
-		return $cols;
 	}
 
 	function format_date($data)
@@ -446,117 +568,6 @@ class mf_calendar
 		return $out;
 	}
 
-	function column_cell_event($col, $id)
-	{
-		global $done_text, $error_text;
-
-		switch($col)
-		{
-			case 'event_title':
-				$post_title = get_the_title($id);
-
-				$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
-
-				if($post_uid != '')
-				{
-					echo $post_title;
-
-					if(get_post_status($id) == 'draft')
-					{
-						echo "<span class='strong nowrap'> - ".__("Hidden", 'lang_calendar')."</span>";
-					}
-
-					else
-					{
-						echo "<div class='row-actions'>
-							<span class='calendar_action_hide'>
-								<a href='#id_".$id."' class='calendar_event_post_action calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
-							</span>
-						</div>";
-					}
-				}
-
-				else
-				{
-					$edit_url = admin_url("post.php?post=".$id."&action=edit");
-
-					echo "<a href='".$edit_url."'>".$post_title."</a>"
-					."<div class='row-actions'>";
-
-						if(get_post_status($id) == 'trash')
-						{
-							echo "<span class='untrash'>
-								<a href='".wp_nonce_url(admin_url("post.php?post=".$id."&action=untrash"), 'untrash-post_'.$id)."'>".__("Recover", 'lang_calendar')."</a>
-							</span>";
-						}
-
-						else
-						{
-							echo "<span class='edit'>
-								<a href='".$edit_url."'>".__("Edit", 'lang_calendar')."</a> | 
-							</span>
-							<span class='trash'>
-								<a href='".get_delete_post_link($id)."'>".__("Delete", 'lang_calendar')."</a>
-							</span>";
-						}
-
-					echo "</div>";
-				}
-			break;
-
-			case 'location':
-				$post_location = get_post_meta($id, $this->meta_prefix.'location', true);
-
-				if($post_location == '')
-				{
-					$post_longitude = get_post_meta($id, $this->meta_prefix.'longitude', true);
-					$post_latitude = get_post_meta($id, $this->meta_prefix.'latitude', true);
-
-					if($post_longitude != '' && $post_latitude != '')
-					{
-						$post_location = $post_longitude.",".$post_latitude;
-					}
-				}
-
-				$obj_calendar = new mf_calendar();
-				echo $obj_calendar->get_map_link($post_location);
-			break;
-
-			case 'datetime':
-				echo $this->format_date(array('post_id' => $id));
-			break;
-
-			case 'registration':
-				$arr_registration_meta = $this->get_registration_meta($id);
-
-				if($arr_registration_meta['registration'] > 0)
-				{
-					echo "<a href='".get_permalink($arr_registration_meta['registration'])."?calendar_id=".$id."'>".get_post_title($arr_registration_meta['registration'])."</a>";
-
-					if($arr_registration_meta['limit_participants'] > 0)
-					{
-						echo "<span> (".sprintf(__("%d of %d spots left", 'lang_calendar'), $arr_registration_meta['spots_left'], $arr_registration_meta['limit_participants']).")</span>";
-					}
-				}
-			break;
-
-			case 'calendar':
-				$post_meta = get_post_meta($id, $this->meta_prefix.$col, true);
-
-				$post_parent = $post_meta > 0 ? get_the_title($post_meta) : "";
-
-				echo "<a href='post.php?post=".$post_meta."&action=edit'>".$post_parent."</a>";
-
-				$post_uid = get_post_meta($id, $this->meta_prefix.'uid', true);
-
-				if($post_uid != '')
-				{
-					echo "<div class='row-actions'>UID: ".$post_uid."</div>";
-				}
-			break;
-		}
-	}
-
 	function admin_init()
 	{
 		global $pagenow;
@@ -629,11 +640,6 @@ class mf_calendar
 
 		$fields_settings = array(
 			array(
-				'name' => __("Color", 'lang_calendar'),
-				'id' => $this->meta_prefix.'color',
-				'type' => 'color',
-			),
-			array(
 				'name' => __("Calendar ID", 'lang_calendar'),
 				'id' => $this->meta_prefix.'calendar_id',
 				'type' => 'email',
@@ -647,6 +653,18 @@ class mf_calendar
 				'type' => 'custom_html',
 				'callback' => array($this, 'meta_calendar_info'),
 			),
+		);
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'google',
+			'title' => __("Google Calendar", 'lang_calendar'),
+			'post_types' => array($this->post_type),
+			//'context' => 'side',
+			'priority' => 'low',
+			'fields' => $fields_settings,
+		);
+
+		$fields_settings = array(
 			array(
 				'name' => __("Custom URL", 'lang_calendar'),
 				'id' => $this->meta_prefix.'custom_url',
@@ -703,6 +721,23 @@ class mf_calendar
 			),
 		);
 
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'custom',
+			'title' => __("Custom", 'lang_calendar'),
+			'post_types' => array($this->post_type),
+			//'context' => 'side',
+			'priority' => 'low',
+			'fields' => $fields_settings,
+		);
+
+		$fields_settings = array(
+			array(
+				'name' => __("Color", 'lang_calendar'),
+				'id' => $this->meta_prefix.'color',
+				'type' => 'color',
+			),	
+		);
+
 		if($this->is_birthday_active())
 		{
 			$fields_settings[] = array(
@@ -710,15 +745,15 @@ class mf_calendar
 				'id' => $this->meta_prefix.'display_birthdays',
 				'type' => 'select',
 				'options' => get_yes_no_for_select(),
-				'std' => 'yes',
+				'std' => 'no',
 			);
 		}
-
+		
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_calendar'),
 			'post_types' => array($this->post_type),
-			//'context' => 'side',
+			'context' => 'side',
 			'priority' => 'low',
 			'fields' => $fields_settings
 		);
@@ -1601,6 +1636,7 @@ class mf_calendar
 		$this->get_calendar_id();
 
 		$this->arr_events = array();
+		$this->feed_was_updated = false;
 
 		if($this->calendar_id != '')
 		{
@@ -1620,7 +1656,12 @@ class mf_calendar
 		if(count($this->arr_events) > 0)
 		{
 			$this->insert_events();
-			$this->remove_deleted();
+		}
+
+		$this->remove_deleted();
+
+		if($this->feed_was_updated == true)
+		{
 			$this->set_date_modified();
 		}
 	}
@@ -1930,7 +1971,7 @@ class mf_calendar
 															{
 																//$arr_debug['new'][] =
 																$this->arr_events[] = array(
-																	'type' => "gcal",
+																	'type' => 'gcal',
 																	'id' => $item_id."_req_".$count,
 																	'status' => $item_status,
 																	'link' => $item_link,
@@ -1962,7 +2003,7 @@ class mf_calendar
 
 								case 'cancelled':
 									$this->arr_events[] = array(
-										'type' => "gcal",
+										'type' => 'gcal',
 										'id' => $item_id,
 										'status' => $item_status,
 									);
@@ -2107,7 +2148,7 @@ class mf_calendar
 				}
 
 				$this->arr_events[] = array(
-					'type' => "bday",
+					'type' => 'bday',
 					'id' => $item_id,
 					'status' => 'confirmed',
 					'title' => $item_title,
@@ -2188,6 +2229,8 @@ class mf_calendar
 								);
 
 								$post_id = wp_insert_post($post_data);
+
+								$this->feed_was_updated = true;
 							}
 						}
 
@@ -2200,6 +2243,8 @@ class mf_calendar
 								if($i > 0)
 								{
 									wp_trash_post($r->ID);
+
+									$this->feed_was_updated = true;
 								}
 
 								$i++;
@@ -2230,11 +2275,18 @@ class mf_calendar
 									);
 
 									wp_update_post($post_data);
+
+									if($wpdb->rows_affected > 0)
+									{
+										$this->feed_was_updated = true;
+									}
 								}
 
 								else
 								{
 									wp_trash_post($r->ID);
+
+									$this->feed_was_updated = true;
 								}
 							}
 						}
@@ -2244,6 +2296,8 @@ class mf_calendar
 						foreach($result as $r)
 						{
 							wp_trash_post($r->ID);
+
+							$this->feed_was_updated = true;
 						}
 					break;
 				}
@@ -2260,18 +2314,27 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		$arr_titles = array();
+		$query_where = "";
 
-		foreach($this->arr_events as $post)
+		if(count($this->arr_events) > 0)
 		{
-			$arr_titles[] = $post['type']." ".$post['id'];
+			$arr_titles = array();
+
+			foreach($this->arr_events as $post)
+			{
+				$arr_titles[] = $post['type']." ".$post['id'];
+			}
+
+			$query_where .= " AND meta_value NOT IN ('".implode("','", $arr_titles)."')";
 		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value NOT IN ('".implode("','", $arr_titles)."') AND post_parent = '%d'", $this->post_type_event, 'publish', $this->meta_prefix.'uid', $this->id));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND post_parent = '%d' AND meta_key = %s".$query_where, $this->post_type_event, 'publish', $this->id, $this->meta_prefix.'uid'));
 
 		foreach($result as $r)
 		{
 			wp_trash_post($r->ID);
+
+			$this->feed_was_updated = true;
 		}
 	}
 
