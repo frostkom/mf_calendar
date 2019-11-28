@@ -173,7 +173,7 @@ class mf_calendar
 	function column_header($cols)
 	{
 		global $post_type;
-		
+
 		unset($cols['date']);
 
 		switch($post_type)
@@ -735,7 +735,7 @@ class mf_calendar
 				'name' => __("Color", 'lang_calendar'),
 				'id' => $this->meta_prefix.'color',
 				'type' => 'color',
-			),	
+			),
 		);
 
 		if($this->is_birthday_active())
@@ -748,7 +748,7 @@ class mf_calendar
 				'std' => 'no',
 			);
 		}
-		
+
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_calendar'),

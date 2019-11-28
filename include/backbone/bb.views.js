@@ -60,6 +60,24 @@ var CalendarView = Backbone.View.extend(
 		this.model.getPage(tab_active);
 	},
 
+	get_max_weeks: function(type)
+	{
+		var year_temp = this.display_year;
+
+		switch(type)
+		{
+			case 'previous':
+				year_temp--;
+			break;
+
+			case 'next':
+				year_temp++;
+			break;
+		}
+
+		return (typeof this.week_dates[year_temp + '-53'] === 'undefined' ? 52 : 53);
+	},
+
 	change_week: function(e)
 	{
 		var dom_obj = jQuery(e.currentTarget);
@@ -68,11 +86,11 @@ var CalendarView = Backbone.View.extend(
 
 		if(this.display_week < 1)
 		{
-			this.display_week = 53;
+			this.display_week = this.get_max_weeks('previous');
 			this.display_year--;
 		}
 
-		if(this.display_week > 53)
+		if(this.display_week > this.get_max_weeks('next'))
 		{
 			this.display_week = 1;
 			this.display_year++;
@@ -201,6 +219,8 @@ var CalendarView = Backbone.View.extend(
 				this.display_year = parseInt(script_calendar_views.current_year);
 
 				this.week_dates = response.week_dates;
+
+				console.log("show_arrows - week_dates: " , response.week_dates);
 
 				this.update_current_week();
 			}
