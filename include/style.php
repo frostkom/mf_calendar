@@ -45,7 +45,7 @@ echo "@media all
 				flex: 0 1 auto;
 			}
 
-				.widget.calendar .section > h4 .controls.fa.disabled
+				.widget.calendar .section > h4 .controls.fa.is_disabled
 				{
 					cursor: no-drop;
 					opacity: .2 !important;

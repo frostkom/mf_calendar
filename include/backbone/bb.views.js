@@ -14,7 +14,7 @@ var CalendarView = Backbone.View.extend(
 
 	events:
 	{
-		"click .section .controls.fa:not(.disabled)" : 'change_week',
+		"click .section .controls.fa:not(.is_disabled)" : 'change_week',
 		"change #calendar_feeds" : 'change_feeds'
 	},
 
@@ -229,24 +229,24 @@ var CalendarView = Backbone.View.extend(
 
 			if(response.week_start < this.display_week || response.year_start < this.display_year)
 			{
-				jQuery(this.el).find(".previous").removeClass('disabled');
+				jQuery(this.el).find(".previous").removeClass('is_disabled');
 				week_disabled = false;
 			}
 
 			else
 			{
-				jQuery(this.el).find(".previous").addClass('disabled');
+				jQuery(this.el).find(".previous").addClass('is_disabled');
 			}
 
 			if(response.week_end > this.display_week || response.year_end > this.display_year)
 			{
-				jQuery(this.el).find(".next").removeClass('disabled');
+				jQuery(this.el).find(".next").removeClass('is_disabled');
 				week_disabled = false;
 			}
 
 			else
 			{
-				jQuery(this.el).find(".next").addClass('disabled');
+				jQuery(this.el).find(".next").addClass('is_disabled');
 			}
 
 			if(week_disabled == false)
