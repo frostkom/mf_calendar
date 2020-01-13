@@ -1579,7 +1579,7 @@ class mf_calendar
 		{
 			$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()", $this->post_type, 'publish')); // INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."calendar_id'
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()", $this->post_type, 'publish'));
 
 			foreach($result as $r)
 			{
@@ -2134,29 +2134,34 @@ class mf_calendar
 
 		foreach($users as $user)
 		{
-			$user_birthday = get_the_author_meta('profile_birthday', $user->ID);
+			$user_data = get_userdata($user->ID);
 
-			if($user_birthday != '')
+			if(isset($user_data->roles[0]) && $user_data->roles[0] != '')
 			{
-				$item_id = $user->ID;
-				$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user->display_name);
-				$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
+				$user_birthday = get_the_author_meta('profile_birthday', $user->ID);
 
-				if($item_birthday < date("Y-m-d", strtotime("-1 month")))
+				if($user_birthday != '')
 				{
-					$item_birthday = date("Y", strtotime("+1 year"))."-".date("m-d", strtotime($user_birthday));
-				}
+					$item_id = $user->ID;
+					$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user->display_name);
+					$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
 
-				$this->arr_events[] = array(
-					'type' => 'bday',
-					'id' => $item_id,
-					'status' => 'confirmed',
-					'title' => $item_title,
-					'content' => '',
-					'start' => $item_birthday,
-					'end' => $item_birthday,
-					'created' => date("Y-m-d H:i:s"),
-				);
+					if($item_birthday < date("Y-m-d", strtotime("-1 month")))
+					{
+						$item_birthday = date("Y", strtotime("+1 year"))."-".date("m-d", strtotime($user_birthday));
+					}
+
+					$this->arr_events[] = array(
+						'type' => 'bday',
+						'id' => $item_id,
+						'status' => 'confirmed',
+						'title' => $item_title,
+						'content' => '',
+						'start' => $item_birthday,
+						'end' => $item_birthday,
+						'created' => date("Y-m-d H:i:s"),
+					);
+				}
 			}
 		}
 	}
