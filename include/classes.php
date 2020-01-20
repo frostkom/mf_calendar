@@ -1547,9 +1547,7 @@ class mf_calendar
 
 						echo "<span class='title
 							<% if(more_icon != '')
-							{ %>
-								 has_more
-							<% } %>
+							{ %> has_more<% } %>
 						' itemprop='name'><%= title %></span>
 						<%= more_icon %>
 

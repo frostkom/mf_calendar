@@ -145,54 +145,55 @@ echo "@media all
 						text-align: left;
 					}
 
-						/*.widget.calendar .section .calendar_feed_item p
+						.widget.calendar .section .calendar_feed_item p > span
 						{
-							margin: .2em 0 0;
-						}*/
+							display: inline-block;
+						}
 
-							.widget.calendar .section .calendar_feed_item p > span
+							.widget.calendar .section .calendar_feed_item p > span + span
 							{
-								display: block;
+								padding-top: .2em;
 							}
 
-								.widget.calendar .section .calendar_feed_item p > span + span
-								{
-									padding-top: .2em;
-								}
-
-								.widget.calendar .section .calendar_feed_item .feed_name
-								{
-									font-weight: bold;
-								}
-
-								.widget.calendar .section .calendar_feed_item .heading
-								{
-									font-size: .8em;
-								}
-
-								.widget.calendar .section .calendar_feed_item .title
-								{
-									font-weight: bold;
-								}
-
-									.widget.calendar .section .calendar_feed_item .title.has_more
-									{
-										overflow: hidden;
-										text-overflow: ellipsis;
-										white-space: nowrap;
-										max-width: 75%;
-									}
-
-								.widget.calendar .section .calendar_feed_item .end_date
-								{
-									font-weight: bold;
-								}
-
-							.widget.calendar .section .calendar_feed_item p > .fa
+							.widget.calendar .section .calendar_feed_item .feed_name
 							{
-								margin-left: .4em;
-								-webkit-transform: translateY(-25%);
-								transform: translateY(-25%);
+								font-weight: bold;
+							}
+
+							.widget.calendar .section .calendar_feed_item .heading
+							{
+								display: block;
+								font-size: .8em;
+							}
+
+							.widget.calendar .section .calendar_feed_item .title
+							{
+								font-weight: bold;
+							}
+
+								.widget.calendar .section .calendar_feed_item .title.has_more
+								{
+									overflow: hidden;
+									text-overflow: ellipsis;
+									white-space: nowrap;
+									max-width: 75%;
+								}
+
+							.widget.calendar .section .calendar_feed_item .end_date
+							{
+								font-weight: bold;
+							}
+
+						.widget.calendar .section .calendar_feed_item p > .fa
+						{
+							margin-left: .4em;
+							-webkit-transform: translateY(-25%);
+							transform: translateY(-25%);
+						}
+
+							.widget.calendar .section .calendar_feed_item p > .fa + .end_date
+							{
+								display: block;
 							}
 
 						.widget.calendar .section .calendar_feed_item .toggler

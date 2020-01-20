@@ -220,8 +220,6 @@ var CalendarView = Backbone.View.extend(
 
 				this.week_dates = response.week_dates;
 
-				console.log("show_arrows - week_dates: " , response.week_dates);
-
 				this.update_current_week();
 			}
 
