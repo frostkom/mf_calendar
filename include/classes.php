@@ -289,17 +289,17 @@ class mf_calendar
 							{
 								$obj_calendar->get_calendar_url();
 
-								echo "<a href='".$obj_calendar->calendar_url."'>".$post_meta."</a>";
+								echo "<a href='".$obj_calendar->calendar_url."'>".shorten_text(array('string' => $post_meta, 'limit' => 20))."</a>";
 							}
 
 							else if($post_custom_url != '')
 							{
-								echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 40))."</a>";
+								echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 20))."</a>";
 							}
 
 							else
 							{
-								echo $post_meta;
+								echo shorten_text(array('string' => $post_meta, 'limit' => 20));
 							}
 
 							echo "<div class='row-actions'>"
@@ -310,7 +310,20 @@ class mf_calendar
 					break;
 
 					case 'amount_of_posts':
-						echo $this->get_amount_of_posts_for_td($id);
+						$post_error = get_post_meta($id, $this->meta_prefix.'error', true);
+
+						if($post_error != '')
+						{
+							echo "<i class='fa fa-times red fa-2x'></i>
+							<div class='row-actions'>"
+								.$post_error
+							."</div>";
+						}
+
+						else
+						{
+							echo $this->get_amount_of_posts_for_td($id);
+						}
 					break;
 				}
 			break;
@@ -1684,7 +1697,7 @@ class mf_calendar
 				do_log("Calendar URL: ".$this->calendar_url);
 			}
 
-			$log_message = __("Something went wrong when fetching the calendar source", 'lang_calendar');
+			//$log_message = __("Something went wrong when fetching the calendar source", 'lang_calendar');
 
 			switch($headers['http_code'])
 			{
@@ -2027,7 +2040,7 @@ class mf_calendar
 							do_log("The Calendar API returned the maximum number of events (".$this->calendar_url_clean.")");
 						}
 
-						do_log($log_message, 'trash');
+						//do_log($log_message, 'trash');
 					}
 
 					else
@@ -2036,13 +2049,27 @@ class mf_calendar
 
 						if($content != '' && !preg_match("/Not Found/i", $content))
 						{
-							do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
+							update_post_meta($this->id, $this->meta_prefix.'error', __("The calendar was not found", 'lang_calendar'));
+
+							wp_update_post(array(
+								'ID' => $this->id,
+								'post_status' => 'draft',
+							));
+
+							//do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
 						}
 					}
 				break;
 
 				default:
-					do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
+					update_post_meta($this->id, $this->meta_prefix.'error', sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']));
+
+					wp_update_post(array(
+						'ID' => $this->id,
+						'post_status' => 'draft',
+					));
+
+					//do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
 				break;
 			}
 		}
