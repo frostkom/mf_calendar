@@ -148,19 +148,32 @@ class mf_calendar
 	function admin_menu()
 	{
 		$menu_root = 'mf_calendar/';
-		$menu_start = "edit.php?post_type=".$this->post_type;
+		$menu_start_orig = $menu_start = "edit.php?post_type=".$this->post_type;
 		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_pages'));
+
+		$calendar_amount = $this->get_calendar_amount(array('post_status' => ''));
+
+		if($calendar_amount > 0)
+		{
+			$menu_start = "edit.php?post_type=".$this->post_type_event;
+		}
 
 		$menu_title = __("Calendar", 'lang_calendar');
 		add_menu_page("", $menu_title, $menu_capability, $menu_start, '', 'dashicons-calendar', 21);
 
-		$menu_title = __("Calendar", 'lang_calendar');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
+		if($calendar_amount > 0)
+		{
+			$menu_title = "";
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
+
+			$menu_title = __("Calendar", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start_orig);
+		}
 
 		$menu_title = " - ".__("Add New", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
 
-		if($this->get_calendar_amount(array('post_status' => '')) > 0)
+		if($calendar_amount > 0)
 		{
 			$menu_title = __("Events", 'lang_calendar');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type_event);
