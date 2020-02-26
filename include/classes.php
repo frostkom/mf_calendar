@@ -1550,14 +1550,8 @@ class mf_calendar
 			<li>".__("There are no events to display", 'lang_calendar')."</li>
 		</script>
 
-		<script type='text/template' id='template_calendar_events'>";
-
-			/*echo "<% if(heading != '')
-			{ %>
-				<li><h4><%= heading %></h4></li>
-			<% } %>";*/
-
-			echo "<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
+		<script type='text/template' id='template_calendar_events'>
+			<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
 				<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
 				<div class='content<%= content_class %>' rel='<%= id %>'>
 					<p>
@@ -2062,11 +2056,12 @@ class mf_calendar
 
 						if($content != '' && !preg_match("/Not Found/i", $content))
 						{
-							update_post_meta($this->id, $this->meta_prefix.'error', __("The calendar was not found", 'lang_calendar'));
-
 							wp_update_post(array(
 								'ID' => $this->id,
 								'post_status' => 'draft',
+								'meta_input' => array(
+									$this->meta_prefix.'error' => __("The calendar was not found", 'lang_calendar'),
+								),
 							));
 
 							//do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
@@ -2075,11 +2070,12 @@ class mf_calendar
 				break;
 
 				default:
-					update_post_meta($this->id, $this->meta_prefix.'error', sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']));
-
 					wp_update_post(array(
 						'ID' => $this->id,
 						'post_status' => 'draft',
+						'meta_input' => array(
+							$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
+						),
 					));
 
 					//do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
