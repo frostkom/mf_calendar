@@ -1701,7 +1701,7 @@ class mf_calendar
 
 			if($setting_calendar_debug == 'yes')
 			{
-				do_log("Calendar URL: ".$this->calendar_url);
+				do_log("Calendar URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
 			}
 
 			//$log_message = __("Something went wrong when fetching the calendar source", 'lang_calendar');
@@ -2041,6 +2041,14 @@ class mf_calendar
 						{
 							echo "Debug: ".var_export($arr_debug, true);
 						}*/
+
+						wp_update_post(array(
+							'ID' => $this->id,
+							'post_status' => 'publish',
+							'meta_input' => array(
+								$this->meta_prefix.'error' => '',
+							),
+						));
 
 						if(count($json['items']) == 250)
 						{
