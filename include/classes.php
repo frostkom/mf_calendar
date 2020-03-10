@@ -2525,7 +2525,7 @@ class widget_calendar extends WP_Widget
 		echo "<div class='mf_form'>"
 			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => " id='calendar-title'"));
 
-			if(count($arr_data_feeds) > 1)
+			if(count($arr_data_feeds) > 0)
 			{
 				echo "<div class='flex_flow'>"
 					.show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
@@ -2549,6 +2549,11 @@ class widget_calendar extends WP_Widget
 					}
 
 				echo "</div>";
+			}
+
+			else
+			{
+				echo "<em>".__("There are no available calendars", 'lang_calendar')."</em>";
 			}
 
 			echo "<div class='flex_flow'>"
