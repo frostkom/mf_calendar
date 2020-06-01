@@ -683,7 +683,7 @@ class mf_calendar
 
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'google',
-			'title' => __("Google Calendar", 'lang_calendar'),
+			'title' => "Google Calendar",
 			'post_types' => array($this->post_type),
 			//'context' => 'side',
 			'priority' => 'low',
