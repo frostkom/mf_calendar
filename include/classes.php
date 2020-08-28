@@ -2406,7 +2406,7 @@ class widget_calendar extends WP_Widget
 {
 	function __construct()
 	{
-		$widget_ops = array(
+		$this->widget_ops = array(
 			'classname' => 'calendar',
 			'description' => __("Display Calendar", 'lang_calendar')
 		);
@@ -2422,7 +2422,7 @@ class widget_calendar extends WP_Widget
 			'calendar_page' => 0,
 		);
 
-		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $widget_ops);
+		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $this->widget_ops);
 
 		$this->obj_calendar = new mf_calendar();
 	}
@@ -2523,7 +2523,7 @@ class widget_calendar extends WP_Widget
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
 
 		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => " id='calendar-title'"));
+			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"));
 
 			if(count($arr_data_feeds) > 0)
 			{
