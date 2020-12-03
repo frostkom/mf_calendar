@@ -1476,6 +1476,8 @@ class mf_calendar
 
 	function get_registration_meta($post_id)
 	{
+		global $obj_form;
+
 		$out = array(
 			'registration' => get_post_meta($post_id, $this->meta_prefix.'registration', true),
 			'limit_participants' => get_post_meta($post_id, $this->meta_prefix.'limit_participants', true),
@@ -1483,7 +1485,11 @@ class mf_calendar
 
 		if($out['limit_participants'] > 0)
 		{
-			$obj_form = new mf_form();
+			if(!isset($obj_form))
+			{
+				$obj_form = new mf_form();
+			}
+
 			$obj_form->get_form_id($out['registration']);
 
 			$out['spots_left'] = $out['limit_participants'] - $obj_form->get_answer_amount(array('form_id' => $obj_form->id, 'meta_key' => 'calendar_id', 'meta_value' => $post_id));
@@ -1531,11 +1537,17 @@ class mf_calendar
 
 	function filter_form_on_submit($data)
 	{
+		global $obj_form;
+
 		$post_id = check_var('calendar_id', 'int');
 
 		if($post_id > 0)
 		{
-			$obj_form = new mf_form();
+			if(!isset($obj_form))
+			{
+				$obj_form = new mf_form();
+			}
+
 			$obj_form->set_meta(array('id' => $data['obj_form']->answer_id, 'key' => 'calendar_id', 'value' => $post_id));
 		}
 
