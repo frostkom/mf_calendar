@@ -145,6 +145,8 @@ class mf_calendar
 		$option = get_option($setting_key, 'no');
 
 		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
+
+		setting_time_limit(array('key' => $setting_key, 'value' => $option));
 	}
 
 	function admin_menu()
@@ -797,6 +799,9 @@ class mf_calendar
 		$default_calendar = '';
 
 		$post_id = check_var('post');
+		/*$post_id = get_rwmb_post_id(array(
+			'meta_key' => 'meta_calendar_',
+		));*/
 
 		if(!($post_id > 0))
 		{
