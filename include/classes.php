@@ -2559,7 +2559,7 @@ class widget_calendar extends WP_Widget
 						echo "<div>"
 							.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
 
-							if($instance['calendar_display_filter'] == 'yes' && is_plugin_active('mf_multiselect/index.php'))
+							if($instance['calendar_display_filter'] == 'yes' && is_plugin_active("mf_multiselect/index.php"))
 							{
 								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose Here", 'lang_calendar')));
 							}
