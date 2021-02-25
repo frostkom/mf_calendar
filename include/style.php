@@ -73,7 +73,6 @@ echo "@media all
 		.widget.calendar .section > ul
 		{
 			list-style: none;
-			/*margin-top: .5em;*/
 		}
 
 			.widget.calendar .section .calendar_feed_item
@@ -97,11 +96,6 @@ echo "@media all
 				{
 					padding-top: .5em;
 				}
-
-					/*.widget.calendar .section .calendar_feed_item + li > h4
-					{
-						margin-top: .5em;
-					}*/
 
 					.widget.calendar .section .calendar_feed_item .start_date
 					{
