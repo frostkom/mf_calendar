@@ -174,16 +174,16 @@ class mf_calendar
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start_orig);
 		}
 
-		$menu_title = " - ".__("Add New", 'lang_calendar');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
+		$menu_title = __("Add New", 'lang_calendar');
+		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
 
 		if($calendar_amount > 0)
 		{
 			$menu_title = __("Events", 'lang_calendar');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type_event);
 
-			$menu_title = " - ".__("Add New", 'lang_calendar');
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_event);
+			$menu_title = __("Add New", 'lang_calendar');
+			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_event);
 		}
 	}
 
@@ -601,11 +601,6 @@ class mf_calendar
 	function admin_init()
 	{
 		global $pagenow;
-
-		if(!is_plugin_active("mf_base/index.php"))
-		{
-			deactivate_plugins(str_replace("include/classes.php", "index.php", plugin_basename(__FILE__)));
-		}
 
 		if($pagenow == 'edit.php' && check_var('post_type') == $this->post_type_event)
 		{
