@@ -1205,7 +1205,7 @@ class mf_calendar
 					break;
 
 					default:
-						if($data['months'] > 2)
+						if($data['months'] > 1)
 						{
 							if($post_start_yearmonth != $yearmonth_temp)
 							{
@@ -1441,11 +1441,9 @@ class mf_calendar
 						$out .= "<li itemscope itemtype='//schema.org/Event' class='calendar_feed_".$event['feed'].">
 							<div class='start_date' itemprop='startDate' content='".$event['start_date_c']."'><p>".$event['start_day']."</p></div>
 							<div class='content".$event['content_class']."' rel='".$event['id']."'>
-								<p>";
-
-									$out .= "<span class='heading'>".$data['array']['title']."</span>";
-
-									$out .= "<span class='title";
+								<p>
+									<span class='heading'>".$data['array']['title']."</span>
+									<span class='title";
 
 										if($event['more_icon'] != '')
 										{
@@ -1460,9 +1458,8 @@ class mf_calendar
 										$out .= "<span class='end_date' itemprop='endDate' content='".$event['end_date_c']."'>".$event['date_end']."</span>";
 									}
 
-								$out .= "</p>";
-
-								$out .= $event['more_content']
+								$out .= "</p>"
+								.$event['more_content']
 							."</div>
 						</li>";
 					}
