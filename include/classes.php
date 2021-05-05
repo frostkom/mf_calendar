@@ -1781,11 +1781,11 @@ class mf_calendar
 							switch($item_status)
 							{
 								case 'confirmed':
-									$item_link = isset($item['htmlLink']) ? trim($item['htmlLink']) : '';
-									$item_title = isset($item['summary']) ? trim($item['summary']) : '';
-									$item_content = isset($item['description']) ? trim($item['description']) : '';
-									$item_location = isset($item['location']) ? trim($item['location']) : '';
-									$item_created = isset($item['created']) ? date("Y-m-d H:i:s", strtotime($item['created'])) : '';
+									$item_link = (isset($item['htmlLink']) ? trim($item['htmlLink']) : '');
+									$item_title = (isset($item['summary']) ? trim($item['summary']) : '');
+									$item_content = (isset($item['description']) ? trim($item['description']) : '');
+									$item_location = (isset($item['location']) ? trim($item['location']) : '');
+									$item_created = (isset($item['created']) ? date("Y-m-d H:i:s", strtotime($item['created'])) : '');
 
 									if(isset($item['start']['dateTime']))
 									{
@@ -2152,16 +2152,16 @@ class mf_calendar
 					"lat":"13.8222284514"
 				)*/
 
-				$item_id = $custom_url_id != '' ? $item[$custom_url_id] : '';
+				$item_id = ($custom_url_id != '' ? $item[$custom_url_id] : '');
 				//$item_link = $item['htmlLink'];
-				$item_title = $custom_url_title != '' && isset($item[$custom_url_title]) ? trim($item[$custom_url_title]) : '';
-				$item_content = $custom_url_description != '' && isset($item[$custom_url_description]) ? trim($item[$custom_url_description]) : '';
-				//$item_location = isset($item['location']) ? trim($item['location']) : '';
-				$item_longitude = $custom_url_longitude != '' && isset($item[$custom_url_longitude]) ? $item[$custom_url_longitude] : '';
-				$item_latitude = $custom_url_latitude != '' && isset($item[$custom_url_latitude]) ? $item[$custom_url_latitude] : '';
-				$item_created = $custom_url_created != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_created])) : '';
-				$item_start = $custom_url_start != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : '';
-				$item_end = $custom_url_end != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '';
+				$item_title = ($custom_url_title != '' && isset($item[$custom_url_title]) ? trim($item[$custom_url_title]) : '');
+				$item_content = ($custom_url_description != '' && isset($item[$custom_url_description]) ? trim($item[$custom_url_description]) : '');
+				//$item_location = (isset($item['location']) ? trim($item['location']) : '');
+				$item_longitude = ($custom_url_longitude != '' && isset($item[$custom_url_longitude]) ? $item[$custom_url_longitude] : '');
+				$item_latitude = ($custom_url_latitude != '' && isset($item[$custom_url_latitude]) ? $item[$custom_url_latitude] : '');
+				$item_created = ($custom_url_created != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_created])) : '');
+				$item_start = ($custom_url_start != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : '');
+				$item_end = ($custom_url_end != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '');
 
 				$this->arr_events[] = array(
 					'type' => "custom",
