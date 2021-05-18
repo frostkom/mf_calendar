@@ -264,12 +264,17 @@ class mf_calendar
 
 						if($post_calendar_id != '')
 						{
-							$post_meta = $post_calendar_id;
+							$obj_calendar = new mf_calendar($id);
+							$obj_calendar->get_calendar_url();
+
+							$post_meta = "<a href='".$obj_calendar->calendar_url."'>".shorten_text(array('string' => $post_calendar_id, 'limit' => 20))."</a>";
+
+							//$post_meta = $post_calendar_id;
 						}
 
 						else if($post_custom_url != '')
 						{
-							$post_meta = $post_custom_url;
+							$post_meta = "<a href='".$post_custom_url."' rel='external'><i class='fa fa-link fa-lg'></i></a>";
 						}
 
 						else if($post_display_birthdays == 'yes') //$this->is_birthday_active()
@@ -279,8 +284,6 @@ class mf_calendar
 
 						if($post_meta != '')
 						{
-							$obj_calendar = new mf_calendar($id);
-
 							$fetch_link = "";
 
 							$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $id, $this->post_type));
@@ -291,6 +294,7 @@ class mf_calendar
 
 								if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$id))
 								{
+									$obj_calendar = new mf_calendar($id);
 									$obj_calendar->fetch_source($id);
 								}
 
@@ -302,8 +306,9 @@ class mf_calendar
 
 							$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $id, $this->post_type));
 
-							if($post_calendar_id != '')
+							/*if($post_calendar_id != '')
 							{
+								$obj_calendar = new mf_calendar($id);
 								$obj_calendar->get_calendar_url();
 
 								echo "<a href='".$obj_calendar->calendar_url."'>".shorten_text(array('string' => $post_meta, 'limit' => 20))."</a>";
@@ -314,9 +319,14 @@ class mf_calendar
 								echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 20))."</a>";
 							}
 
-							else
+							else */if(preg_match("/\</", $post_meta) == false)
 							{
 								echo shorten_text(array('string' => $post_meta, 'limit' => 20));
+							}
+
+							else
+							{
+								echo $post_meta;
 							}
 
 							echo "<div class='row-actions'>"
@@ -651,14 +661,28 @@ class mf_calendar
 		return is_plugin_active("mf_users/index.php") && is_array($setting_add_profile_fields) && in_array('profile_birthday', $setting_add_profile_fields);
 	}
 
-	function meta_calendar_info()
+	/*function meta_calendar_info()
 	{
 		$out = "<ol id='".$this->meta_prefix."info'>
 			<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
-			<li>".__("Click on Settings (The grey gear icon to the right)", 'lang_calendar')."</li>
-			<li>".__("Click on My Calendar Settings", 'lang_calendar')."</li>
+			<li>".__("Find the calendar that you would like to synchronize in the left column under My calendars.", 'lang_calendar')."</li>
+			<li>".__("Click on Options for your calendar (The three dots to the right of the calendar name)", 'lang_calendar')."</li>
+			<li>".__("Click on Settings and sharing", 'lang_calendar')."</li>
 			<li>".__("Choose which calendar to share if there are multiple", 'lang_calendar')."</li>
 			<li>".__("Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category", 'lang_calendar')."</li>
+		</ol>";
+
+		return $out;
+	}*/
+
+	function meta_calendar_custom_info()
+	{
+		$out = "<ol id='".$this->meta_prefix."info'>
+			<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
+			<li>".__("Find the calendar that you would like to synchronize in the left column under My calendars", 'lang_calendar')."</li>
+			<li>".__("Click on Options for your calendar (The three dots to the right of the calendar name)", 'lang_calendar')."</li>
+			<li>".__("Click on Settings and sharing", 'lang_calendar')."</li>
+			<li>".__("Scroll down to Integrate calendar and copy the Secret address in iCal format", 'lang_calendar')."</li>
 		</ol>";
 
 		return $out;
@@ -668,86 +692,27 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		$fields_settings = array(
-			array(
-				'name' => __("Calendar ID", 'lang_calendar'),
-				'id' => $this->meta_prefix.'calendar_id',
-				'type' => 'email',
-				'attributes' => array(
-					'condition_type' => 'show_if',
-					'condition_field' => $this->meta_prefix.'custom_url, #'.$this->meta_prefix.'custom_url_container, #'.$this->meta_prefix.'custom_url_id, #'.$this->meta_prefix.'custom_url_title, #'.$this->meta_prefix.'custom_url_description, #'.$this->meta_prefix.'custom_url_longitude, #'.$this->meta_prefix.'custom_url_latitude, #'.$this->meta_prefix.'custom_url_created, #'.$this->meta_prefix.'custom_url_start, #'.$this->meta_prefix.'custom_url_end',
-				),
-			),
-			array(
-				'id' => $this->meta_prefix.'info',
-				'type' => 'custom_html',
-				'callback' => array($this, 'meta_calendar_info'),
-			),
-		);
-
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'google',
 			'title' => "Google Calendar",
 			'post_types' => array($this->post_type),
 			//'context' => 'side',
 			'priority' => 'low',
-			'fields' => $fields_settings,
-		);
-
-		$fields_settings = array(
-			array(
-				'name' => __("Custom URL", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url',
-				'type' => 'url',
-				'attributes' => array(
-					'condition_type' => 'show_if',
-					'condition_field' => $this->meta_prefix.'calendar_id, #'.$this->meta_prefix.'info',
+			'fields' => array(
+				array(
+					'name' => __("Calendar ID", 'lang_calendar'),
+					'id' => $this->meta_prefix.'calendar_id',
+					'type' => 'email',
+					/*'attributes' => array(
+						'condition_type' => 'show_if',
+						'condition_field' => $this->meta_prefix.'custom_url, #'.$this->meta_prefix.'custom_url_container, #'.$this->meta_prefix.'custom_url_id, #'.$this->meta_prefix.'custom_url_title, #'.$this->meta_prefix.'custom_url_description, #'.$this->meta_prefix.'custom_url_longitude, #'.$this->meta_prefix.'custom_url_latitude, #'.$this->meta_prefix.'custom_url_created, #'.$this->meta_prefix.'custom_url_start, #'.$this->meta_prefix.'custom_url_end',
+					),*/
 				),
-			),
-			array(
-				'name' => __("Field for Container", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_container',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for ID", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_id',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Title", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_title',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Description", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_description',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Longitude", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_longitude',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Latitude", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_latitude',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Created", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_created',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for Start Date", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_start',
-				'type' => 'text',
-			),
-			array(
-				'name' => __("Field for End Date", 'lang_calendar'),
-				'id' => $this->meta_prefix.'custom_url_end',
-				'type' => 'text',
+				/*array(
+					'id' => $this->meta_prefix.'info',
+					'type' => 'custom_html',
+					'callback' => array($this, 'meta_calendar_info'),
+				),*/
 			),
 		);
 
@@ -757,7 +722,67 @@ class mf_calendar
 			'post_types' => array($this->post_type),
 			//'context' => 'side',
 			'priority' => 'low',
-			'fields' => $fields_settings,
+			'fields' => array(
+				array(
+					'name' => __("Custom URL", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url',
+					'type' => 'url',
+					/*'attributes' => array(
+						'condition_type' => 'show_if',
+						'condition_field' => $this->meta_prefix.'calendar_id, #'.$this->meta_prefix.'info',
+					),*/
+				),
+				array(
+					'id' => $this->meta_prefix.'custom_info',
+					'type' => 'custom_html',
+					'callback' => array($this, 'meta_calendar_custom_info'),
+				),
+				array(
+					'name' => __("Field for Container", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_container',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for ID", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_id',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Title", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_title',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Description", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_description',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Longitude", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_longitude',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Latitude", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_latitude',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Created", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_created',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for Start Date", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_start',
+					'type' => 'text',
+				),
+				array(
+					'name' => __("Field for End Date", 'lang_calendar'),
+					'id' => $this->meta_prefix.'custom_url_end',
+					'type' => 'text',
+				),
+			),
 		);
 
 		$fields_settings = array(
@@ -2091,6 +2116,14 @@ class mf_calendar
 							//do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
 						}
 					}
+
+					wp_update_post(array(
+						'ID' => $this->id,
+						'post_status' => 'publish',
+						'meta_input' => array(
+							$this->meta_prefix.'error' => '',
+						),
+					));
 				break;
 
 				default:
@@ -2113,76 +2146,193 @@ class mf_calendar
 		$setting_calendar_debug = get_option('setting_calendar_debug');
 
 		list($content, $headers) = get_url_content(array('url' => $this->custom_url, 'catch_head' => true));
-		$json = json_decode($content, true);
 
-		$custom_url_container = get_post_meta($this->id, $this->meta_prefix.'custom_url_container', true);
-		$custom_url_id = get_post_meta($this->id, $this->meta_prefix.'custom_url_id', true);
-		$custom_url_title = get_post_meta($this->id, $this->meta_prefix.'custom_url_title', true);
-		$custom_url_description = get_post_meta($this->id, $this->meta_prefix.'custom_url_description', true);
-		$custom_url_longitude = get_post_meta($this->id, $this->meta_prefix.'custom_url_longitude', true);
-		$custom_url_latitude = get_post_meta($this->id, $this->meta_prefix.'custom_url_latitude', true);
-		$custom_url_created = get_post_meta($this->id, $this->meta_prefix.'custom_url_created', true);
-		$custom_url_start = get_post_meta($this->id, $this->meta_prefix.'custom_url_start', true);
-		$custom_url_end = get_post_meta($this->id, $this->meta_prefix.'custom_url_end', true);
-
-		if(isset($json[$custom_url_container]))
+		if($setting_calendar_debug == 'yes')
 		{
-			//$arr_debug = array('old' => array(), 'new' => array());
+			do_log("Calendar URL: ".$this->calendar_url);
+		}
 
-			foreach($json[$custom_url_container] as $item)
-			{
-				/*if($setting_calendar_debug == 'yes')
+		switch($headers['http_code'])
+		{
+			case 200:
+				if(basename($this->custom_url) == "basic.ics")
 				{
-					do_log("Calendar Event: ".var_export($item, true));
-				}*/
+					$custom_url_container = 'ical';
+					$custom_url_id = 'uid';
+					$custom_url_title = 'summary';
+					$custom_url_description = 'description';
+					$custom_url_longitude = 'longitude';
+					$custom_url_latitude = 'latitude';
+					$custom_url_created = 'created';
+					$custom_url_start = 'dtstart';
+					$custom_url_end = 'dtend';
 
-				/*array(
-					"kampanjid":"[id]",
-					"title":"[text]",
-					"date_start":"2018-04-30T18:00:00+02:00",
-					"date_end":"2018-04-30T21:30:00+02:00",
-					"created":"2018-04-23T17:17:51+02:00",
-					"reported_at":null,
-					"description":"[text]",
-					"district_id":"O-01306",
-					"association_id":"O-01335",
-					"forening":"Ystad",
-					"kommun":"1286",
-					"lon":"55.4300904504",
-					"lat":"13.8222284514"
-				)*/
+					$json = array('ical' => array());
 
-				$item_id = ($custom_url_id != '' ? $item[$custom_url_id] : '');
-				//$item_link = $item['htmlLink'];
-				$item_title = ($custom_url_title != '' && isset($item[$custom_url_title]) ? trim($item[$custom_url_title]) : '');
-				$item_content = ($custom_url_description != '' && isset($item[$custom_url_description]) ? trim($item[$custom_url_description]) : '');
-				//$item_location = (isset($item['location']) ? trim($item['location']) : '');
-				$item_longitude = ($custom_url_longitude != '' && isset($item[$custom_url_longitude]) ? $item[$custom_url_longitude] : '');
-				$item_latitude = ($custom_url_latitude != '' && isset($item[$custom_url_latitude]) ? $item[$custom_url_latitude] : '');
-				$item_created = ($custom_url_created != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_created])) : '');
-				$item_start = ($custom_url_start != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : '');
-				$item_end = ($custom_url_end != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '');
+					$arr_events = explode("BEGIN:VEVENT", $content);
 
-				$this->arr_events[] = array(
-					'type' => "custom",
-					'id' => $item_id,
-					'status' => 'confirmed',
-					//'link' => $item_link,
-					'title' => $item_title,
-					'content' => $item_content,
-					//'location' => $item_location,
-					'longitude' => $item_longitude,
-					'latitude' => $item_latitude,
-					'start' => $item_start,
-					'end' => $item_end,
-					'created' => $item_created,
-				);
-			}
+					$i = 0;
 
-			/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-			{
-				echo "Debug: ".var_export($arr_debug, true);
-			}*/
+					foreach($arr_events as $event)
+					{
+						if($i > 0)
+						{
+							$data_temp = array();
+
+							foreach(explode("\r", $event) as $event_row)
+							{
+								list($row_key, $row_value) = explode(":", trim($event_row));
+
+								if($row_value != '')
+								{
+									switch($row_key)
+									{
+										case 'UID':
+										case 'SUMMARY':
+										case 'DESCRIPTION':
+											$data_temp[strtolower($row_key)] = $row_value;
+										break;
+
+										case 'LOCATION':
+											$row_coordinates = apply_filters('get_coordinates_from_location', $row_value);
+
+											//do_log("Test ".__LINE__.": ".$row_value." -> ".$row_coordinates);
+
+											if($row_coordinates != '' && $row_coordinates != $row_value)
+											{
+												list($latitude, $longitude) = $this->split_coordinates($row_coordinates);
+
+												$data_temp['latitude'] = $latitude;
+												$data_temp['longitude'] = $longitude;
+											}
+										break;
+
+										case 'CREATED':
+										case 'DTSTART':
+										case 'DTEND':
+											$row_value = get_date_from_gmt(date("Y-m-d H:i:s", strtotime($row_value)), "Y-m-d H:i:s");
+
+											$data_temp[strtolower($row_key)] = $row_value;
+										break;
+
+										case 'DTSTAMP':
+										case 'LAST-MODIFIED':
+										case 'SEQUENCE':
+										case 'STATUS':
+										case 'TRANSP':
+										case 'END':
+											// Ignore this
+										break;
+
+										default:
+											do_log("Unkown Event Key: ".$row_key);
+										break;
+									}
+								}
+							}
+
+							$json['ical'][] = $data_temp;
+						}
+
+						$i++;
+					}
+				}
+
+				else
+				{
+					$json = json_decode($content, true);
+
+					$custom_url_container = get_post_meta($this->id, $this->meta_prefix.'custom_url_container', true);
+					$custom_url_id = get_post_meta($this->id, $this->meta_prefix.'custom_url_id', true);
+					$custom_url_title = get_post_meta($this->id, $this->meta_prefix.'custom_url_title', true);
+					$custom_url_description = get_post_meta($this->id, $this->meta_prefix.'custom_url_description', true);
+					$custom_url_longitude = get_post_meta($this->id, $this->meta_prefix.'custom_url_longitude', true);
+					$custom_url_latitude = get_post_meta($this->id, $this->meta_prefix.'custom_url_latitude', true);
+					$custom_url_created = get_post_meta($this->id, $this->meta_prefix.'custom_url_created', true);
+					$custom_url_start = get_post_meta($this->id, $this->meta_prefix.'custom_url_start', true);
+					$custom_url_end = get_post_meta($this->id, $this->meta_prefix.'custom_url_end', true);
+				}
+
+				if(isset($json[$custom_url_container]))
+				{
+					//$arr_debug = array('old' => array(), 'new' => array());
+
+					foreach($json[$custom_url_container] as $item)
+					{
+						/*if($setting_calendar_debug == 'yes')
+						{
+							do_log("Calendar Event: ".var_export($item, true));
+						}*/
+
+						/*array(
+							"kampanjid":"[id]",
+							"title":"[text]",
+							"date_start":"2018-04-30T18:00:00+02:00",
+							"date_end":"2018-04-30T21:30:00+02:00",
+							"created":"2018-04-23T17:17:51+02:00",
+							"reported_at":null,
+							"description":"[text]",
+							"district_id":"O-01306",
+							"association_id":"O-01335",
+							"forening":"Ystad",
+							"kommun":"1286",
+							"lon":"55.4300904504",
+							"lat":"13.8222284514"
+						)*/
+
+						$item_id = ($custom_url_id != '' ? $item[$custom_url_id] : '');
+						//$item_link = $item['htmlLink'];
+						$item_title = ($custom_url_title != '' && isset($item[$custom_url_title]) ? trim($item[$custom_url_title]) : '');
+						$item_content = ($custom_url_description != '' && isset($item[$custom_url_description]) ? trim($item[$custom_url_description]) : '');
+						//$item_location = (isset($item['location']) ? trim($item['location']) : '');
+						$item_longitude = ($custom_url_longitude != '' && isset($item[$custom_url_longitude]) ? $item[$custom_url_longitude] : '');
+						$item_latitude = ($custom_url_latitude != '' && isset($item[$custom_url_latitude]) ? $item[$custom_url_latitude] : '');
+						$item_created = ($custom_url_created != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_created])) : '');
+						$item_start = ($custom_url_start != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : '');
+						$item_end = ($custom_url_end != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '');
+
+						$this->arr_events[] = array(
+							'type' => "custom",
+							'id' => $item_id,
+							'status' => 'confirmed',
+							//'link' => $item_link,
+							'title' => $item_title,
+							'content' => $item_content,
+							//'location' => $item_location,
+							'longitude' => $item_longitude,
+							'latitude' => $item_latitude,
+							'start' => $item_start,
+							'end' => $item_end,
+							'created' => $item_created,
+						);
+					}
+
+					/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
+					{
+						echo "Debug: ".var_export($arr_debug, true);
+					}*/
+				}
+
+				wp_update_post(array(
+					'ID' => $this->id,
+					'post_status' => 'publish',
+					'meta_input' => array(
+						$this->meta_prefix.'error' => '',
+					),
+				));
+			break;
+
+			default:
+				wp_update_post(array(
+					'ID' => $this->id,
+					'post_status' => 'draft',
+					'meta_input' => array(
+						$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
+					),
+				));
+
+				//do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
+			break;
 		}
 	}
 
