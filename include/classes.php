@@ -1007,6 +1007,17 @@ class mf_calendar
 		}
 	}
 
+	function filter_last_updated_post_types($array, $type)
+	{
+		if($type == 'manual')
+		{
+			$array[] = $this->post_type;
+			$array[] = $this->post_type_event;
+		}
+
+		return $array;
+	}
+
 	function action_hide()
 	{
 		global $wpdb, $done_text, $error_text;
