@@ -221,17 +221,22 @@ class mf_calendar
 
 		$out = "";
 
-		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, 'publish', $this->meta_prefix.'calendar', $id));
-		$amount = $wpdb->num_rows;
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, $this->meta_prefix.'calendar', $id));
+		$rows = $wpdb->num_rows;
 
-		if($amount > 0)
+		if($rows > 0)
 		{
-			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, 'publish', $this->meta_prefix.'calendar', $id));
+			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, $this->meta_prefix.'calendar', $id));
 
-			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$amount."</a>"
+			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$rows."</a>"
 			."<div class='row-actions'>"
 				.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 			."</div>";
+		}
+
+		else if(get_option('setting_calendar_debug') == 'yes')
+		{
+			do_log("No rows found in ".get_post_title($id)." (#".$id.", ".$wpdb->last_query.")");
 		}
 
 		return $out;
@@ -1160,7 +1165,7 @@ class mf_calendar
 
 		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] > 0 ? $data['months'] : 6)." MONTH)";
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status = %s AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event, 'publish'));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event));
 
 		if($wpdb->num_rows > 0)
 		{
