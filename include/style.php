@@ -9,7 +9,10 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
-$obj_calendar = new mf_calendar();
+if(!isset($obj_calendar))
+{
+	$obj_calendar = new mf_calendar();
+}
 
 $setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
 

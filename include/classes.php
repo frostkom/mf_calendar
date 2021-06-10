@@ -2197,7 +2197,7 @@ class mf_calendar
 
 							foreach(explode("\r", $event) as $event_row)
 							{
-								list($row_key, $row_value) = explode(":", trim($event_row));
+								@list($row_key, $row_value) = explode(":", trim($event_row));
 
 								if($row_value != '')
 								{
@@ -2226,7 +2226,25 @@ class mf_calendar
 										case 'CREATED':
 										case 'DTSTART':
 										case 'DTEND':
-											$row_value = get_date_from_gmt(date("Y-m-d H:i:s", strtotime($row_value)), "Y-m-d H:i:s");
+											$row_value_orig = $row_value;
+											$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
+											//$row_value = get_date_from_gmt($row_value_utc, "Y-m-d H:i:s");
+											$row_value = $row_value_utc;
+
+											/*$utc_date = DateTime::createFromFormat(
+												'Y-m-d G:i', 
+												$row_value_utc, 
+												new DateTimeZone('UTC')
+											);
+
+											$nyc_date = $utc_date;
+											$nyc_date->setTimeZone(new DateTimeZone('America/New_York'));
+
+											$row_value_test = $nyc_date->format("Y-m-d H:i:s");*/
+
+											//$row_value_test = date_i18n("Y-m-d H:i:s", strtotime($row_value_orig));
+
+											//do_log($row_key.": ".$row_value_orig." -> ".$row_value_utc." -> ".$row_value." -> ".$row_value_test);
 
 											$data_temp[strtolower($row_key)] = $row_value;
 										break;
