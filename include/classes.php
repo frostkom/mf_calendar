@@ -63,7 +63,7 @@ class mf_calendar
 
 		$args = array(
 			'labels' => $labels,
-			'public' => false, // Previously true but changed to hide in sitemap.xml
+			'public' => (is_plugin_active("mf_webshop/index.php")), // Has to be true so that events are reachable with widget_webshop_events()
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
