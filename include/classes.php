@@ -666,20 +666,6 @@ class mf_calendar
 		return is_plugin_active("mf_users/index.php") && is_array($setting_add_profile_fields) && in_array('profile_birthday', $setting_add_profile_fields);
 	}
 
-	/*function meta_calendar_info()
-	{
-		$out = "<ol id='".$this->meta_prefix."info'>
-			<li>".sprintf(__("Go to %sGoogle Calendar%s and login", 'lang_calendar'), "<a href='//calendar.google.com'>", "</a>")."</li>
-			<li>".__("Find the calendar that you would like to synchronize in the left column under My calendars.", 'lang_calendar')."</li>
-			<li>".__("Click on Options for your calendar (The three dots to the right of the calendar name)", 'lang_calendar')."</li>
-			<li>".__("Click on Settings and sharing", 'lang_calendar')."</li>
-			<li>".__("Choose which calendar to share if there are multiple", 'lang_calendar')."</li>
-			<li>".__("Make the calendar accessible to all in the Rights category and copy the email that is shown in the Integrate category", 'lang_calendar')."</li>
-		</ol>";
-
-		return $out;
-	}*/
-
 	function meta_calendar_custom_info()
 	{
 		$out = "<ol id='".$this->meta_prefix."info'>
@@ -713,11 +699,6 @@ class mf_calendar
 						'condition_field' => $this->meta_prefix.'custom_url, #'.$this->meta_prefix.'custom_url_container, #'.$this->meta_prefix.'custom_url_id, #'.$this->meta_prefix.'custom_url_title, #'.$this->meta_prefix.'custom_url_description, #'.$this->meta_prefix.'custom_url_longitude, #'.$this->meta_prefix.'custom_url_latitude, #'.$this->meta_prefix.'custom_url_created, #'.$this->meta_prefix.'custom_url_start, #'.$this->meta_prefix.'custom_url_end',
 					),*/
 				),
-				/*array(
-					'id' => $this->meta_prefix.'info',
-					'type' => 'custom_html',
-					'callback' => array($this, 'meta_calendar_info'),
-				),*/
 			),
 		);
 
@@ -1761,7 +1742,7 @@ class mf_calendar
 				do_log("Calendar URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
 			}
 
-			//$log_message = __("Something went wrong when fetching the calendar source", 'lang_calendar');
+			//$log_message = ;
 
 			switch($headers['http_code'])
 			{
