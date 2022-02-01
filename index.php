@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: 
-Version: 4.7.8
+Version: 4.7.9
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -14,7 +14,7 @@ Depends: Meta Box, MF Base
 GitHub Plugin URI: frostkom/mf_calendar
 */
 
-if(function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php"))
+if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php"))
 {
 	include_once("include/classes.php");
 
@@ -44,7 +44,7 @@ if(function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php"))
 
 		add_action('rwmb_meta_boxes', array($obj_calendar, 'rwmb_meta_boxes'));
 
-		if(function_exists('is_plugin_active') && is_plugin_active("mf_maps/index.php"))
+		if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_maps/index.php"))
 		{
 			add_action('rwmb_enqueue_scripts', array($obj_calendar, 'rwmb_enqueue_scripts'));
 			add_action('rwmb_after_save_post', array($obj_calendar, 'rwmb_after_save_post'));
