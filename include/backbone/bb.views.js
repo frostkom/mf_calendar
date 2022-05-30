@@ -23,9 +23,9 @@ var CalendarView = Backbone.View.extend(
 		var dom_obj = jQuery(this.el).find(".section"),
 			action_type = "type=events";
 
-		this.calendar_display_filter = dom_obj.attr('data-calendar_display_filter') || 'no';
-		this.calendar_display_categories = dom_obj.attr('data-calendar_display_categories') || 'no';
-		this.calendar_type = dom_obj.attr('data-calendar_type') || '';
+		this.calendar_display_filter = (dom_obj.attr('data-calendar_display_filter') || 'no');
+		this.calendar_display_categories = (dom_obj.attr('data-calendar_display_categories') || 'no');
+		this.calendar_type = (dom_obj.attr('data-calendar_type') || '');
 
 		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined')
 		{
@@ -82,7 +82,7 @@ var CalendarView = Backbone.View.extend(
 	{
 		var dom_obj = jQuery(e.currentTarget);
 
-		this.display_week = dom_obj.hasClass('previous') ? (this.display_week - 1) : (this.display_week + 1);
+		this.display_week = (dom_obj.hasClass('previous') ? (this.display_week - 1) : (this.display_week + 1));
 
 		if(this.display_week < 1)
 		{
