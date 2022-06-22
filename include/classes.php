@@ -1332,7 +1332,7 @@ class mf_calendar
 
 						if($post_longitude != '' && $post_latitude != '')
 						{
-							$data_temp['coords'] = $post_location;
+							$data_temp['coordinates'] = $post_location;
 						}
 
 						else
@@ -2216,8 +2216,8 @@ class mf_calendar
 											$row_value = $row_value_utc;
 
 											/*$utc_date = DateTime::createFromFormat(
-												'Y-m-d G:i', 
-												$row_value_utc, 
+												'Y-m-d G:i',
+												$row_value_utc,
 												new DateTimeZone('UTC')
 											);
 
