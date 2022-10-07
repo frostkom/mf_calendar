@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.7.13
+Version: 4.7.14
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -80,7 +80,9 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	function uninstall_calendar()
 	{
-		global $obj_calendar;
+		include_once("include/classes.php");
+
+		$obj_calendar = new mf_calendar();
 
 		mf_uninstall_plugin(array(
 			'post_types' => array($obj_calendar->post_type, $obj_calendar->post_type_event),
