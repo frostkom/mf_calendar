@@ -1901,7 +1901,7 @@ class mf_calendar
 															case 'DAILY':
 																$interval = isset($arr_repeat['INTERVAL']) ? $arr_repeat['INTERVAL'] : 1;
 
-																$timestamp += 24 * 60 * 60 * $interval;
+																$timestamp += (DAY_IN_SECONDS * $interval);
 															break;
 
 															case 'WEEKLY':
@@ -1926,7 +1926,7 @@ class mf_calendar
 
 																if(isset($next_day))
 																{
-																	$timestamp += 24 * 60 * 60 * ($next_day - $day);
+																	$timestamp += (DAY_IN_SECONDS * ($next_day - $day));
 																}
 
 																else
@@ -1934,12 +1934,12 @@ class mf_calendar
 																	if(isset($arr_repeat['BYDAY'][0]))
 																	{
 																		$next_day = array_search($arr_repeat['BYDAY'][0], $weekday_short_array);
-																		$timestamp += 24 * 60 * 60 * ($next_day + 7 - $day);
+																		$timestamp += (DAY_IN_SECONDS * ($next_day + 7 - $day));
 																	}
 
 																	else
 																	{
-																		$timestamp += 24 * 60 * 60 * 7;
+																		$timestamp += (DAY_IN_SECONDS * 7);
 																	}
 																}
 															break;
