@@ -2618,7 +2618,7 @@ class widget_calendar extends WP_Widget
 
 		add_action('wp_footer', array($this->obj_calendar, 'get_footer'), 0);
 
-		echo $before_widget;
+		echo apply_filters('filter_before_widget', $before_widget);
 
 			if($instance['calendar_heading'] != '')
 			{
