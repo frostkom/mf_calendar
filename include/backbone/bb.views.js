@@ -104,7 +104,7 @@ var CalendarView = Backbone.View.extend(
 	{
 		var dom_obj = jQuery(this.el).find("#calendar_feeds");
 
-		this.chosen_feeds = dom_obj.val() || [];
+		this.chosen_feeds = (dom_obj.val() || []);
 
 		this.show_events();
 	},

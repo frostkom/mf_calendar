@@ -2,14 +2,25 @@
 
 class mf_calendar
 {
+	var $id = 0;
+	var $calendar_id = "";
+	var $custom_url = "";
+	var $display_birthdays = '';
+	var $post_type = 'mf_calendar';
+	var $post_type_event = 'mf_calendar_event';
+	var $meta_prefix = "";
+	var $arr_events = array();
+	var $feed_was_updated = false;
+	var $arr_data = array();
+
 	function __construct($id = 0)
 	{
-		$this->id = $id > 0 ? $id : 0;
+		$this->id = ($id > 0 ? $id : 0);
 
 		$this->calendar_id = $this->custom_url = $this->display_birthdays = '';
 
-		$this->post_type = 'mf_calendar';
-		$this->post_type_event = 'mf_calendar_event';
+		//$this->post_type = 'mf_calendar';
+		//$this->post_type_event = 'mf_calendar_event';
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
@@ -1096,7 +1107,7 @@ class mf_calendar
 		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
 		if(!isset($data['display_categories'])){				$data['display_categories'] = 'no';}
 		if(!isset($data['type'])){								$data['type'] = '';}
-		if(!isset($data['months']) || !($data['months'] > 0)){	$data['months'] = 6;}
+		if(!isset($data['months'])){							$data['months'] = 6;}
 		if(!isset($data['limit'])){								$data['limit'] = 0;}
 
 		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
@@ -1107,7 +1118,7 @@ class mf_calendar
 		$week_start = date("W", strtotime($data['date']));
 		$year_start = date("Y", strtotime($data['date']));
 
-		$this->arr_events = array();
+		//$this->arr_events = array();
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
@@ -1129,11 +1140,19 @@ class mf_calendar
 			break;
 
 			default:
-				$date_limit_past = "SUBSTRING(NOW(), 1, 10)";
+				if($data['months'] >= 0)
+				{
+					$date_limit_past = " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";
+				}
+
+				else
+				{
+					$date_limit_past = " AND SUBSTRING(meta_date.meta_value, 1, 10) <= SUBSTRING(NOW(), 1, 10)";
+				}
 			break;
 		}
 
-		$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start' AND SUBSTRING(meta_date.meta_value, 1, 10) >= ".$date_limit_past." OR meta_date.meta_key = '".$this->meta_prefix."end' AND SUBSTRING(meta_date.meta_value, 1, 10) >= ".$date_limit_past.")";
+		$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start'".$date_limit_past." OR meta_date.meta_key = '".$this->meta_prefix."end'".$date_limit_past.")";
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
 
@@ -1147,7 +1166,15 @@ class mf_calendar
 			$query_where .= " AND meta_calendar.meta_value IN('".implode("','", $data['feeds'])."')";
 		}
 
-		$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] > 0 ? $data['months'] : 6)." MONTH)";
+		if($data['months'] >= 0)
+		{
+			$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] != 0 ? $data['months'] : 6)." MONTH)";
+		}
+
+		else
+		{
+			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs($data['months'])." MONTH)"; // AND meta_date.meta_value < NOW()
+		}
 
 		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event));
 
@@ -1230,7 +1257,7 @@ class mf_calendar
 					break;
 
 					default:
-						if($data['months'] > 1)
+						if($data['months'] > 1 || $data['months'] < 0)
 						{
 							if($post_start_yearmonth != $yearmonth_temp)
 							{
@@ -1694,8 +1721,8 @@ class mf_calendar
 		$this->set_id($id);
 		$this->get_calendar_id();
 
-		$this->arr_events = array();
-		$this->feed_was_updated = false;
+		//$this->arr_events = array();
+		//$this->feed_was_updated = false;
 
 		if($this->calendar_id != '')
 		{
@@ -2634,7 +2661,7 @@ class widget_calendar extends WP_Widget
 				.($instance['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
 				.($instance['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$instance['calendar_display_categories']."'" : '')
 				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
-				.($instance['calendar_months'] > 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
+				.($instance['calendar_months'] != 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
@@ -2742,7 +2769,7 @@ class widget_calendar extends WP_Widget
 
 			echo "<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
-				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Search", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='1' max='12'"))
+				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Search", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='-12' max='12'"))
 			."</div>"
 			.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']))
 		."</div>";
