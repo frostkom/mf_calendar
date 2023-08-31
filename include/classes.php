@@ -2615,11 +2615,28 @@ class mf_calendar
 
 class widget_calendar extends WP_Widget
 {
+	var $obj_calendar = "";
+
+	var $widget_ops = array();
+
+	var $arr_default = array(
+		'calendar_heading' => "",
+		'calendar_feeds' => array(),
+		'calendar_display_filter' => 'no',
+		'calendar_filter_label' => "",
+		'calendar_display_categories' => 'no',
+		'calendar_type' => '',
+		'calendar_months' => 6,
+		'calendar_page' => 0,
+	);
+
 	function __construct()
 	{
+		$this->obj_calendar = new mf_calendar();
+
 		$this->widget_ops = array(
 			'classname' => 'calendar',
-			'description' => __("Display Calendar", 'lang_calendar')
+			'description' => __("Display Calendar", 'lang_calendar'),
 		);
 
 		$this->arr_default = array(
@@ -2634,8 +2651,6 @@ class widget_calendar extends WP_Widget
 		);
 
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $this->widget_ops);
-
-		$this->obj_calendar = new mf_calendar();
 	}
 
 	function widget($args, $instance)
