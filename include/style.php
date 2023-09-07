@@ -138,18 +138,19 @@ echo "@media all
 						-webkit-flex: 1 0 0;
 						-ms-flex: 1 0 0;
 						flex: 1 0 0;
-						margin-left: 2%;
+						margin: 0 0 0 1em;
 						text-align: left;
 					}
 
-						.widget.calendar .section .calendar_feed_item p > span
+						.widget.calendar .section .calendar_feed_item .meta
 						{
-							display: inline-block;
+							padding: 0;
 						}
 
-							.widget.calendar .section .calendar_feed_item p > span + span
+							.widget.calendar .section .calendar_feed_item .heading
 							{
-								padding-top: .2em;
+								font-size: 1.2em !important;
+								margin: 0 !important;
 							}
 
 							.widget.calendar .section .calendar_feed_item .feed_name
@@ -157,15 +158,10 @@ echo "@media all
 								font-weight: bold;
 							}
 
-							.widget.calendar .section .calendar_feed_item .heading
-							{
-								display: block;
-								font-size: .8em;
-							}
-
 							.widget.calendar .section .calendar_feed_item .title
 							{
 								font-weight: bold;
+								margin: 0 !important;
 							}
 
 								.widget.calendar .section .calendar_feed_item .title.has_more
@@ -181,31 +177,14 @@ echo "@media all
 								font-weight: bold;
 							}
 
-						.widget.calendar .section .calendar_feed_item p > .fa
-						{
-							margin-left: .4em;
-							-webkit-transform: translateY(-25%);
-							transform: translateY(-25%);
-						}
-
-							.widget.calendar .section .calendar_feed_item p > .fa + .end_date
+							.widget.calendar .section .calendar_feed_item p > .fa
 							{
-								display: block;
+								margin-left: .4em;
 							}
 
-						.widget.calendar .section .calendar_feed_item .toggler
+						.widget.calendar .section .calendar_feed_item .more_content
 						{
+							margin: .5em 0;
 							padding: 0;
 						}
-
-						.widget.calendar .section .calendar_feed_item .toggle_container
-						{
-							margin-bottom: 1em;
-						}
-
-							.widget.calendar .section .calendar_feed_item .toggle_container p
-							{
-								font-size: .8em;
-								margin-bottom: .5em;
-							}
 }";

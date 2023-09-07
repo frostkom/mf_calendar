@@ -25,6 +25,9 @@ var CalendarView = Backbone.View.extend(
 
 		this.calendar_display_filter = (dom_obj.attr('data-calendar_display_filter') || 'no');
 		this.calendar_display_categories = (dom_obj.attr('data-calendar_display_categories') || 'no');
+		this.calendar_display_all_info = (dom_obj.attr('data-calendar_display_all_info') || 'no');
+		this.calendar_months = (dom_obj.attr('data-calendar_months') || '');
+		this.calendar_order = (dom_obj.attr('data-calendar_order') || '');
 		this.calendar_type = (dom_obj.attr('data-calendar_type') || '');
 
 		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined')
@@ -42,14 +45,24 @@ var CalendarView = Backbone.View.extend(
 			action_type += "&calendar_display_categories=" + this.calendar_display_categories;
 		}
 
+		if(this.calendar_display_all_info == 'yes')
+		{
+			action_type += "&calendar_display_all_info=" + this.calendar_display_all_info;
+		}
+
 		if(this.calendar_type != '')
 		{
 			action_type += "&calendar_type=" + this.calendar_type;
 		}
 
-		if(typeof dom_obj.attr('data-calendar_months') != 'undefined')
+		if(this.calendar_months != '')
 		{
-			action_type += "&calendar_months=" + dom_obj.attr('data-calendar_months');
+			action_type += "&calendar_months=" + this.calendar_months;
+		}
+
+		if(this.calendar_order != '')
+		{
+			action_type += "&calendar_order=" + this.calendar_order;
 		}
 
 		this.loadPage(action_type);

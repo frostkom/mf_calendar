@@ -17,10 +17,6 @@ class mf_calendar
 	{
 		$this->id = ($id > 0 ? $id : 0);
 
-		$this->calendar_id = $this->custom_url = $this->display_birthdays = '';
-
-		//$this->post_type = 'mf_calendar';
-		//$this->post_type_event = 'mf_calendar_event';
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
@@ -1106,8 +1102,10 @@ class mf_calendar
 		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = array();}
 		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
 		if(!isset($data['display_categories'])){				$data['display_categories'] = 'no';}
+		if(!isset($data['display_all_info'])){					$data['display_all_info'] = 'no';}
 		if(!isset($data['type'])){								$data['type'] = '';}
 		if(!isset($data['months'])){							$data['months'] = 6;}
+		if(!isset($data['order']) || $data['order'] == ''){		$data['order'] = "ASC";}
 		if(!isset($data['limit'])){								$data['limit'] = 0;}
 
 		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
@@ -1176,9 +1174,10 @@ class mf_calendar
 			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs($data['months'])." MONTH)"; // AND meta_date.meta_value < NOW()
 		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ".$data['order'], $this->post_type_event));
+		$rows = $wpdb->num_rows;
 
-		if($wpdb->num_rows > 0)
+		if($rows > 0)
 		{
 			$year_temp = $yearmonth_temp = $week_temp = $date_temp = "";
 			$i = 0;
@@ -1367,7 +1366,6 @@ class mf_calendar
 							$data_temp['input'] = $post_location;
 						}
 
-						//$more_content .= get_map($data_temp);
 						$more_content .= apply_filters('get_map', '', $data_temp);
 					}
 
@@ -1428,11 +1426,20 @@ class mf_calendar
 
 				if($more_content != '')
 				{
-					$content_class = 'toggler';
-					$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon_closed'></i>
-					<i class='fa fa-caret-down fa-lg toggle_icon_open'></i>";
+					if($data['display_all_info'] != 'yes')
+					{
+						$content_class .= " toggler";
+						$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon_closed'></i>
+						<i class='fa fa-caret-down fa-lg toggle_icon_open'></i>";
+					}
 
-					$more_content = "<div class='toggle_container hide' rel='".$post_id."'>".$more_content."</div>";
+					$more_content = "<div class='more_content"
+						.($data['display_all_info'] != 'yes' ? " toggle_container hide" : "")
+					."'"
+					." rel='".$post_id."'"
+					.">"
+						.$more_content
+					."</div>";
 				}
 
 				$this->arr_events[] = array(
@@ -1441,7 +1448,7 @@ class mf_calendar
 					'title' => $post_title,
 
 					'date_end' => $date_end,
-					'content_class' => ($content_class != '' ? " ".$content_class : ''),
+					'content_class' => $content_class,
 					'more_icon' => $more_icon,
 					'more_content' => $more_content,
 
@@ -1614,6 +1621,8 @@ class mf_calendar
 
 		$out = $obj_base->get_templates(array('lost_connection'));
 
+		$obj_base->get_toggler_includes();
+
 		echo "<script type='text/template' id='template_calendar_message'>
 			<li>".__("There are no events to display", 'lang_calendar')."</li>
 		</script>
@@ -1622,29 +1631,27 @@ class mf_calendar
 			<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
 				<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
 				<div class='content<%= content_class %>' rel='<%= id %>'>
-					<p>
+					<div class='meta'>
 						<% if(feed_name != '')
 						{ %>
-							<span class='feed_name'><%= feed_name %></span>
+							<p class='feed_name'><%= feed_name %></p>
 						<% } %>";
 
 						echo "<% if(heading != '')
 						{ %>
-							<span class='heading'><%= heading %></span>
+							<p class='heading'><%= heading %></p>
 						<% } %>";
 
-						echo "<span class='title
-							<% if(more_icon != '')
-							{ %> has_more<% } %>
-						' itemprop='name'><%= title %></span>
-						<%= more_icon %>
+						echo "<p class='title<% if(more_icon != ''){ %> has_more<% } %>' itemprop='name'>
+							<%= title %>
+							<%= more_icon %>
+						</p>
 
 						<% if(date_end != '')
 						{ %>
-							<span class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span>
+							<p class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></p>
 						<% } %>
-					</p>
-
+					</div>
 					<%= more_content %>
 				</div>
 			</li>
@@ -2625,9 +2632,12 @@ class widget_calendar extends WP_Widget
 		'calendar_display_filter' => 'no',
 		'calendar_filter_label' => "",
 		'calendar_display_categories' => 'no',
+		'calendar_display_all_info' => 'no',
 		'calendar_type' => '',
 		'calendar_months' => 6,
+		'calendar_order' => "ASC",
 		'calendar_page' => 0,
+		'calendar_page_title' => "",
 	);
 
 	function __construct()
@@ -2637,17 +2647,6 @@ class widget_calendar extends WP_Widget
 		$this->widget_ops = array(
 			'classname' => 'calendar',
 			'description' => __("Display Calendar", 'lang_calendar'),
-		);
-
-		$this->arr_default = array(
-			'calendar_heading' => "",
-			'calendar_feeds' => array(),
-			'calendar_display_filter' => 'no',
-			'calendar_filter_label' => "",
-			'calendar_display_categories' => 'no',
-			'calendar_type' => '',
-			'calendar_months' => 6,
-			'calendar_page' => 0,
 		);
 
 		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $this->widget_ops);
@@ -2675,8 +2674,10 @@ class widget_calendar extends WP_Widget
 				.(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $instance['calendar_feeds'])."'" : '')
 				.($instance['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$instance['calendar_display_filter']."'" : '')
 				.($instance['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$instance['calendar_display_categories']."'" : '')
+				.($instance['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$instance['calendar_display_all_info']."'" : '')
 				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
 				.($instance['calendar_months'] != 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
+				.($instance['calendar_order'] != '' ? " data-calendar_order='".$instance['calendar_order']."'" : '')
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
@@ -2706,7 +2707,9 @@ class widget_calendar extends WP_Widget
 
 				if($instance['calendar_page'] > 0)
 				{
-					echo "<p class='read_more'><a href='".get_permalink($instance['calendar_page'])."'>".__("Read More", 'lang_calendar')."</a></p>";
+					echo "<p class='read_more'>
+						<a href='".get_permalink($instance['calendar_page'])."'>".($instance['calendar_page_title'] != '' ? $instance['calendar_page_title'] : __("Read More", 'lang_calendar'))."</a>
+					</p>";
 				}
 
 			echo "</div>"
@@ -2723,9 +2726,12 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
 		$instance['calendar_filter_label'] = sanitize_text_field($new_instance['calendar_filter_label']);
 		$instance['calendar_display_categories'] = sanitize_text_field($new_instance['calendar_display_categories']);
+		$instance['calendar_display_all_info'] = sanitize_text_field($new_instance['calendar_display_all_info']);
 		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
 		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
+		$instance['calendar_order'] = sanitize_text_field($new_instance['calendar_order']);
 		$instance['calendar_page'] = sanitize_text_field($new_instance['calendar_page']);
+		$instance['calendar_page_title'] = sanitize_text_field($new_instance['calendar_page_title']);
 
 		return $instance;
 	}
@@ -2735,6 +2741,14 @@ class widget_calendar extends WP_Widget
 		return array(
 			'' => __("Normal", 'lang_calendar'),
 			'week' => __("Weekly", 'lang_calendar'),
+		);
+	}
+
+	function get_order_for_select()
+	{
+		return array(
+			'ASC' => __("Ascending", 'lang_calendar'),
+			'DESC' => __("Descending", 'lang_calendar'),
 		);
 	}
 
@@ -2782,11 +2796,22 @@ class widget_calendar extends WP_Widget
 				echo "<em>".__("There are no available calendars", 'lang_calendar')."</em>";
 			}
 
+			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_all_info'), 'text' => __("Display All Info", 'lang_calendar'), 'value' => $instance['calendar_display_all_info']));
+
 			echo "<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
-				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Search", 'lang_calendar')." (".__("months", 'lang_calendar').")", 'value' => $instance['calendar_months'], 'xtra' => "min='-12' max='12'"))
-			."</div>"
-			.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']))
-		."</div>";
+				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-12' max='12'"))
+				.show_select(array('data' => $this->get_order_for_select(), 'name' => $this->get_field_name('calendar_order'), 'text' => __("Order", 'lang_calendar'), 'value' => $instance['calendar_order']))
+			."</div>
+			<div class='flex_flow'>"
+				.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']));
+
+				if($instance['calendar_page'] > 0)
+				{
+					echo show_textfield(array('name' => $this->get_field_name('calendar_page_title'), 'text' => __("Title", 'lang_calendar'), 'value' => $instance['calendar_page_title']));
+				}
+
+			echo "</div>
+		</div>";
 	}
 }
