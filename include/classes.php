@@ -1134,7 +1134,7 @@ class mf_calendar
 		switch($data['type'])
 		{
 			case 'week':
-				$date_limit_past = "SUBSTRING(DATE_SUB(NOW(), INTERVAL 1 MONTH), 1, 10)";
+				$date_limit_past = " AND SUBSTRING(DATE_SUB(NOW(), INTERVAL 1 MONTH), 1, 10)";
 			break;
 
 			default:
