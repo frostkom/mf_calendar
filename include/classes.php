@@ -141,9 +141,7 @@ class mf_calendar
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option_or_default($setting_key, 30);
 
-		$description = __("Minutes between each API request", 'lang_calendar');
-
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => $description));
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("Minutes between each API request", 'lang_calendar')));
 	}
 
 	function setting_calendar_debug_callback()
