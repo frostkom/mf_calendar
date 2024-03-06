@@ -141,7 +141,7 @@ class mf_calendar
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option_or_default($setting_key, 30);
 
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("Minutes between each API request", 'lang_calendar')));
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("minutes between each API request", 'lang_calendar')));
 	}
 
 	function setting_calendar_debug_callback()
@@ -162,22 +162,8 @@ class mf_calendar
 
 		$calendar_amount = $this->get_calendar_amount(array('post_status' => ''));
 
-		/*if($calendar_amount > 0)
-		{
-			$menu_start = "edit.php?post_type=".$this->post_type_event;
-		}*/
-
 		$menu_title = __("Calendar", 'lang_calendar');
 		add_menu_page("", $menu_title, $menu_capability, $menu_start, '', 'dashicons-calendar', 21);
-
-		/*if($calendar_amount > 0)
-		{
-			$menu_title = "";
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
-
-			$menu_title = __("Calendar", 'lang_calendar');
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start_orig);
-		}*/
 
 		$menu_title = __("Add New", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
@@ -281,8 +267,6 @@ class mf_calendar
 							$obj_calendar->get_calendar_url();
 
 							$post_meta = "<a href='".$obj_calendar->calendar_url."'>".shorten_text(array('string' => $post_calendar_id, 'limit' => 20))."</a>";
-
-							//$post_meta = $post_calendar_id;
 						}
 
 						else if($post_custom_url != '')
@@ -290,7 +274,7 @@ class mf_calendar
 							$post_meta = "<a href='".$post_custom_url."' rel='external'><i class='fa fa-link fa-lg'></i></a>";
 						}
 
-						else if($post_display_birthdays == 'yes') //$this->is_birthday_active()
+						else if($post_display_birthdays == 'yes')
 						{
 							$post_meta = "<em>(".__("birthdays", 'lang_calendar').")</em>";
 						}
@@ -319,20 +303,7 @@ class mf_calendar
 
 							$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $id, $this->post_type));
 
-							/*if($post_calendar_id != '')
-							{
-								$obj_calendar = new mf_calendar($id);
-								$obj_calendar->get_calendar_url();
-
-								echo "<a href='".$obj_calendar->calendar_url."'>".shorten_text(array('string' => $post_meta, 'limit' => 20))."</a>";
-							}
-
-							else if($post_custom_url != '')
-							{
-								echo "<a href='".$post_custom_url."'>".shorten_text(array('string' => $post_custom_url, 'limit' => 20))."</a>";
-							}
-
-							else */if(preg_match("/\</", $post_meta) == false)
+							if(preg_match("/\</", $post_meta) == false)
 							{
 								echo shorten_text(array('string' => $post_meta, 'limit' => 20));
 							}
@@ -439,8 +410,8 @@ class mf_calendar
 							}
 						}
 
-						$obj_calendar = new mf_calendar();
-						echo $obj_calendar->get_map_link($post_location);
+						//$obj_calendar = new mf_calendar();
+						echo $this->get_map_link($post_location);
 					break;
 
 					case 'datetime':
@@ -449,6 +420,28 @@ class mf_calendar
 
 					case 'registration':
 						$arr_registration_meta = $this->get_registration_meta($id);
+
+						if($arr_registration_meta['registration_groups'] == 'yes')
+						{
+							global $obj_group;
+
+							if(!isset($obj_group))
+							{
+								$obj_group = new mf_group();
+							}
+
+							echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$arr_registration_meta['registration_groups_id']."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>".$obj_group->amount_in_group(array('id' => $arr_registration_meta['registration_groups_id']))."</a>";
+
+							if($arr_registration_meta['limit_participants'] > 0)
+							{
+								echo " / ".$arr_registration_meta['limit_participants'];
+							}
+
+							echo "<div class='row-actions'>
+								<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$arr_registration_meta['registration_groups_id'])."'>".__("Edit", 'lang_calendar')."</a>"
+								." | <a href='".get_permalink($arr_registration_meta['registration_groups_id'])."'>".__("View", 'lang_calendar')."</a>
+							</div>";
+						}
 
 						if($arr_registration_meta['registration'] > 0)
 						{
@@ -691,93 +684,103 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		$meta_boxes[] = array(
-			'id' => $this->meta_prefix.'google',
-			'title' => "Google Calendar",
-			'post_types' => array($this->post_type),
-			//'context' => 'side',
-			'priority' => 'low',
-			'fields' => array(
-				array(
-					'name' => __("Calendar ID", 'lang_calendar'),
-					'id' => $this->meta_prefix.'calendar_id',
-					'type' => 'email',
-					/*'attributes' => array(
-						'condition_type' => 'show_if',
-						'condition_field' => $this->meta_prefix.'custom_url, #'.$this->meta_prefix.'custom_url_container, #'.$this->meta_prefix.'custom_url_id, #'.$this->meta_prefix.'custom_url_title, #'.$this->meta_prefix.'custom_url_description, #'.$this->meta_prefix.'custom_url_longitude, #'.$this->meta_prefix.'custom_url_latitude, #'.$this->meta_prefix.'custom_url_created, #'.$this->meta_prefix.'custom_url_start, #'.$this->meta_prefix.'custom_url_end',
-					),*/
-				),
-			),
-		);
+		$post_id = check_var('post');
 
-		$meta_boxes[] = array(
-			'id' => $this->meta_prefix.'custom',
-			'title' => __("Custom", 'lang_calendar'),
-			'post_types' => array($this->post_type),
-			//'context' => 'side',
-			'priority' => 'low',
-			'fields' => array(
-				array(
-					'name' => __("Custom URL", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url',
-					'type' => 'url',
-					/*'attributes' => array(
-						'condition_type' => 'show_if',
-						'condition_field' => $this->meta_prefix.'calendar_id, #'.$this->meta_prefix.'info',
-					),*/
+		// Calendar
+		###############################
+		$calendar_id = $custom_url = "";
+
+		if($post_id > 0)
+		{
+			$calendar_id = get_post_meta($post_id, $this->meta_prefix.'calendar_id', true);
+			$custom_url = get_post_meta($post_id, $this->meta_prefix.'custom_url', true);
+		}
+
+		if($custom_url == '')
+		{
+			$meta_boxes[] = array(
+				'id' => $this->meta_prefix.'google',
+				'title' => "Google Calendar",
+				'post_types' => array($this->post_type),
+				//'context' => 'side',
+				'priority' => 'low',
+				'fields' => array(
+					array(
+						'name' => __("Calendar ID", 'lang_calendar'),
+						'id' => $this->meta_prefix.'calendar_id',
+						'type' => 'email',
+					),
 				),
-				array(
-					'id' => $this->meta_prefix.'custom_info',
-					'type' => 'custom_html',
-					'callback' => array($this, 'meta_calendar_custom_info'),
+			);
+		}
+
+		if($calendar_id == '')
+		{
+			$meta_boxes[] = array(
+				'id' => $this->meta_prefix.'custom',
+				'title' => __("Custom", 'lang_calendar'),
+				'post_types' => array($this->post_type),
+				//'context' => 'side',
+				'priority' => 'low',
+				'fields' => array(
+					array(
+						'name' => __("Custom URL", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url',
+						'type' => 'url',
+					),
+					array(
+						'id' => $this->meta_prefix.'custom_info',
+						'type' => 'custom_html',
+						'callback' => array($this, 'meta_calendar_custom_info'),
+					),
+					array(
+						'name' => __("Field for Container", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_container',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for ID", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_id',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Title", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_title',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Description", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_description',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Longitude", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_longitude',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Latitude", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_latitude',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Created", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_created',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Start Date", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_start',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for End Date", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_end',
+						'type' => 'text',
+					),
 				),
-				array(
-					'name' => __("Field for Container", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_container',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for ID", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_id',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Title", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_title',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Description", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_description',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Longitude", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_longitude',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Latitude", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_latitude',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Created", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_created',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for Start Date", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_start',
-					'type' => 'text',
-				),
-				array(
-					'name' => __("Field for End Date", 'lang_calendar'),
-					'id' => $this->meta_prefix.'custom_url_end',
-					'type' => 'text',
-				),
-			),
-		);
+			);
+		}
 
 		$fields_settings = array(
 			array(
@@ -806,24 +809,25 @@ class mf_calendar
 			'priority' => 'low',
 			'fields' => $fields_settings
 		);
+		###############################
+
+		// Events
+		###############################
+		$arr_fields_normal = array(
+			array(
+				'id' => $this->meta_prefix.'images',
+				'type' => 'file_advanced',
+				'mime_type' => 'image',
+			)
+		);
 
 		$arr_data = array();
 		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => true), $arr_data);
 
 		$default_calendar = '';
 
-		$post_id = check_var('post');
-		/*$post_id = get_rwmb_post_id(array(
-			'meta_key' => 'meta_calendar_',
-		));*/
-
 		if(!($post_id > 0))
 		{
-			/*if($default_calendar == '')
-			{
-				$default_calendar = check_var('list_id', 'int');
-			}*/
-
 			if($default_calendar == '')
 			{
 				$default_calendar = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".$wpdb->postmeta." WHERE meta_key = %s ORDER BY meta_id DESC LIMIT 0, 1", $this->meta_prefix.'calendar'));
@@ -835,7 +839,9 @@ class mf_calendar
 			}
 		}
 
-		$arr_fields = array(
+		$arr_data_forms = get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form"));
+
+		$arr_fields_side = array(
 			array(
 				'name' => __("Calendar", 'lang_calendar'),
 				'id' => $this->meta_prefix.'calendar',
@@ -862,36 +868,178 @@ class mf_calendar
 				'id' => $this->meta_prefix.'end',
 				'type' => 'datetime', //Replace with 'date' and 'clock'
 			),
-			array(
-				'name' => __("Registration", 'lang_calendar'),
+		);
+
+		if(is_plugin_active("mf_group/index.php"))
+		{
+			global $obj_group;
+
+			if(!isset($obj_group))
+			{
+				$obj_group = new mf_group();
+			}
+
+			$arr_fields_side[] = array(
+				'name' => __("Registration", 'lang_calendar')." (".__("Groups", 'lang_calendar').")",
+				'id' => $this->meta_prefix.'registration_groups',
+				'type' => 'select',
+				'options' => get_yes_no_for_select(),
+			);
+
+			$arr_fields_normal[] = array(
+				'name' => __("Success Message", 'lang_calendar'),
+				'id' => $this->meta_prefix.'success_message',
+				'type' => 'text',
+				'attributes' => array(
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'registration_groups',
+					'condition_value' => 'yes',
+				),
+			);
+
+			$arr_fields_normal[] = array(
+				'name' => __("Error Message", 'lang_calendar'),
+				'id' => $this->meta_prefix.'error_message',
+				'type' => 'text',
+				'attributes' => array(
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'registration_groups',
+					'condition_value' => 'yes',
+				),
+			);
+
+			$arr_fields_side[] = array(
+				'name' => __("Deadline", 'lang_calendar'),
+				'id' => $this->meta_prefix.'deadline',
+				'type' => 'datetime', //Replace with 'date' and 'clock'
+				'attributes' => array(
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'registration_groups',
+					'condition_value' => 'yes',
+				),
+			);
+
+			$arr_fields_side[] = array(
+				'name' => __("Limit Participants", 'lang_calendar'),
+				'id' => $this->meta_prefix.'limit_participants',
+				'type' => 'number',
+				'attributes' => array(
+					'min' => 0,
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'registration_groups',
+					'condition_value' => 'yes',
+				),
+			);
+
+			if($post_id > 0)
+			{
+				$registration_groups = get_post_meta($post_id, $this->meta_prefix.'registration_groups', true);
+				$registration_groups_id = get_post_meta($post_id, $this->meta_prefix.'registration_groups_id', true);
+
+				if($registration_groups == 'yes')
+				{
+					$post_title = mf_get_post_content($post_id, 'post_title');
+
+					$post_data = array(
+						'post_type' => $obj_group->post_type,
+						'post_title' => $post_title,
+						'post_status' => 'publish',
+						'post_modified' => date("Y-m-d H:i:s"),
+						'meta_input' => array(
+							//$obj_group->meta_prefix.'api' => $this->api,
+							//$obj_group->meta_prefix.'api_filter' => $this->api_filter,
+							//$obj_group->meta_prefix.'acceptance_email' => $this->acceptance_email,
+							//$obj_group->meta_prefix.'acceptance_subject' => $this->acceptance_subject,
+							//$obj_group->meta_prefix.'acceptance_text' => $this->acceptance_text,
+							$obj_group->meta_prefix.'group_type' => 'normal',
+							$obj_group->meta_prefix.'allow_registration' => 'yes',
+							//$obj_group->meta_prefix.'verify_address' => $this->verify_address,
+							//$obj_group->meta_prefix.'contact_page' => $this->contact_page,
+							//$obj_group->meta_prefix.'registration_fields' => $this->registration_fields,
+							//$obj_group->meta_prefix.'verify_link' => $this->verify_link,
+							//$obj_group->meta_prefix.'sync_users' => $this->sync_users,
+							//$obj_group->meta_prefix.'owner_email' => $this->owner_email,
+							//$obj_group->meta_prefix.'help_page' => $this->help_page,
+							//$obj_group->meta_prefix.'archive_page' => $this->archive_page,
+						),
+					);
+
+					if($registration_groups_id > 0)
+					{
+						$post_data['ID'] = $registration_groups_id;
+
+						wp_update_post($post_data);
+					}
+
+					else
+					{
+						$registration_groups_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_title = %s", $obj_group->post_type, $post_title));
+
+						if($registration_groups_id > 0)
+						{
+							update_post_meta($post_id, $this->meta_prefix.'registration_groups_id', $registration_groups_id);
+						}
+
+						else
+						{
+							wp_insert_post($post_data);
+						}
+					}
+				}
+
+				else
+				{
+					if($registration_groups_id > 0)
+					{
+						wp_trash_post($registration_groups_id);
+					}
+				}
+			}
+		}
+
+		if(count($arr_data_forms) > 1)
+		{
+			$arr_fields_side[] = array(
+				'name' => __("Registration", 'lang_calendar')." (".__("Forms", 'lang_calendar').")",
 				'id' => $this->meta_prefix.'registration',
 				'type' => 'select',
-				'options' => get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form")),
+				'options' => $arr_data_forms,
 				'attributes' => array(
 					'condition_type' => 'hide_if_empty',
 					'condition_field' => $this->meta_prefix.'limit_participants',
 				),
-			),
-			array(
+			);
+
+			$arr_fields_side[] = array(
 				'name' => __("Limit Participants", 'lang_calendar'),
 				'id' => $this->meta_prefix.'limit_participants',
 				'type' => 'number',
 				'attributes' => array(
 					'min' => 0,
 				),
-			),
-		);
-
-		$arr_fields = apply_filters('before_meta_box_fields', $arr_fields);
+			);
+		}
 
 		$meta_boxes[] = array(
-			'id' => $this->meta_prefix.'settings',
+			'id' => $this->meta_prefix.'settings_normal',
+			'title' => __("Settings", 'lang_calendar'),
+			'post_types' => array($this->post_type_event),
+			//'context' => 'side',
+			'priority' => 'low',
+			'fields' => $arr_fields_normal,
+		);
+
+		$arr_fields_side = apply_filters('before_meta_box_fields', $arr_fields_side);
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'settings_side',
 			'title' => __("Settings", 'lang_calendar'),
 			'post_types' => array($this->post_type_event),
 			'context' => 'side',
 			'priority' => 'low',
-			'fields' => $arr_fields,
+			'fields' => $arr_fields_side,
 		);
+		###############################
 
 		return $meta_boxes;
 	}
@@ -1114,7 +1262,6 @@ class mf_calendar
 		$week_start = date("W", strtotime($data['date']));
 		$year_start = date("Y", strtotime($data['date']));
 
-		//$this->arr_events = array();
 		$query_join = $query_where = "";
 
 		$this->arr_data = array(
@@ -1213,7 +1360,7 @@ class mf_calendar
 					$post_end = $post_start;
 				}
 
-				//default
+				// Default
 				$post_start_date = date("Y-m-d", strtotime($post_start));
 				$post_start_year = date("Y", strtotime($post_start));
 				$post_start_yearmonth = date("Y-m", strtotime($post_start));
@@ -1224,7 +1371,7 @@ class mf_calendar
 				$post_end_date = date("Y-m-d", strtotime($post_end));
 				$post_end_time = date("H:i", strtotime($post_end));
 
-				//week
+				// Week
 				$post_start_week = date("W", strtotime($post_start));
 				$post_start_weekday = date("w", strtotime($post_start));
 
@@ -1530,23 +1677,40 @@ class mf_calendar
 
 	function get_registration_meta($post_id)
 	{
-		global $obj_form;
-
 		$out = array(
+			'registration_groups' => get_post_meta($post_id, $this->meta_prefix.'registration_groups', true),
+			'registration_groups_id' => get_post_meta($post_id, $this->meta_prefix.'registration_groups_id', true),
 			'registration' => get_post_meta($post_id, $this->meta_prefix.'registration', true),
 			'limit_participants' => get_post_meta($post_id, $this->meta_prefix.'limit_participants', true),
 		);
 
-		if($out['limit_participants'] > 0)
+		if($out['registration_groups'] > 0 && $out['limit_participants'] > 0)
 		{
+			global $obj_group;
+
+			if(!isset($obj_group))
+			{
+				$obj_group = new mf_group();
+			}
+
+			$registration_amount = $obj_group->amount_in_group(array('id' => $post_id));
+
+			$out['spots_left'] = ($out['limit_participants'] - $registration_amount);
+		}
+
+		if($out['registration'] > 0 && $out['limit_participants'] > 0)
+		{
+			global $obj_form;
+
 			if(!isset($obj_form))
 			{
 				$obj_form = new mf_form();
 			}
 
 			$obj_form->get_form_id($out['registration']);
+			$registration_amount = $obj_form->get_answer_amount(array('form_id' => $obj_form->id, 'meta_key' => 'calendar_id', 'meta_value' => $post_id));
 
-			$out['spots_left'] = $out['limit_participants'] - $obj_form->get_answer_amount(array('form_id' => $obj_form->id, 'meta_key' => 'calendar_id', 'meta_value' => $post_id));
+			$out['spots_left'] = ($out['limit_participants'] - $registration_amount);
 		}
 
 		return $out;
@@ -1726,9 +1890,6 @@ class mf_calendar
 		$this->set_id($id);
 		$this->get_calendar_id();
 
-		//$this->arr_events = array();
-		//$this->feed_was_updated = false;
-
 		if($this->calendar_id != '')
 		{
 			$this->fetch_google_calendar();
@@ -1777,8 +1938,6 @@ class mf_calendar
 				do_log("Calendar URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
 			}
 
-			//$log_message = ;
-
 			switch($headers['http_code'])
 			{
 				case 200:
@@ -1786,15 +1945,8 @@ class mf_calendar
 
 					if(isset($json['items']))
 					{
-						//$arr_debug = array('old' => array(), 'new' => array());
-
 						foreach($json['items'] as $item)
 						{
-							/*if($setting_calendar_debug == 'yes')
-							{
-								do_log("Calendar Event: ".var_export($item, true));
-							}*/
-
 							/*array(
 								'kind' => 'calendar#event',
 								'etag' => '[etag]',
@@ -2020,22 +2172,12 @@ class mf_calendar
 																	if(date("Y-m-d", $timestamp_temp) > date("Y-m-d", $last_timestamp_next_month))
 																	{
 																		$out_of_bounds++;
-
-																		/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-																		{
-																			echo "Outside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
-																		}*/
 																	}
 
 																	else
 																	{
 																		$timestamp = $timestamp_temp;
 																		$out_of_bounds = 0;
-
-																		/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-																		{
-																			echo "Inside: ".date("Y-m-d", $timestamp_temp)." > ".date("Y-m-d", $last_timestamp_next_month)."<br>";
-																		}*/
 																	}
 																}
 															break;
@@ -2060,7 +2202,6 @@ class mf_calendar
 														{
 															if($out_of_bounds == 0)
 															{
-																//$arr_debug['new'][] =
 																$this->arr_events[] = array(
 																	'type' => 'gcal',
 																	'id' => $item_id."_req_".$count,
@@ -2110,11 +2251,6 @@ class mf_calendar
 							}
 						}
 
-						/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-						{
-							echo "Debug: ".var_export($arr_debug, true);
-						}*/
-
 						wp_update_post(array(
 							'ID' => $this->id,
 							'post_status' => 'publish',
@@ -2127,8 +2263,6 @@ class mf_calendar
 						{
 							do_log("The Calendar API returned the maximum number of events (".$this->calendar_url_clean.")");
 						}
-
-						//do_log($log_message, 'trash');
 					}
 
 					else
@@ -2144,8 +2278,6 @@ class mf_calendar
 									$this->meta_prefix.'error' => __("The calendar was not found", 'lang_calendar'),
 								),
 							));
-
-							//do_log($log_message." (".$this->calendar_url_clean.", ".htmlspecialchars($content).")");
 						}
 					}
 
@@ -2166,8 +2298,6 @@ class mf_calendar
 							$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
 						),
 					));
-
-					//do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
 				break;
 			}
 		}
@@ -2228,8 +2358,6 @@ class mf_calendar
 										case 'LOCATION':
 											$row_coordinates = apply_filters('get_coordinates_from_location', $row_value);
 
-											//do_log("Test ".__LINE__.": ".$row_value." -> ".$row_coordinates);
-
 											if($row_coordinates != '' && $row_coordinates != $row_value)
 											{
 												list($latitude, $longitude) = $this->split_coordinates($row_coordinates);
@@ -2244,23 +2372,7 @@ class mf_calendar
 										case 'DTEND':
 											$row_value_orig = $row_value;
 											$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
-											//$row_value = get_date_from_gmt($row_value_utc, "Y-m-d H:i:s");
 											$row_value = $row_value_utc;
-
-											/*$utc_date = DateTime::createFromFormat(
-												'Y-m-d G:i',
-												$row_value_utc,
-												new DateTimeZone('UTC')
-											);
-
-											$nyc_date = $utc_date;
-											$nyc_date->setTimeZone(new DateTimeZone('America/New_York'));
-
-											$row_value_test = $nyc_date->format("Y-m-d H:i:s");*/
-
-											//$row_value_test = date_i18n("Y-m-d H:i:s", strtotime($row_value_orig));
-
-											//do_log($row_key.": ".$row_value_orig." -> ".$row_value_utc." -> ".$row_value." -> ".$row_value_test);
 
 											$data_temp[strtolower($row_key)] = $row_value;
 										break;
@@ -2305,15 +2417,8 @@ class mf_calendar
 
 				if(isset($json[$custom_url_container]))
 				{
-					//$arr_debug = array('old' => array(), 'new' => array());
-
 					foreach($json[$custom_url_container] as $item)
 					{
-						/*if($setting_calendar_debug == 'yes')
-						{
-							do_log("Calendar Event: ".var_export($item, true));
-						}*/
-
 						/*array(
 							"kampanjid":"[id]",
 							"title":"[text]",
@@ -2356,11 +2461,6 @@ class mf_calendar
 							'created' => $item_created,
 						);
 					}
-
-					/*if($setting_calendar_debug == 'yes' && IS_SUPER_ADMIN)
-					{
-						echo "Debug: ".var_export($arr_debug, true);
-					}*/
 				}
 
 				wp_update_post(array(
@@ -2380,8 +2480,6 @@ class mf_calendar
 						$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
 					),
 				));
-
-				//do_log($log_message." (".$this->calendar_url_clean.", ".$headers['http_code'].", ".htmlspecialchars($content).")");
 			break;
 		}
 	}
@@ -2620,10 +2718,8 @@ class mf_calendar
 
 class widget_calendar extends WP_Widget
 {
-	var $obj_calendar = "";
-
-	var $widget_ops = array();
-
+	var $obj_calendar;
+	var $widget_ops;
 	var $arr_default = array(
 		'calendar_heading' => "",
 		'calendar_feeds' => array(),
