@@ -839,8 +839,6 @@ class mf_calendar
 			}
 		}
 
-		$arr_data_forms = get_posts_for_select(array('add_choose_here' => true, 'post_type' => "mf_form"));
-
 		$arr_fields_side = array(
 			array(
 				'name' => __("Calendar", 'lang_calendar'),
@@ -997,27 +995,40 @@ class mf_calendar
 			}
 		}
 
-		if(count($arr_data_forms) > 1)
+		if(is_plugin_active("mf_form/index.php"))
 		{
-			$arr_fields_side[] = array(
-				'name' => __("Registration", 'lang_calendar')." (".__("Forms", 'lang_calendar').")",
-				'id' => $this->meta_prefix.'registration',
-				'type' => 'select',
-				'options' => $arr_data_forms,
-				'attributes' => array(
-					'condition_type' => 'hide_if_empty',
-					'condition_field' => $this->meta_prefix.'limit_participants',
-				),
-			);
+			global $obj_form;
 
-			$arr_fields_side[] = array(
-				'name' => __("Limit Participants", 'lang_calendar'),
-				'id' => $this->meta_prefix.'limit_participants',
-				'type' => 'number',
-				'attributes' => array(
-					'min' => 0,
-				),
-			);
+			if(!isset($obj_form))
+			{
+				$obj_form = new mf_form();
+			}
+
+			$arr_data_forms = array();
+			get_post_children(array('add_choose_here' => true, 'post_type' => $obj_form->post_type), $arr_data_forms);
+
+			if(count($arr_data_forms) > 1)
+			{
+				$arr_fields_side[] = array(
+					'name' => __("Registration", 'lang_calendar')." (".__("Forms", 'lang_calendar').")",
+					'id' => $this->meta_prefix.'registration',
+					'type' => 'select',
+					'options' => $arr_data_forms,
+					'attributes' => array(
+						'condition_type' => 'hide_if_empty',
+						'condition_field' => $this->meta_prefix.'limit_participants',
+					),
+				);
+
+				$arr_fields_side[] = array(
+					'name' => __("Limit Participants", 'lang_calendar'),
+					'id' => $this->meta_prefix.'limit_participants',
+					'type' => 'number',
+					'attributes' => array(
+						'min' => 0,
+					),
+				);
+			}
 		}
 
 		$meta_boxes[] = array(
