@@ -2,13 +2,13 @@
 
 class mf_calendar
 {
-	var $id = 0;
+	var $id;
 	var $calendar_id = "";
 	var $custom_url = "";
 	var $display_birthdays = '';
 	var $post_type = 'mf_calendar';
 	var $post_type_event = 'mf_calendar_event';
-	var $meta_prefix = "";
+	var $meta_prefix;
 	var $arr_events = array();
 	var $feed_was_updated = false;
 	var $arr_data = array();
@@ -38,8 +38,99 @@ class mf_calendar
 		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", $this->post_type, $this->meta_prefix.'color'));
 	}
 
+	function block_render_callback($attributes)
+	{
+		if(!isset($attributes['calendar_heading'])){			$attributes['calendar_heading'] = '';}
+		if(!isset($attributes['calendar_feeds'])){				$attributes['calendar_feeds'] = array();}
+		if(!isset($attributes['calendar_display_filter'])){		$attributes['calendar_display_filter'] = 'no';}
+		if(!isset($attributes['calendar_filter_label'])){		$attributes['calendar_filter_label'] = '';}
+		if(!isset($attributes['calendar_display_categories'])){	$attributes['calendar_display_categories'] = 'no';}
+		if(!isset($attributes['calendar_display_all_info'])){	$attributes['calendar_display_all_info'] = 'no';}
+		if(!isset($attributes['calendar_type'])){				$attributes['calendar_type'] = '';}
+		if(!isset($attributes['calendar_months'])){				$attributes['calendar_months'] = 6;}
+		if(!isset($attributes['calendar_order'])){				$attributes['calendar_order'] = 'ASC';}
+		if(!isset($attributes['calendar_page'])){				$attributes['calendar_page'] = 0;}
+		if(!isset($attributes['calendar_page_title'])){			$attributes['calendar_page_title'] = '';}
+
+		$out = "";
+
+		add_action('wp_footer', array($this, 'get_footer'), 0);
+
+		$out .= "<div class='widget calendar'>";
+
+			if($attributes['calendar_heading'] != '')
+			{
+				$out .= "<h3>".$attributes['calendar_heading']."</h3>";
+			}
+
+			$out .= "<div class='section'"
+				.(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $attributes['calendar_feeds'])."'" : '')
+				.($attributes['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$attributes['calendar_display_filter']."'" : '')
+				.($attributes['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$attributes['calendar_display_categories']."'" : '')
+				.($attributes['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$attributes['calendar_display_all_info']."'" : '')
+				.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
+				.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
+				.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
+			.">
+				<i class='fa fa-spinner fa-spin fa-3x'></i>";
+
+				if($attributes['calendar_type'] == 'week')
+				{
+					$out .= "<h4 class='hide'>
+						<i class='fa fa-chevron-left controls previous'></i>
+						<span class='calendar_week'></span>
+						<i class='fa fa-chevron-right controls next'></i>
+					</h4>";
+				}
+
+				if($attributes['calendar_display_filter'] == 'yes')
+				{
+					$arr_data_feeds = array();
+					get_post_children(array('post_type' => $this->post_type, 'include' => $attributes['calendar_feeds']), $arr_data_feeds);
+
+					if(count($arr_data_feeds) > 1)
+					{
+						$out .= "<form action='' method='post' class='mf_form hide'>"
+							.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
+						."</form>";
+					}
+				}
+
+				$out .= "<ul class='hide'></ul>";
+
+				if($attributes['calendar_page'] > 0)
+				{
+					$out .= "<p class='read_more'>
+						<a href='".get_permalink($attributes['calendar_page'])."'>".($attributes['calendar_page_title'] != '' ? $attributes['calendar_page_title'] : __("Read More", 'lang_calendar'))."</a>
+					</p>";
+				}
+
+			$out .= "</div>
+		</div>";
+
+		return $out;
+	}
+
+	function get_type_for_select()
+	{
+		return array(
+			'' => __("Normal", 'lang_calendar'),
+			'week' => __("Weekly", 'lang_calendar'),
+		);
+	}
+
+	function get_order_for_select()
+	{
+		return array(
+			'ASC' => __("Ascending", 'lang_calendar'),
+			'DESC' => __("Descending", 'lang_calendar'),
+		);
+	}
+
 	function init()
 	{
+		// Post Types
+		#######################
 		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
 
 		$labels = array(
@@ -81,6 +172,30 @@ class mf_calendar
 		);
 
 		register_post_type($this->post_type_event, $args);
+		#######################
+
+		// Blocks
+		#######################
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-components', 'wp-editor'), $plugin_version);
+
+		$arr_data_feeds = array();
+		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => true), $arr_data_feeds);
+
+		$arr_data_pages = array();
+		get_post_children(array('add_choose_here' => true), $arr_data_pages);
+
+		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array('calendar_feeds' => $arr_data_feeds, 'yes_no_for_select' => get_yes_no_for_select(), 'calendar_type' => $this->get_type_for_select(), 'calendar_order' => $this->get_order_for_select(), 'calendar_page' => $arr_data_pages));
+
+		register_block_type('mf/calendar', array(
+			'editor_script' => 'script_calendar_block_wp',
+			'editor_style' => 'style_base_block_wp',
+			'render_callback' => array($this, 'block_render_callback'),
+			//'style' => 'style_base_block_wp',
+		));
+		#######################
 	}
 
 	function settings_calendar()
@@ -882,6 +997,7 @@ class mf_calendar
 				'id' => $this->meta_prefix.'registration_groups',
 				'type' => 'select',
 				'options' => get_yes_no_for_select(),
+				'std' => 'no',
 			);
 
 			$arr_fields_normal[] = array(
@@ -1014,10 +1130,6 @@ class mf_calendar
 					'id' => $this->meta_prefix.'registration',
 					'type' => 'select',
 					'options' => $arr_data_forms,
-					'attributes' => array(
-						'condition_type' => 'hide_if_empty',
-						'condition_field' => $this->meta_prefix.'limit_participants',
-					),
 				);
 
 				$arr_fields_side[] = array(
@@ -1026,6 +1138,9 @@ class mf_calendar
 					'type' => 'number',
 					'attributes' => array(
 						'min' => 0,
+						'condition_type' => 'hide_this_if',
+						'condition_selector' => $this->meta_prefix.'registration',
+						'condition_value' => '',
 					),
 				);
 			}
