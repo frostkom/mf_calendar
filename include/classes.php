@@ -12,6 +12,7 @@ class mf_calendar
 	var $arr_events = array();
 	var $feed_was_updated = false;
 	var $arr_data = array();
+	var $debug;
 
 	function __construct($id = 0)
 	{
@@ -205,11 +206,15 @@ class mf_calendar
 		add_settings_section($options_area, "", array($this, $options_area."_callback"), BASE_OPTIONS_PAGE);
 
 		$arr_settings = array();
-		$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
 		$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
 		$arr_settings['setting_calendar_date_bg'] = __("Date Background", 'lang_calendar');
-		$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
-		$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
+		$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
+
+		if(get_option('setting_google_calendar_api_key') != '')
+		{
+			$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
+			$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
+		}
 
 		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
 	}
@@ -221,53 +226,53 @@ class mf_calendar
 		echo settings_header($setting_key, __("Calendar", 'lang_calendar'));
 	}
 
-	function setting_google_calendar_api_key_callback()
-	{
-		$setting_key = get_setting_key(__FUNCTION__);
-		$option = get_option($setting_key);
+		function setting_calendar_events_searchable_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option($setting_key, 'no');
 
-		$description = "<ol>
-			<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
-			<li>".__("Create a new project", 'lang_calendar')."</li>
-			<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
-		</ol>";
+			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
+		}
 
-		echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
-	}
+		function setting_calendar_date_bg_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option($setting_key, '#019cdb');
 
-	function setting_calendar_events_searchable_callback()
-	{
-		$setting_key = get_setting_key(__FUNCTION__);
-		$option = get_option($setting_key, 'no');
+			echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
+		}
 
-		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
-	}
+		function setting_google_calendar_api_key_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option($setting_key);
 
-	function setting_calendar_date_bg_callback()
-	{
-		$setting_key = get_setting_key(__FUNCTION__);
-		$option = get_option($setting_key, '#019cdb');
+			$description = "<ol>
+				<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
+				<li>".__("Create a new project", 'lang_calendar')."</li>
+				<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
+			</ol>";
 
-		echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
-	}
+			echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
+		}
 
-	function setting_calendar_time_limit_callback()
-	{
-		$setting_key = get_setting_key(__FUNCTION__);
-		$option = get_option_or_default($setting_key, 30);
+		function setting_calendar_time_limit_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option_or_default($setting_key, 30);
 
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("minutes between each API request", 'lang_calendar')));
-	}
+			echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("minutes between each API request", 'lang_calendar')));
+		}
 
-	function setting_calendar_debug_callback()
-	{
-		$setting_key = get_setting_key(__FUNCTION__);
-		$option = get_option($setting_key, 'no');
+		function setting_calendar_debug_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option($setting_key, 'no');
 
-		list($option, $description) = setting_time_limit(array('key' => $setting_key, 'value' => $option, 'return' => 'array'));
+			list($option, $description) = setting_time_limit(array('key' => $setting_key, 'value' => $option, 'return' => 'array'));
 
-		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option, 'description' => $description));
-	}
+			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option, 'description' => $description));
+		}
 
 	function admin_menu()
 	{
@@ -1422,7 +1427,6 @@ class mf_calendar
 		}
 
 		$query_where .= " AND (meta_date.meta_key = '".$this->meta_prefix."start'".$date_limit_past." OR meta_date.meta_key = '".$this->meta_prefix."end'".$date_limit_past.")";
-
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_calendar ON ".$wpdb->posts.".ID = meta_calendar.post_id AND meta_calendar.meta_key = '".$this->meta_prefix."calendar'";
 
 		if($data['id'] > 0)
@@ -1447,6 +1451,8 @@ class mf_calendar
 
 		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ".$data['order'], $this->post_type_event));
 		$rows = $wpdb->num_rows;
+
+		$this->debug = $wpdb->last_query;
 
 		if($rows > 0)
 		{
