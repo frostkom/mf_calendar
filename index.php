@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.8.1
+Version: 4.8.3
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -33,6 +33,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_action('admin_init', array($obj_calendar, 'settings_calendar'));
 		add_action('admin_init', array($obj_calendar, 'admin_init'), 0);
 		add_action('admin_menu', array($obj_calendar, 'admin_menu'));
+
+		add_filter('filter_sites_table_pages', array($obj_calendar, 'filter_sites_table_pages'));
 
 		add_filter('manage_'.$obj_calendar->post_type.'_posts_columns', array($obj_calendar, 'column_header'), 5);
 		add_action('manage_'.$obj_calendar->post_type.'_posts_custom_column', array($obj_calendar, 'column_cell'), 5, 2);

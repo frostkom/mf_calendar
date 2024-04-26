@@ -55,59 +55,62 @@ class mf_calendar
 
 		$out = "";
 
-		add_action('wp_footer', array($this, 'get_footer'), 0);
+		if(count($attributes['calendar_feeds']) > 0)
+		{
+			add_action('wp_footer', array($this, 'get_footer'), 0);
 
-		$out .= "<div class='widget calendar'>";
+			$out .= "<div class='widget calendar'>";
 
-			if($attributes['calendar_heading'] != '')
-			{
-				$out .= "<h3>".$attributes['calendar_heading']."</h3>";
-			}
-
-			$out .= "<div class='section'"
-				.(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $attributes['calendar_feeds'])."'" : '')
-				.($attributes['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$attributes['calendar_display_filter']."'" : '')
-				.($attributes['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$attributes['calendar_display_categories']."'" : '')
-				.($attributes['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$attributes['calendar_display_all_info']."'" : '')
-				.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
-				.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
-				.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
-			.">
-				<i class='fa fa-spinner fa-spin fa-3x'></i>";
-
-				if($attributes['calendar_type'] == 'week')
+				if($attributes['calendar_heading'] != '')
 				{
-					$out .= "<h4 class='hide'>
-						<i class='fa fa-chevron-left controls previous'></i>
-						<span class='calendar_week'></span>
-						<i class='fa fa-chevron-right controls next'></i>
-					</h4>";
+					$out .= "<h3>".$attributes['calendar_heading']."</h3>";
 				}
 
-				if($attributes['calendar_display_filter'] == 'yes')
-				{
-					$arr_data_feeds = array();
-					get_post_children(array('post_type' => $this->post_type, 'include' => $attributes['calendar_feeds']), $arr_data_feeds);
+				$out .= "<div class='section'"
+					.(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $attributes['calendar_feeds'])."'" : '')
+					.($attributes['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$attributes['calendar_display_filter']."'" : '')
+					.($attributes['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$attributes['calendar_display_categories']."'" : '')
+					.($attributes['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$attributes['calendar_display_all_info']."'" : '')
+					.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
+					.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
+					.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
+				.">
+					<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
-					if(count($arr_data_feeds) > 1)
+					if($attributes['calendar_type'] == 'week')
 					{
-						$out .= "<form action='' method='post' class='mf_form hide'>"
-							.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
-						."</form>";
+						$out .= "<h4 class='hide'>
+							<i class='fa fa-chevron-left controls previous'></i>
+							<span class='calendar_week'></span>
+							<i class='fa fa-chevron-right controls next'></i>
+						</h4>";
 					}
-				}
 
-				$out .= "<ul class='hide'></ul>";
+					if($attributes['calendar_display_filter'] == 'yes')
+					{
+						$arr_data_feeds = array();
+						get_post_children(array('post_type' => $this->post_type, 'include' => $attributes['calendar_feeds']), $arr_data_feeds);
 
-				if($attributes['calendar_page'] > 0)
-				{
-					$out .= "<p class='read_more'>
-						<a href='".get_permalink($attributes['calendar_page'])."'>".($attributes['calendar_page_title'] != '' ? $attributes['calendar_page_title'] : __("Read More", 'lang_calendar'))."</a>
-					</p>";
-				}
+						if(count($arr_data_feeds) > 1)
+						{
+							$out .= "<form action='' method='post' class='mf_form hide'>"
+								.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
+							."</form>";
+						}
+					}
 
-			$out .= "</div>
-		</div>";
+					$out .= "<ul class='hide'></ul>";
+
+					if($attributes['calendar_page'] > 0)
+					{
+						$out .= "<p class='read_more'>
+							<a href='".get_permalink($attributes['calendar_page'])."'>".($attributes['calendar_page_title'] != '' ? $attributes['calendar_page_title'] : __("Read More", 'lang_calendar'))."</a>
+						</p>";
+					}
+
+				$out .= "</div>
+			</div>";
+		}
 
 		return $out;
 	}
@@ -299,6 +302,21 @@ class mf_calendar
 
 		$menu_title = __("Settings", 'lang_calendar');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_calendar"));
+	}
+
+	function filter_sites_table_pages($arr_pages)
+	{
+		$arr_pages[$this->post_type] = array(
+			'icon' => "far fa-calendar-alt",
+			'title' => __("Calendars", 'lang_calendar'),
+		);
+
+		/*$arr_pages[$this->post_type_event] = array(
+			'icon' => "far fa-calendar-plus",
+			'title' => __("Events", 'lang_calendar'),
+		);*/
+
+		return $arr_pages;
 	}
 
 	function column_header($cols)

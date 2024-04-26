@@ -29,7 +29,7 @@
             },
 			'calendar_feeds':
 			{
-                'type': 'string',
+                'type': 'array',
                 'default': ''
             },
 			'calendar_display_filter':
@@ -181,6 +181,7 @@
 						label: __("Feeds", 'lang_calendar'),
 						value: props.attributes.calendar_feeds,
 						options: arr_options,
+						multiple: true,
 						onChange: function(value)
 						{
 							props.setAttributes({calendar_feeds: value});
