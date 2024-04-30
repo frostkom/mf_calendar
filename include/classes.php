@@ -4,6 +4,7 @@ class mf_calendar
 {
 	var $id;
 	var $calendar_id = "";
+	var $calendar_url;
 	var $custom_url = "";
 	var $display_birthdays = '';
 	var $post_type = 'mf_calendar';
@@ -2461,7 +2462,7 @@ class mf_calendar
 
 		if($setting_calendar_debug == 'yes')
 		{
-			do_log("Calendar URL: ".$this->calendar_url);
+			do_log("Calendar URL: ".$this->custom_url);
 		}
 
 		switch($headers['http_code'])
