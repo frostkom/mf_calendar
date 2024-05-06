@@ -56,7 +56,7 @@ class mf_calendar
 
 		$out = "";
 
-		if(count($attributes['calendar_feeds']) > 0)
+		if(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0)
 		{
 			add_action('wp_footer', array($this, 'get_footer'), 0);
 
@@ -187,7 +187,7 @@ class mf_calendar
 		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-components', 'wp-editor'), $plugin_version);
 
 		$arr_data_feeds = array();
-		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => true), $arr_data_feeds);
+		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data_feeds);
 
 		$arr_data_pages = array();
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
@@ -359,9 +359,13 @@ class mf_calendar
 
 		if($rows > 0)
 		{
+			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, 'draft', $this->meta_prefix.'calendar', $id));
+			$rows_draft = $wpdb->num_rows;
+
 			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, $this->meta_prefix.'calendar', $id));
 
 			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$rows."</a>"
+			.($rows_draft > 0 ? "<span class='grey' title='".__("Draft", 'lang_calendar')."'>+".$rows_draft."</span>" : "")
 			."<div class='row-actions'>"
 				.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 			."</div>";
@@ -1468,7 +1472,9 @@ class mf_calendar
 			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs($data['months'])." MONTH)"; // AND meta_date.meta_value < NOW()
 		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ".$data['order'], $this->post_type_event));
+		$arr_post_statuses = apply_filters('filter_calendar_post_statuses', array('publish', 'future'));
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", $arr_post_statuses)."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ".$data['order'], $this->post_type_event));
 		$rows = $wpdb->num_rows;
 
 		$this->debug = $wpdb->last_query;
