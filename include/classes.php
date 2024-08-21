@@ -2582,17 +2582,17 @@ class mf_calendar
 						/*array(
 							"kampanjid":"[id]",
 							"title":"[text]",
-							"date_start":"2018-04-30T18:00:00+02:00",
-							"date_end":"2018-04-30T21:30:00+02:00",
-							"created":"2018-04-23T17:17:51+02:00",
+							"date_start":"YYYY-MM-DDTHH:II:SS+02:00",
+							"date_end":"YYYY-MM-DDTHH:MM:SS+02:00",
+							"created":"YYYY-MM-DDTHH:MM:SS+02:00",
 							"reported_at":null,
 							"description":"[text]",
-							"district_id":"O-01306",
-							"association_id":"O-01335",
-							"forening":"Ystad",
-							"kommun":"1286",
-							"lon":"55.4300904504",
-							"lat":"13.8222284514"
+							"district_id":"O-01234",
+							"association_id":"O-01234",
+							"forening":"[text]",
+							"kommun":"[number]",
+							"lon":"55.4",
+							"lat":"13.8"
 						)*/
 
 						$item_id = ($custom_url_id != '' ? $item[$custom_url_id] : '');
@@ -3054,7 +3054,7 @@ class widget_calendar extends WP_Widget
 
 			echo "<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
-				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-12' max='12'"))
+				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-36' max='36'"))
 				.show_select(array('data' => $this->get_order_for_select(), 'name' => $this->get_field_name('calendar_order'), 'text' => __("Order", 'lang_calendar'), 'value' => $instance['calendar_order']))
 			."</div>
 			<div class='flex_flow'>"
