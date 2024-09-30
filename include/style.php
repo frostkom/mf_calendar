@@ -79,19 +79,29 @@ echo "@media all
 		.widget.calendar .section > ul
 		{
 			list-style: none;
+			padding-left: 0;
 		}
 
 			.widget.calendar .section .calendar_feed_item
 			{
+				border-radius: .3em;
+				box-shadow: .1em .1em 2em rgba(0, 0, 0, .03);
 				display: -webkit-box;
 				display: -ms-flexbox;
 				display: -webkit-flex;
 				display: flex;
 				margin-left: -.5em;
 				margin-right: -.5em;
+				margin-bottom: 1em;
 				padding: .5em;
 				overflow: hidden;
+				transition: all 2s ease;
 			}
+
+				.widget.calendar .section .calendar_feed_item:hover
+				{
+					box-shadow: .1em .1em 2em rgba(0, 0, 0, .2);
+				}
 
 				.widget.calendar .section .calendar_feed_item:nth-child(2n + 1)
 				{
@@ -142,6 +152,7 @@ echo "@media all
 						-ms-flex: 1 0 0;
 						flex: 1 0 0;
 						margin: 0 0 0 1em;
+						padding: 0;
 						text-align: left;
 					}
 
@@ -153,7 +164,8 @@ echo "@media all
 							.widget.calendar .section .calendar_feed_item .heading
 							{
 								font-size: 1.2em !important;
-								margin: 0 !important;
+								margin: 0 0 .2em auto !important;
+								border-bottom: .05em solid rgba(0, 0, 0, .2);
 							}
 
 							.widget.calendar .section .calendar_feed_item .feed_name
