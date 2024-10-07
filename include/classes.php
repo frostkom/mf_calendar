@@ -578,9 +578,9 @@ class mf_calendar
 
 							echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$arr_registration_meta['registration_groups_id']."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>".$obj_group->amount_in_group(array('id' => $arr_registration_meta['registration_groups_id']))."</a>";
 
-							if($arr_registration_meta['limit_participants'] > 0)
+							if($arr_registration_meta['limit_group_participants'] > 0)
 							{
-								echo " / ".$arr_registration_meta['limit_participants'];
+								echo " / ".$arr_registration_meta['limit_group_participants'];
 							}
 
 							echo "<div class='row-actions'>
@@ -1014,7 +1014,7 @@ class mf_calendar
 			),
 		);
 
-		if(is_plugin_active("mf_group/index.php"))
+		if(is_plugin_active("mf_address/index.php") && is_plugin_active("mf_group/index.php"))
 		{
 			global $obj_group;
 
@@ -1066,7 +1066,7 @@ class mf_calendar
 
 			$arr_fields_side[] = array(
 				'name' => __("Limit Participants", 'lang_calendar'),
-				'id' => $this->meta_prefix.'limit_participants',
+				'id' => $this->meta_prefix.'limit_group_participants',
 				'type' => 'number',
 				'attributes' => array(
 					'min' => 0,
@@ -1840,11 +1840,12 @@ class mf_calendar
 		$out = array(
 			'registration_groups' => get_post_meta($post_id, $this->meta_prefix.'registration_groups', true),
 			'registration_groups_id' => get_post_meta($post_id, $this->meta_prefix.'registration_groups_id', true),
+			'limit_group_participants' => get_post_meta($post_id, $this->meta_prefix.'limit_group_participants', true),
 			'registration' => get_post_meta($post_id, $this->meta_prefix.'registration', true),
 			'limit_participants' => get_post_meta($post_id, $this->meta_prefix.'limit_participants', true),
 		);
 
-		if($out['registration_groups'] > 0 && $out['limit_participants'] > 0)
+		if($out['registration_groups'] > 0 && $out['limit_group_participants'] > 0)
 		{
 			global $obj_group;
 
@@ -1855,7 +1856,7 @@ class mf_calendar
 
 			$registration_amount = $obj_group->amount_in_group(array('id' => $post_id));
 
-			$out['spots_left'] = ($out['limit_participants'] - $registration_amount);
+			$out['spots_left'] = ($out['limit_group_participants'] - $registration_amount);
 		}
 
 		if($out['registration'] > 0 && $out['limit_participants'] > 0)
