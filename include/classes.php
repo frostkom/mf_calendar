@@ -1648,6 +1648,8 @@ class mf_calendar
 
 				$content_class = $more_rel = $more_icon = $more_content = "";
 
+				$post_content = apply_filters('filter_calendar_post_content', $post_id, $post_content);
+
 				if($post_content != '')
 				{
 					$more_content .= "<p itemprop='description'>".$post_content."</p>";
