@@ -60,7 +60,7 @@ class mf_calendar
 		{
 			add_action('wp_footer', array($this, 'get_footer'), 0);
 
-			$out .= "<div class='widget calendar'>";
+			$out .= "<div class='widget calendar".(isset($attributes['className']) && $attributes['className'] != '' ? " ".$attributes['className'] : "")."'>";
 
 				if($attributes['calendar_heading'] != '')
 				{
