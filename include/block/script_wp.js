@@ -13,8 +13,8 @@
 	{
 		title: __("Calendar", 'lang_calendar'),
 		description: __("Display a Calendar", 'lang_calendar'),
-		icon: 'calendar', /* https://developer.wordpress.org/resource/dashicons/ */
-		category: 'widgets', /* common, formatting, layout, widgets, embed */
+		icon: 'calendar',
+		category: 'widgets',
 		'attributes':
 		{
 			'align':
@@ -99,6 +99,10 @@
 			{
 				'fontSize': true,
 				'lineHeight': true
+			},
+			"__experimentalBorder":
+			{
+				"radius": true
 			}
 		},
 		edit: function(props)
