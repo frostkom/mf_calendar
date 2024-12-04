@@ -134,6 +134,8 @@ class mf_calendar
 
 	function init()
 	{
+		load_plugin_textdomain('lang_calendar', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
+
 		// Post Types
 		#######################
 		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');

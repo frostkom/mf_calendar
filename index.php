@@ -76,8 +76,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	add_action('wp_ajax_calendar_action_hide', array($obj_calendar, 'action_hide'));
 
-	load_plugin_textdomain('lang_calendar', false, dirname(plugin_basename(__FILE__))."/lang/");
-
 	function activate_calendar()
 	{
 		require_plugin("meta-box/meta-box.php", "Meta Box");
