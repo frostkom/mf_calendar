@@ -3,10 +3,10 @@
 class mf_calendar
 {
 	var $id;
-	var $calendar_id = "";
+	var $calendar_id;
 	var $calendar_url;
-	var $custom_url = "";
-	var $display_birthdays = '';
+	var $custom_url;
+	var $display_birthdays;
 	var $post_type = 'mf_calendar';
 	var $post_type_event = 'mf_calendar_event';
 	var $meta_prefix;
@@ -1551,14 +1551,15 @@ class mf_calendar
 					$this->arr_data['year_start'] = $post_start_year;
 				}
 
-				$heading = "";
+				$post_heading = "";
+				$feed_name = ($data['display_filter'] == 'yes' || $data['display_categories'] == 'yes' ? get_post_title($post_feed) : '');
 
 				switch($data['type'])
 				{
 					case 'week':
 						if($date_temp != $post_start_date)
 						{
-							$heading = day_name($post_start_weekday);
+							$post_heading = day_name($post_start_weekday);
 						}
 					break;
 
@@ -1567,11 +1568,11 @@ class mf_calendar
 						{
 							if($post_start_yearmonth != $yearmonth_temp)
 							{
-								$heading = month_name($post_start_month);
+								$post_heading = month_name($post_start_month);
 
 								if($post_start_year != $year_temp && $year_temp != '')
 								{
-									$heading .= "&nbsp;".$post_start_year;
+									$post_heading .= "&nbsp;".$post_start_year;
 								}
 							}
 						}
@@ -1582,12 +1583,12 @@ class mf_calendar
 							{
 								if($post_start_week == $week_start)
 								{
-									$heading = __("Current Week", 'lang_calendar');
+									$post_heading = __("Current Week", 'lang_calendar');
 								}
 
 								else if($post_start_week == date("W", strtotime($date_start." +1 week")))
 								{
-									$heading = __("Next Week", 'lang_calendar');
+									$post_heading = __("Next Week", 'lang_calendar');
 								}
 
 								else
@@ -1606,11 +1607,11 @@ class mf_calendar
 									$day_end = date("j", strtotime($date_end_temp));
 									$month_end = date("n", strtotime($date_end_temp));
 
-									$heading = "<span class='calendar_week'>".__("w", 'lang_calendar').$post_start_week."<span>".$day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end."</span></span>";
+									$post_heading = "<span class='calendar_week'>".__("w", 'lang_calendar').$post_start_week."<span>".$day_start.($month_start != $month_end ? "/".$month_start : '')."-".$day_end."/".$month_end."</span></span>";
 
 									if($post_start_year != $year_temp && $year_temp != '')
 									{
-										$heading .= "&nbsp;".$post_start_year;
+										$post_heading .= "&nbsp;".$post_start_year;
 									}
 								}
 							}
@@ -1650,6 +1651,7 @@ class mf_calendar
 
 				$content_class = $more_rel = $more_icon = $more_content = "";
 
+				$post_title = apply_filters('filter_calendar_post_title', $post_id, $post_title);
 				$post_content = apply_filters('filter_calendar_post_content', $post_id, $post_content);
 
 				if($post_content != '')
@@ -1686,27 +1688,6 @@ class mf_calendar
 					$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
 						<meta itemprop='address' content='".$post_location."'>
 					</div>";
-
-					/* Marknadsgatan 22 || Turning Torso, Lilla Varvsgatan 14, 211 15 Malmö, Sweden */
-					/*$location_name = $location_address = $location_locality = $location_region = $location_zip = '';
-
-					foreach(explode(",", $post_location) as $location_temp)
-					{
-						if(preg_match("/(\d\s){5-6}/", $location_temp))
-						{
-							list($location_zip, $location_locality) = explode(" ", $location_temp);
-						}
-					}
-
-					$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
-						<span itemprop='name'>".$location_name."</span>
-						<div itemprop='address' itemscope itemtype='//schema.org/PostalAddress'>
-							<span itemprop='streetAddress'>".$location_address."</span><br>
-							<span itemprop='addressLocality'>".$location_locality."</span>,
-							<span itemprop='addressRegion'>".$location_region."</span>
-							<span itemprop='postalCode'>".$location_zip."</span>
-						</div>
-					</div>";*/
 				}
 
 				if($arr_registration_meta['registration'] > 0)
@@ -1742,17 +1723,27 @@ class mf_calendar
 						<i class='fa fa-caret-down fa-lg toggle_icon_open'></i>";
 					}
 
-					$more_content = "<div class='more_content"
-						.($data['display_all_info'] != 'yes' ? " toggle_container hide" : "")
-					."'"
-					." rel='".$post_id."'"
-					.">"
+					$more_content = "<div class='more_content".($data['display_all_info'] != 'yes' ? " toggle_container hide" : "")."' rel='".$post_id."'>"
 						.$more_content
 					."</div>";
 				}
 
+				if($post_heading != '')
+				{
+					$this->arr_events[] = array(
+						'feed' => $post_feed,
+						'feed_name' => $feed_name,
+
+						'heading' => $post_heading,
+					);
+				}
+
 				$this->arr_events[] = array(
-					'heading' => $heading,
+					'feed' => $post_feed,
+					'feed_name' => $feed_name,
+
+					'heading' => "",
+
 					'id' => $post_id,
 					'title' => $post_title,
 
@@ -1760,10 +1751,6 @@ class mf_calendar
 					'content_class' => $content_class,
 					'more_icon' => $more_icon,
 					'more_content' => $more_content,
-
-					//display_filter == yes/no
-					'feed' => $post_feed,
-					'feed_name' => ($data['display_filter'] == 'yes' || $data['display_categories'] == 'yes' ? get_post_title($post_feed) : ''),
 
 					//type == week
 					'start_week' => $post_start_week,
@@ -1955,33 +1942,38 @@ class mf_calendar
 		</script>
 
 		<script type='text/template' id='template_calendar_events'>
-			<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
-				<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
-				<div class='content<%= content_class %>' rel='<%= id %>'>
-					<div class='meta'>
-						<% if(feed_name != '')
-						{ %>
-							<p class='feed_name'><%= feed_name %></p>
-						<% } %>";
+			<% if(heading != '')
+			{ %>
+				<li class='calendar_feed_item calendar_feed_<%= feed %>'>
+					<p class='heading'><%= heading %></p>
+				</li>
+			<% }
+			
+			else
+			{ %>
+				<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
+					<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
+					<div class='content<%= content_class %>' rel='<%= id %>'>
+						<div class='meta'>
+							<% if(feed_name != '')
+							{ %>
+								<p class='feed_name'><%= feed_name %></p>
+							<% } %>
+							
+							<p class='title<% if(more_icon != ''){ %> has_more<% } %>' itemprop='name'>
+								<%= title %>
+								<%= more_icon %>
+							</p>
 
-						echo "<% if(heading != '')
-						{ %>
-							<p class='heading'><%= heading %></p>
-						<% } %>";
-
-						echo "<p class='title<% if(more_icon != ''){ %> has_more<% } %>' itemprop='name'>
-							<%= title %>
-							<%= more_icon %>
-						</p>
-
-						<% if(date_end != '')
-						{ %>
-							<p class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></p>
-						<% } %>
+							<% if(date_end != '')
+							{ %>
+								<p class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></p>
+							<% } %>
+						</div>
+						<%= more_content %>
 					</div>
-					<%= more_content %>
-				</div>
-			</li>
+				</li>
+			<% } %>
 		</script>";
 	}
 	##############################
@@ -3055,9 +3047,8 @@ class widget_calendar extends WP_Widget
 				echo "<em>".__("There are no available calendars", 'lang_calendar')."</em>";
 			}
 
-			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_all_info'), 'text' => __("Display All Info", 'lang_calendar'), 'value' => $instance['calendar_display_all_info']));
-
-			echo "<div class='flex_flow'>"
+			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_all_info'), 'text' => __("Display All Info", 'lang_calendar'), 'value' => $instance['calendar_display_all_info']))
+			."<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
 				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-36' max='36'"))
 				.show_select(array('data' => $this->get_order_for_select(), 'name' => $this->get_field_name('calendar_order'), 'text' => __("Order", 'lang_calendar'), 'value' => $instance['calendar_order']))

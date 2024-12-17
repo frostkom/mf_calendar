@@ -113,13 +113,13 @@ echo "@media all
 					padding-top: .5em;
 				}
 
-					.widget.calendar .section .calendar_feed_item .start_date
+					/*.widget.calendar .section .calendar_feed_item .start_date
 					{
 						-webkit-box-flex: 0 0 3.1em;
 						-webkit-flex: 0 0 3.1em;
 						-ms-flex: 0 0 3.1em;
 						flex: 0 0 3.1em;
-					}
+					}*/
 
 						.widget.calendar .section .calendar_feed_item .start_date p
 						{
@@ -127,6 +127,7 @@ echo "@media all
 							border-radius: .3em;
 							color: ".$setting_calendar_date_text_color.";
 							font-size: 1.5em;
+							margin: 0;
 							padding: .4em .5em;
 							text-align: center;
 							min-width: 2.12em;
@@ -163,9 +164,8 @@ echo "@media all
 
 							.widget.calendar .section .calendar_feed_item .heading
 							{
-								font-size: 1.2em !important;
-								margin: 0 0 .2em auto !important;
-								border-bottom: .05em solid rgba(0, 0, 0, .2);
+								font-size: 1.2em;
+								margin: 0;
 							}
 
 							.widget.calendar .section .calendar_feed_item .feed_name
@@ -189,7 +189,7 @@ echo "@media all
 
 							.widget.calendar .section .calendar_feed_item .end_date
 							{
-								font-weight: bold;
+								margin-bottom: 0;
 							}
 
 							.widget.calendar .section .calendar_feed_item p > .fa
@@ -202,4 +202,9 @@ echo "@media all
 							margin: .5em 0;
 							padding: 0;
 						}
+
+							.widget.calendar .section .calendar_feed_item .more_content p
+							{
+								margin-bottom: 0;
+							}
 }";

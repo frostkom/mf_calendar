@@ -3,7 +3,7 @@ var CalendarModel = Backbone.Model.extend(
 	getPage: function(dom_href)
 	{
 		var self = this,
-			url = (dom_href ? '?' + dom_href.replace('#', '') : "");
+			url = (dom_href ? '?' + dom_href.replace('#', '') : "") + "&timestamp=" + Date.now();
 
 		jQuery().callAPI(
 		{
