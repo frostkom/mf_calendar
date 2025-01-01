@@ -186,7 +186,7 @@ class mf_calendar
 		$plugin_include_url = plugin_dir_url(__FILE__);
 		$plugin_version = get_plugin_version(__FILE__);
 
-		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-components', 'wp-editor'), $plugin_version);
+		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version);
 
 		$arr_data_feeds = array();
 		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data_feeds);
@@ -194,7 +194,27 @@ class mf_calendar
 		$arr_data_pages = array();
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
 
-		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array('calendar_feeds' => $arr_data_feeds, 'yes_no_for_select' => get_yes_no_for_select(), 'calendar_type' => $this->get_type_for_select(), 'calendar_order' => $this->get_order_for_select(), 'calendar_page' => $arr_data_pages));
+		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array(
+			'block_title' => __("Calendar", 'lang_calendar'),
+			'block_description' => __("Display a Calendar", 'lang_calendar'),
+			'full_width_label' => __("Full Width", 'lang_calendar'),
+			'yes_no_for_select' => get_yes_no_for_select(),
+			'calendar_heading_label' => __("Heading", 'lang_calendar'),
+			'calendar_feeds_label' => __("Feeds", 'lang_calendar'),
+			'calendar_feeds' => $arr_data_feeds,
+			'calendar_display_filter' => __("Display Filter", 'lang_calendar'),
+			'calendar_filter_label' => __("Label", 'lang_calendar'),
+			'calendar_display_categories_label' => __("Display Categories", 'lang_calendar'),
+			'calendar_display_all_info' => __("Display All Info", 'lang_calendar'),
+			'calendar_type_label' => __("Design", 'lang_calendar'),
+			'calendar_type' => $this->get_type_for_select(),
+			'calendar_months_label' => __("Months", 'lang_calendar'),
+			'calendar_order_label' => __("Order", 'lang_calendar'),
+			'calendar_order' => $this->get_order_for_select(),
+			'calendar_page_label' => __("Read More", 'lang_calendar'),
+			'calendar_page' => $arr_data_pages,
+			'calendar_page_title' => __("Title", 'lang_calendar'),
+		));
 
 		register_block_type('mf/calendar', array(
 			'editor_script' => 'script_calendar_block_wp',
@@ -214,6 +234,7 @@ class mf_calendar
 		$arr_settings = array();
 		$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
 		$arr_settings['setting_calendar_date_bg'] = __("Date Background", 'lang_calendar');
+		$arr_settings['setting_calendar_image_fallback'] = __("Fallback Image", 'lang_calendar');
 		$arr_settings['setting_google_calendar_api_key'] = __("API Key", 'lang_calendar');
 
 		if(get_option('setting_google_calendar_api_key') != '')
@@ -246,6 +267,14 @@ class mf_calendar
 			$option = get_option($setting_key, '#019cdb');
 
 			echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
+		}
+
+		function setting_calendar_image_fallback_callback()
+		{
+			$setting_key = get_setting_key(__FUNCTION__);
+			$option = get_option($setting_key);
+
+			echo get_media_library(array('type' => 'image', 'name' => $setting_key, 'value' => $option));
 		}
 
 		function setting_google_calendar_api_key_callback()
@@ -1180,6 +1209,28 @@ class mf_calendar
 		}
 
 		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'content',
+			'title' => __("Content", 'lang_calendar'),
+			'post_types' => array($this->post_type_event),
+			//'context' => 'side',
+			'priority' => 'low',
+			'fields' => array(
+				array(
+					'name' => __("Image", 'lang_calendar'),
+					'id' => $this->meta_prefix.'image_internal',
+					'type' => 'file_advanced',
+					'max_file_uploads' => 1,
+					'mime_type' => 'image',
+				),
+				array(
+					'name' => __("Image", 'lang_calendar')." (".__("External", 'lang_calendar').")",
+					'id' => $this->meta_prefix.'image_external',
+					'type' => 'url',
+				),
+			),
+		);
+
+		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings_normal',
 			'title' => __("Settings", 'lang_calendar'),
 			'post_types' => array($this->post_type_event),
@@ -1496,6 +1547,18 @@ class mf_calendar
 				$post_title = $r->post_title;
 				$post_content = $r->post_content;
 
+				$post_image = "";
+
+				if($post_image == '')
+				{
+					$post_image = get_post_meta_file_src(array('post_id' => $post_id, 'meta_key' => $this->meta_prefix.'image_internal', 'is_image' => true));
+				}
+
+				if($post_image == '')
+				{
+					$post_image = get_post_meta($post_id, $this->meta_prefix.'image_external', true);
+				}
+
 				$post_location = get_post_meta($post_id, $this->meta_prefix.'location', true);
 
 				$post_longitude = $post_latitude = '';
@@ -1744,6 +1807,7 @@ class mf_calendar
 
 					'heading' => "",
 
+					'image' => $post_image,
 					'id' => $post_id,
 					'title' => $post_title,
 
@@ -1954,8 +2018,24 @@ class mf_calendar
 				<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
 					<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'><p><%= start_day %></p></div>
 					<div class='content<%= content_class %>' rel='<%= id %>'>
-						<div class='meta'>
-							<% if(feed_name != '')
+						<div class='meta'>";
+
+							$setting_calendar_image_fallback = get_option('setting_calendar_image_fallback');
+
+							if($setting_calendar_image_fallback > 0)
+							{
+								echo "<% if(image != '')
+								{ %>
+									<img src='<%= image %>'/>
+								<% }
+								
+								else
+								{ %>
+									<img src='".$setting_calendar_image_fallback."'/>
+								<% } %>";
+							}
+
+							echo "<% if(feed_name != '')
 							{ %>
 								<p class='feed_name'><%= feed_name %></p>
 							<% } %>

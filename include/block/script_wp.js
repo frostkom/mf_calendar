@@ -1,7 +1,6 @@
 (function()
 {
-	var __ = wp.i18n.__,
-		el = wp.element.createElement,
+	var el = wp.element.createElement,
 		registerBlockType = wp.blocks.registerBlockType,
 		SelectControl = wp.components.SelectControl,
 		TextControl = wp.components.TextControl,
@@ -11,8 +10,8 @@
 
 	registerBlockType('mf/calendar',
 	{
-		title: __("Calendar", 'lang_calendar'),
-		description: __("Display a Calendar", 'lang_calendar'),
+		title: script_calendar_block_wp.block_title,
+		description: script_calendar_block_wp.block_description,
 		icon: 'calendar',
 		category: 'widgets',
 		'attributes':
@@ -107,351 +106,166 @@
 		},
 		edit: function(props)
 		{
-			var arr_out = [];
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.yes_no, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
+			return el(
 				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Full Width", 'lang_calendar'),
-						value: props.attributes.full_width,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({full_width: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Heading", 'lang_calendar'),
-						type: 'text',
-						value: props.attributes.calendar_heading,
-						/*help: __("Description...", 'lang_calendar'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_heading: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.calendar_feeds, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Feeds", 'lang_calendar'),
-						value: props.attributes.calendar_feeds,
-						options: arr_options,
-						multiple: true,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_feeds: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.yes_no_for_select, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Display Filter", 'lang_calendar'),
-						value: props.attributes.calendar_display_filter,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_display_filter: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Label", 'lang_calendar'),
-						type: 'text',
-						value: props.attributes.calendar_filter_label,
-						/*help: __("Description...", 'lang_calendar'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_filter_label: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.yes_no_for_select, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Display Categories", 'lang_calendar'),
-						value: props.attributes.calendar_display_categories,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_display_categories: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.yes_no_for_select, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Display All Info", 'lang_calendar'),
-						value: props.attributes.calendar_display_all_info,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_display_all_info: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.calendar_type, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Design", 'lang_calendar'),
-						value: props.attributes.calendar_type,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_type: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Months", 'lang_calendar'),
-						type: 'text',
-						value: props.attributes.calendar_months,
-						/*, 'xtra' => "min='-12' max='12'"*/
-						/*help: __("Description...", 'lang_calendar'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_months: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.calendar_order, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Order", 'lang_calendar'),
-						value: props.attributes.calendar_order,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_order: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_calendar_block_wp.calendar_page, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Read More", 'lang_calendar'),
-						value: props.attributes.calendar_page,
-						options: arr_options,
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_page: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Title", 'lang_calendar'),
-						type: 'text',
-						value: props.attributes.calendar_page_title,
-						/*help: __("Description...", 'lang_calendar'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({calendar_page_title: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			return arr_out;
+				{className: 'wp_mf_block_container'},
+				[
+					el(
+						InspectorControls,
+						'div',
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.full_width_label,
+									value: props.attributes.full_width,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+									onChange: function(value)
+									{
+										props.setAttributes({full_width: value});
+									}
+								}
+							),
+							el(
+								TextControl,
+								{
+									label: script_calendar_block_wp.calendar_heading_label,
+									type: 'text',
+									value: props.attributes.calendar_heading,
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_heading: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_feeds_label,
+									value: props.attributes.calendar_feeds,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_feeds),
+									multiple: true,
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_feeds: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_display_filter_label,
+									value: props.attributes.calendar_display_filter,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_display_filter: value});
+									}
+								}
+							),
+							el(
+								TextControl,
+								{
+									label: script_calendar_block_wp.calendar_filter_label,
+									type: 'text',
+									value: props.attributes.calendar_filter_label,
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_filter_label: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_display_categories_label,
+									value: props.attributes.calendar_display_categories,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_display_categories: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_display_all_info_label,
+									value: props.attributes.calendar_display_all_info,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_display_all_info: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_type_label,
+									value: props.attributes.calendar_type,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_type),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_type: value});
+									}
+								}
+							),
+							el(
+								TextControl,
+								{
+									label: script_calendar_block_wp.calendar_months_label,
+									type: 'text',
+									value: props.attributes.calendar_months,
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_months: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_order_label,
+									value: props.attributes.calendar_order,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_order),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_order: value});
+									}
+								}
+							),
+							el(
+								SelectControl,
+								{
+									label: script_calendar_block_wp.calendar_page_label,
+									value: props.attributes.calendar_page,
+									options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_page),
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_page: value});
+									}
+								}
+							),
+							el(
+								TextControl,
+								{
+									label: script_calendar_block_wp.calendar_page_title_label,
+									type: 'text',
+									value: props.attributes.calendar_page_title,
+									onChange: function(value)
+									{
+										props.setAttributes({calendar_page_title: value});
+									}
+								}
+							)
+					),
+					el(
+						'strong',
+						{className: props.className},
+						script_calendar_block_wp.block_title
+					)
+				]
+			);
 		},
 		save: function()
 		{
