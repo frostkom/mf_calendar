@@ -14,12 +14,29 @@ class mf_calendar
 	var $feed_was_updated = false;
 	var $arr_data = array();
 	var $debug;
+	var $arr_json_temp;
+	var $arr_settings = array();
 
 	function __construct($id = 0)
 	{
 		$this->id = ($id > 0 ? $id : 0);
 
 		$this->meta_prefix = $this->post_type.'_';
+	}
+
+	function get_all_settings()
+	{
+		global $obj_base;
+
+		if(!isset($obj_base))
+		{
+			$obj_base = new mf_base();
+		}
+
+		$this->arr_settings['date_bg'] = get_option_or_default('setting_calendar_date_bg', "#019cdb");
+		$this->arr_settings['date_text_color'] = $obj_base->get_text_color_from_background($this->arr_settings['date_bg']);
+
+		$this->arr_settings['calendar_colors_result'] = $this->get_calendar_colors();
 	}
 
 	function get_calendar_amount($data = array())
@@ -240,8 +257,9 @@ class mf_calendar
 		if(get_option('setting_google_calendar_api_key') != '')
 		{
 			$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
-			$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
 		}
+
+		$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
 
 		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
 	}
@@ -405,10 +423,10 @@ class mf_calendar
 			."</div>";
 		}
 
-		else if(get_option('setting_calendar_debug') == 'yes')
+		/*else if(get_option('setting_calendar_debug') == 'yes')
 		{
-			do_log("No rows found in ".get_post_title($id)." (#".$id.", ".$wpdb->last_query.")");
-		}
+			do_log(__FUNCTION__." - No rows found in ".get_post_title($id)." (#".$id.", ".$wpdb->last_query.")");
+		}*/
 
 		return $out;
 	}
@@ -469,7 +487,7 @@ class mf_calendar
 								if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $post_id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$post_id))
 								{
 									$obj_calendar = new mf_calendar($post_id);
-									$obj_calendar->fetch_source($post_id);
+									$obj_calendar->fetch_source($post_id, true);
 								}
 
 								else
@@ -812,7 +830,9 @@ class mf_calendar
 			$plugin_include_url = plugin_dir_url(__FILE__);
 			$plugin_version = get_plugin_version(__FILE__);
 
-			mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version);
+			$arr_settings = $this->get_all_settings();
+
+			mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version."-".md5(var_export($arr_settings, true)));
 
 			mf_enqueue_script('underscore');
 			mf_enqueue_script('backbone');
@@ -918,6 +938,11 @@ class mf_calendar
 					array(
 						'name' => __("Field for ID", 'lang_calendar'),
 						'id' => $this->meta_prefix.'custom_url_id',
+						'type' => 'text',
+					),
+					array(
+						'name' => __("Field for Image", 'lang_calendar'),
+						'id' => $this->meta_prefix.'custom_url_image',
 						'type' => 'text',
 					),
 					array(
@@ -2008,7 +2033,7 @@ class mf_calendar
 		<script type='text/template' id='template_calendar_events'>
 			<% if(heading != '')
 			{ %>
-				<li class='calendar_feed_item calendar_feed_<%= feed %>'>
+				<li>
 					<p class='heading'><%= heading %></p>
 				</li>
 			<% }
@@ -2122,7 +2147,7 @@ class mf_calendar
 		}
 	}
 
-	function fetch_source($id)
+	function fetch_source($id, $print = false)
 	{
 		$this->set_id($id);
 		$this->get_calendar_id();
@@ -2134,7 +2159,7 @@ class mf_calendar
 
 		else if($this->custom_url != '')
 		{
-			$this->fetch_from_custom_url();
+			$this->fetch_from_custom_url($print);
 		}
 
 		else if($this->display_birthdays == 'yes')
@@ -2172,17 +2197,17 @@ class mf_calendar
 
 			if($setting_calendar_debug == 'yes')
 			{
-				do_log("Calendar URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
+				do_log(__FUNCTION__." - URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
 			}
 
 			switch($headers['http_code'])
 			{
 				case 200:
-					$json = json_decode($content, true);
+					$arr_json = json_decode($content, true);
 
-					if(isset($json['items']))
+					if(isset($arr_json['items']))
 					{
-						foreach($json['items'] as $item)
+						foreach($arr_json['items'] as $item)
 						{
 							/*array(
 								'kind' => 'calendar#event',
@@ -2496,7 +2521,7 @@ class mf_calendar
 							),
 						));
 
-						if(count($json['items']) == 250)
+						if(count($arr_json['items']) == 250)
 						{
 							do_log("The Calendar API returned the maximum number of events (".$this->calendar_url_clean.")");
 						}
@@ -2539,8 +2564,37 @@ class mf_calendar
 			}
 		}
 	}
+	
+	function get_json_child($arr_json, $custom_url_container, $print)
+	{
+		if($print == true)
+		{
+			echo "<p>".__FUNCTION__." - Checking: ".var_export($arr_json, true)."</p>";
+		}
 
-	function fetch_from_custom_url()
+		foreach($arr_json as $key => $arr_value)
+		{
+			if(is_array($arr_value) && count($arr_value) > 0 && count($this->arr_json_temp) == 0)
+			{
+				if(isset($arr_value[$custom_url_container]))
+				{
+					if($print == true)
+					{
+						echo "<p>".__FUNCTION__." - Found it: ".var_export($arr_json, true)."</p>";
+					}
+
+					$this->arr_json_temp = $arr_value;
+				}
+
+				else
+				{
+					$this->get_json_child($arr_value, $custom_url_container, $print);
+				}
+			}
+		}
+	}
+
+	function fetch_from_custom_url($print)
 	{
 		$setting_calendar_debug = get_option('setting_calendar_debug');
 
@@ -2548,7 +2602,7 @@ class mf_calendar
 
 		if($setting_calendar_debug == 'yes')
 		{
-			do_log("Calendar URL: ".$this->custom_url);
+			do_log(__FUNCTION__." - URL: ".$this->custom_url);
 		}
 
 		switch($headers['http_code'])
@@ -2556,8 +2610,14 @@ class mf_calendar
 			case 200:
 				if(basename($this->custom_url) == "basic.ics")
 				{
+					if($setting_calendar_debug == 'yes')
+					{
+						do_log(__FUNCTION__." - ical");
+					}
+
 					$custom_url_container = 'ical';
 					$custom_url_id = 'uid';
+					$custom_url_image = '';
 					$custom_url_title = 'summary';
 					$custom_url_description = 'description';
 					$custom_url_longitude = 'longitude';
@@ -2566,7 +2626,7 @@ class mf_calendar
 					$custom_url_start = 'dtstart';
 					$custom_url_end = 'dtend';
 
-					$json = array('ical' => array());
+					$arr_json = array($custom_url_container => array());
 
 					$arr_events = explode("BEGIN:VEVENT", $content);
 
@@ -2630,7 +2690,7 @@ class mf_calendar
 								}
 							}
 
-							$json['ical'][] = $data_temp;
+							$arr_json[$custom_url_container][] = $data_temp;
 						}
 
 						$i++;
@@ -2639,10 +2699,9 @@ class mf_calendar
 
 				else
 				{
-					$json = json_decode($content, true);
-
 					$custom_url_container = get_post_meta($this->id, $this->meta_prefix.'custom_url_container', true);
 					$custom_url_id = get_post_meta($this->id, $this->meta_prefix.'custom_url_id', true);
+					$custom_url_image = get_post_meta($this->id, $this->meta_prefix.'custom_url_image', true);
 					$custom_url_title = get_post_meta($this->id, $this->meta_prefix.'custom_url_title', true);
 					$custom_url_description = get_post_meta($this->id, $this->meta_prefix.'custom_url_description', true);
 					$custom_url_longitude = get_post_meta($this->id, $this->meta_prefix.'custom_url_longitude', true);
@@ -2650,44 +2709,101 @@ class mf_calendar
 					$custom_url_created = get_post_meta($this->id, $this->meta_prefix.'custom_url_created', true);
 					$custom_url_start = get_post_meta($this->id, $this->meta_prefix.'custom_url_start', true);
 					$custom_url_end = get_post_meta($this->id, $this->meta_prefix.'custom_url_end', true);
+
+					$arr_json = json_decode($content, true);
+
+					if($setting_calendar_debug == 'yes' && $print == true)
+					{
+						//echo "<p>".__FUNCTION__." - Checking: ".htmlspecialchars($content)." -> ".var_export($arr_json, true)."</p>";
+					}
+
+					if(!isset($arr_json[$custom_url_container]))
+					{
+						$this->arr_json_temp = array();
+
+						$this->get_json_child($arr_json, $custom_url_container, $print);
+
+						if(isset($this->arr_json_temp[$custom_url_container]))
+						{
+							$arr_json = $this->arr_json_temp;
+						}
+					}
+
+					if($setting_calendar_debug == 'yes' && $print == true)
+					{
+						echo "<p>".__FUNCTION__." - Got It: ".var_export($arr_json, true)."</p>";
+					}
 				}
 
-				if(isset($json[$custom_url_container]))
+				if(isset($arr_json[$custom_url_container]))
 				{
-					foreach($json[$custom_url_container] as $item)
+					foreach($arr_json[$custom_url_container] as $item)
 					{
-						/*array(
-							"kampanjid":"[id]",
-							"title":"[text]",
-							"date_start":"YYYY-MM-DDTHH:II:SS+02:00",
-							"date_end":"YYYY-MM-DDTHH:MM:SS+02:00",
-							"created":"YYYY-MM-DDTHH:MM:SS+02:00",
-							"reported_at":null,
-							"description":"[text]",
-							"district_id":"O-01234",
-							"association_id":"O-01234",
-							"forening":"[text]",
-							"kommun":"[number]",
-							"lon":"55.4",
-							"lat":"13.8"
-						)*/
+						$item_image = $item_start = $item_end = "";
 
 						$item_id = ($custom_url_id != '' ? $item[$custom_url_id] : '');
 						//$item_link = $item['htmlLink'];
+						//$item_image = ($custom_url_image != '' && isset($item[$custom_url_image]) ? trim($item[$custom_url_image]) : '');
+
+						if($custom_url_image != '')
+						{
+							if(strpos($custom_url_image, "->") !== false)
+							{
+								list($first, $second) = explode("->", $custom_url_image);
+
+								$item_image = trim(strtotime($item[$first][$second]));
+							}
+
+							else
+							{
+								$item_image = trim(strtotime($item[$custom_url_image]));
+							}
+						}
+
 						$item_title = ($custom_url_title != '' && isset($item[$custom_url_title]) ? trim($item[$custom_url_title]) : '');
 						$item_content = ($custom_url_description != '' && isset($item[$custom_url_description]) ? trim($item[$custom_url_description]) : '');
 						//$item_location = (isset($item['location']) ? trim($item['location']) : '');
 						$item_longitude = ($custom_url_longitude != '' && isset($item[$custom_url_longitude]) ? $item[$custom_url_longitude] : '');
 						$item_latitude = ($custom_url_latitude != '' && isset($item[$custom_url_latitude]) ? $item[$custom_url_latitude] : '');
 						$item_created = ($custom_url_created != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_created])) : '');
-						$item_start = ($custom_url_start != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : '');
-						$item_end = ($custom_url_end != '' ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '');
+
+
+						if($custom_url_start != '')
+						{
+							if(strpos($custom_url_start, "->") !== false)
+							{
+								list($first, $second) = explode("->", $custom_url_start);
+
+								$item_start = date("Y-m-d H:i:s", strtotime($item[$first][$second]));
+							}
+
+							else
+							{
+								$item_start = date("Y-m-d H:i:s", strtotime($item[$custom_url_start]));
+							}
+						}
+
+						if($custom_url_end != '')
+						{
+							if(strpos($custom_url_end, "->") !== false)
+							{
+								list($first, $second) = explode("->", $custom_url_end);
+
+								$item_end = date("Y-m-d H:i:s", strtotime($item[$first][$second]));
+							}
+
+							else
+							{
+								$item_end = date("Y-m-d H:i:s", strtotime($item[$custom_url_end]));
+							}
+						}
 
 						$this->arr_events[] = array(
 							'type' => "custom",
 							'id' => $item_id,
 							'status' => 'confirmed',
 							//'link' => $item_link,
+							'image' => $item_image,
 							'title' => $item_title,
 							'content' => $item_content,
 							//'location' => $item_location,
