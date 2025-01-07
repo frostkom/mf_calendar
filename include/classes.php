@@ -2751,12 +2751,12 @@ class mf_calendar
 							{
 								list($first, $second) = explode("->", $custom_url_image);
 
-								$item_image = trim(strtotime($item[$first][$second]));
+								$item_image = trim($item[$first][$second]);
 							}
 
 							else
 							{
-								$item_image = trim(strtotime($item[$custom_url_image]));
+								$item_image = trim($item[$custom_url_image]);
 							}
 						}
 
