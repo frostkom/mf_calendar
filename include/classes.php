@@ -2553,13 +2553,15 @@ class mf_calendar
 				break;
 
 				default:
-					wp_update_post(array(
+					/*wp_update_post(array(
 						'ID' => $this->id,
 						'post_status' => 'draft',
 						'meta_input' => array(
 							$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
 						),
-					));
+					));*/
+
+					update_post_meta($this->id, $this->meta_prefix.'error', sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']));
 				break;
 			}
 		}
@@ -3040,15 +3042,15 @@ class mf_calendar
 			}
 
 			$query_where .= " AND meta_value NOT IN ('".implode("','", $arr_titles)."')";
-		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND post_parent = '%d' AND meta_key = %s".$query_where, $this->post_type_event, 'publish', $this->id, $this->meta_prefix.'uid'));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND post_parent = '%d' AND meta_key = %s".$query_where, $this->post_type_event, 'publish', $this->id, $this->meta_prefix.'uid'));
 
-		foreach($result as $r)
-		{
-			wp_trash_post($r->ID);
+			foreach($result as $r)
+			{
+				wp_trash_post($r->ID);
 
-			$this->feed_was_updated = true;
+				$this->feed_was_updated = true;
+			}
 		}
 	}
 
