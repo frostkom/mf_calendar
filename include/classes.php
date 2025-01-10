@@ -15,28 +15,12 @@ class mf_calendar
 	var $arr_data = array();
 	var $debug;
 	var $arr_json_temp;
-	var $arr_settings = array();
 
 	function __construct($id = 0)
 	{
 		$this->id = ($id > 0 ? $id : 0);
 
 		$this->meta_prefix = $this->post_type.'_';
-	}
-
-	function get_all_settings()
-	{
-		global $obj_base;
-
-		if(!isset($obj_base))
-		{
-			$obj_base = new mf_base();
-		}
-
-		$this->arr_settings['date_bg'] = get_option_or_default('setting_calendar_date_bg', "#019cdb");
-		$this->arr_settings['date_text_color'] = $obj_base->get_text_color_from_background($this->arr_settings['date_bg']);
-
-		$this->arr_settings['calendar_colors_result'] = $this->get_calendar_colors();
 	}
 
 	function get_calendar_amount($data = array())
@@ -816,9 +800,8 @@ class mf_calendar
 		if($pagenow == 'edit.php' && check_var('post_type') == $this->post_type_event)
 		{
 			$plugin_include_url = plugin_dir_url(__FILE__);
-			$plugin_version = get_plugin_version(__FILE__);
 
-			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')), $plugin_version);
+			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')));
 		}
 	}
 
@@ -828,16 +811,13 @@ class mf_calendar
 		{
 			$plugin_base_include_url = plugins_url()."/mf_base/include/";
 			$plugin_include_url = plugin_dir_url(__FILE__);
-			$plugin_version = get_plugin_version(__FILE__);
 
-			$arr_settings = $this->get_all_settings();
-
-			mf_enqueue_style('style_calendar', $plugin_include_url."style.php", $plugin_version."-".md5(var_export($arr_settings, true)));
+			mf_enqueue_style('style_calendar', $plugin_include_url."style.php");
 
 			mf_enqueue_script('underscore');
 			mf_enqueue_script('backbone');
-			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js", $plugin_version);
-			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url), $plugin_version);
+			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js");
+			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url));
 			mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
 				'last_week' => date("W", strtotime("-1 week")),
 				'last_week_text' => __("Previous Week", 'lang_calendar'),
@@ -847,8 +827,8 @@ class mf_calendar
 				'next_week' => date("W", strtotime("+1 week")),
 				'next_week_text' => __("Next Week", 'lang_calendar'),
 				'week_text' => __("w", 'lang_calendar')
-			), $plugin_version);
-			mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js", $plugin_version);
+			));
+			mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js");
 		}
 	}
 
@@ -1282,9 +1262,8 @@ class mf_calendar
 	function rwmb_enqueue_scripts()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
 
-		mf_enqueue_script('script_calendar_meta', $plugin_include_url."script_meta.js", array('meta_prefix' => $this->meta_prefix), $plugin_version);
+		mf_enqueue_script('script_calendar_meta', $plugin_include_url."script_meta.js", array('meta_prefix' => $this->meta_prefix));
 	}
 
 	function split_coordinates($in)

@@ -9,9 +9,20 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
-$obj_calendar = new mf_calendar();
+if(!isset($obj_base))
+{
+	$obj_base = new mf_base();
+}
 
-$obj_calendar->get_all_settings();
+if(!isset($obj_calendar))
+{
+	$obj_calendar = new mf_calendar();
+}
+
+$setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
+$setting_calendar_date_text_color = $obj_base->get_text_color_from_background($setting_calendar_date_bg);
+
+$setting_calendar_calendar_colors_result = $obj_calendar->get_calendar_colors();
 
 echo "@media all
 {
@@ -106,9 +117,9 @@ echo "@media all
 
 					.widget.calendar .section .calendar_feed_item .start_date p
 					{
-						background: ".$obj_calendar->arr_settings['date_bg'].";
+						background: ".$setting_calendar_date_bg.";
 						border-radius: .3em;
-						color: ".$obj_calendar->arr_settings['date_text_color'].";
+						color: ".$setting_calendar_date_text_color.";
 						font-size: 1.5em;
 						margin: 0;
 						padding: .4em .5em;
@@ -116,7 +127,7 @@ echo "@media all
 						min-width: 2.12em;
 					}";
 
-						foreach($obj_calendar->arr_settings['calendar_colors_result'] as $r)
+						foreach($setting_calendar_calendar_colors_result as $r)
 						{
 							$post_id = $r->ID;
 							$post_color = $r->meta_value;
