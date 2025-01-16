@@ -2016,7 +2016,7 @@ class mf_calendar
 					<p class='heading'><%= heading %></p>
 				</li>
 			<% }
-			
+
 			else
 			{ %>
 				<li itemscope itemtype='//schema.org/Event' class='calendar_feed_item calendar_feed_<%= feed %>'>
@@ -2032,7 +2032,7 @@ class mf_calendar
 								{ %>
 									<img src='<%= image %>'/>
 								<% }
-								
+
 								else
 								{ %>
 									<img src='".$setting_calendar_image_fallback."'/>
@@ -2043,7 +2043,7 @@ class mf_calendar
 							{ %>
 								<p class='feed_name'><%= feed_name %></p>
 							<% } %>
-							
+
 							<p class='title<% if(more_icon != ''){ %> has_more<% } %>' itemprop='name'>
 								<%= title %>
 								<%= more_icon %>
@@ -2545,7 +2545,7 @@ class mf_calendar
 			}
 		}
 	}
-	
+
 	function get_json_child($arr_json, $custom_url_container, $print)
 	{
 		if($print == true)

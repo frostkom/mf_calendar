@@ -33,9 +33,6 @@ echo "@media all
 
 		.widget.calendar .section > h4
 		{
-			display: -webkit-box;
-			display: -ms-flexbox;
-			display: -webkit-flex;
 			display: flex;
 			font-size: 1.2em;
 			text-align: center;
@@ -44,13 +41,9 @@ echo "@media all
 			.widget.calendar .section > h4 .controls.fa
 			{
 				display: inline-block;
+				flex: 0 1 auto;
 				padding: 0 .5em .5em;
 				opacity: .5;
-
-				-webkit-box-flex: 0 1 auto;
-				-webkit-flex: 0 1 auto;
-				-ms-flex: 0 1 auto;
-				flex: 0 1 auto;
 			}
 
 				.widget.calendar .section > h4 .controls.fa.is_disabled
@@ -66,9 +59,6 @@ echo "@media all
 
 			.widget.calendar .section .calendar_week
 			{
-				-webkit-box-flex: 1 0 auto;
-				-webkit-flex: 1 0 auto;
-				-ms-flex: 1 0 auto;
 				flex: 1 0 auto;
 			}
 
@@ -88,9 +78,6 @@ echo "@media all
 			{
 				border-radius: .3em;
 				box-shadow: .1em .1em 2em rgba(0, 0, 0, .03);
-				display: -webkit-box;
-				display: -ms-flexbox;
-				display: -webkit-flex;
 				display: flex;
 				margin-left: -.5em;
 				margin-right: -.5em;
@@ -140,9 +127,6 @@ echo "@media all
 
 					echo ".widget.calendar .section .calendar_feed_item .content
 					{
-						-webkit-box-flex: 1 0 0;
-						-webkit-flex: 1 0 0;
-						-ms-flex: 1 0 0;
 						flex: 1 0 0;
 						margin: 0 0 0 1em;
 						padding: 0;
