@@ -275,11 +275,11 @@ class mf_calendar
 			$setting_key = get_setting_key(__FUNCTION__);
 			$option = get_option($setting_key);
 
-			$description = "<ol>
-				<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.developers.google.com/flows/enableapi?apiid=calendar&pli=1'>Google Developer Console</a>")."</li>
-				<li>".__("Create a new project", 'lang_calendar')."</li>
-				<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>
-			</ol>";
+			$description = "<ol>"
+				."<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.cloud.google.com'>Google Cloud Console</a>")."</li>" //console.developers.google.com/flows/enableapi?apiid=calendar&pli=1
+				."<li>".__("Create a new project", 'lang_calendar')."</li>"
+				."<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>"
+			."</ol>";
 
 			echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
 		}
