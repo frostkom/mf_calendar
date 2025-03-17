@@ -130,18 +130,16 @@ class mf_calendar
 	{
 		load_plugin_textdomain('lang_calendar', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
 
-		// Post Types
+		// Post types
 		#######################
 		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
 
-		$labels = array(
-			'name' => _x(__("Calendar", 'lang_calendar'), 'post type general name'),
-			'singular_name' => _x(__("Calendar", 'lang_calendar'), 'post type singular name'),
-			'menu_name' => __("Calendar", 'lang_calendar')
-		);
-
-		$args = array(
-			'labels' => $labels,
+		register_post_type($this->post_type, array(
+			'labels' => array(
+				'name' => _x(__("Calendar", 'lang_calendar'), 'post type general name'),
+				'singular_name' => _x(__("Calendar", 'lang_calendar'), 'post type singular name'),
+				'menu_name' => __("Calendar", 'lang_calendar')
+			),
 			'public' => false, // Previously true but changed to hide in sitemap.xml
 			'show_ui' => true,
 			'show_in_menu' => false,
@@ -150,18 +148,14 @@ class mf_calendar
 			'supports' => array('title'),
 			'hierarchical' => true,
 			'has_archive' => false,
-		);
+		));
 
-		register_post_type($this->post_type, $args);
-
-		$labels = array(
-			'name' => _x(__("Events", 'lang_calendar'), 'post type general name'),
-			'singular_name' => _x(__("Event", 'lang_calendar'), 'post type singular name'),
-			'menu_name' => __("Event", 'lang_calendar')
-		);
-
-		$args = array(
-			'labels' => $labels,
+		register_post_type($this->post_type_event, array(
+			'labels' => array(
+				'name' => _x(__("Events", 'lang_calendar'), 'post type general name'),
+				'singular_name' => _x(__("Event", 'lang_calendar'), 'post type singular name'),
+				'menu_name' => __("Event", 'lang_calendar')
+			),
 			'public' => (is_plugin_active("mf_webshop/index.php")), // Has to be true so that events are reachable with widget_webshop_events()
 			'show_ui' => true,
 			'show_in_menu' => false,
@@ -170,9 +164,7 @@ class mf_calendar
 			'supports' => array('title', 'editor', 'excerpt'),
 			'hierarchical' => true,
 			'has_archive' => false,
-		);
-
-		register_post_type($this->post_type_event, $args);
+		));
 		#######################
 
 		// Blocks

@@ -137,7 +137,7 @@ echo "@media all
 							{
 								opacity: 0;
 							}
-							
+
 						.widget.calendar .calendar_feed_item .start_date i
 						{
 							left: 0;
@@ -152,7 +152,7 @@ echo "@media all
 							{
 								opacity: 1;
 							}
-					
+
 					.widget.calendar .section .calendar_feed_item .content
 					{
 						flex: 1 0 0;
