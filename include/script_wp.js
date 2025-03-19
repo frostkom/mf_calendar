@@ -6,9 +6,9 @@ jQuery(function($)
 			action_type = '',
 			action_id = dom_obj.attr('href').replace('#id_', '');
 
-		if(dom_obj.hasClass('calendar_action_hide'))
+		if(dom_obj.hasClass('api_calendar_action_hide'))
 		{
-			action_type = 'calendar_action_hide';
+			action_type = 'api_calendar_action_hide';
 		}
 
 		if(action_type != '')
@@ -33,15 +33,7 @@ jQuery(function($)
 				},
 				success: function(data)
 				{
-					if(data.success)
-					{
-						dom_obj.html(data.message);
-					}
-
-					else
-					{
-						dom_obj.html(data.error);
-					}
+					dom_obj.html(data.html);
 				}
 			});
 		}

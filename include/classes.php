@@ -523,8 +523,8 @@ class mf_calendar
 							else
 							{
 								echo "<div class='row-actions'>
-									<span class='calendar_action_hide'>
-										<a href='#id_".$post_id."' class='calendar_event_post_action calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
+									<span class='api_calendar_action_hide'>
+										<a href='#id_".$post_id."' class='calendar_event_post_action api_calendar_action_hide' confirm_text='".__("Are you sure?", 'lang_calendar')."'>".__("Hide", 'lang_calendar')."</a>
 									</span>
 								</div>";
 							}
@@ -1357,13 +1357,15 @@ class mf_calendar
 		return $array;
 	}
 
-	function action_hide()
+	function api_calendar_action_hide()
 	{
 		global $wpdb, $done_text, $error_text;
 
-		$action_id = check_var('action_id', 'int');
+		$json_output = array(
+			'success' => false,
+		);
 
-		$result = array();
+		$action_id = check_var('action_id', 'int');
 
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = %s WHERE post_type = %s AND ID = '%d'", 'draft', $this->post_type_event, $action_id));
 
@@ -1377,21 +1379,15 @@ class mf_calendar
 			$error_text = __("I could not hide the event for you. If the problem persist, please contact an admin regarding this", 'lang_calendar');
 		}
 
-		$out = get_notification();
-
 		if($done_text != '')
 		{
-			$result['success'] = true;
-			$result['message'] = $out;
+			$json_output['success'] = true;
 		}
 
-		else
-		{
-			$result['error'] = $out;
-		}
+		$json_output['html'] = get_notification();
 
 		header('Content-Type: application/json');
-		echo json_encode($result);
+		echo json_encode($json_output);
 		die();
 	}
 
