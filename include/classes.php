@@ -2633,7 +2633,13 @@ class mf_calendar
 										case 'DTSTART':
 										case 'DTEND':
 											$row_value_orig = $row_value;
-											$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
+											
+											//$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
+
+											$utc_date = new DateTime($row_value_orig);
+											$utc_date->setTimezone(new DateTimeZone(wp_timezone_string()));
+											$row_value_utc = $utc_date->format('Y-m-d H:i:s');
+
 											$row_value = $row_value_utc;
 
 											$data_temp[strtolower($row_key)] = $row_value;
