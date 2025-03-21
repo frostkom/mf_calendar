@@ -572,7 +572,6 @@ class mf_calendar
 							}
 						}
 
-						//$obj_calendar = new mf_calendar();
 						echo $this->get_map_link($post_location);
 					break;
 
@@ -800,7 +799,7 @@ class mf_calendar
 			mf_enqueue_script('underscore');
 			mf_enqueue_script('backbone');
 			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js");
-			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('plugin_url' => $plugin_include_url));
+			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('ajax_url' => admin_url('admin-ajax.php')));
 			mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
 				'last_week' => date("W", strtotime("-1 week")),
 				'last_week_text' => __("Previous Week", 'lang_calendar'),
@@ -1387,6 +1386,53 @@ class mf_calendar
 		$json_output['html'] = get_notification();
 
 		header('Content-Type: application/json');
+		echo json_encode($json_output);
+		die();
+	}
+
+	function api_calendar_events()
+	{
+		$json_output = array(
+			'success' => false,
+		);
+
+		$calendar_feeds = check_var('calendar_feeds', 'char');
+		$calendar_display_filter = check_var('calendar_display_filter', 'char');
+		$calendar_display_categories = check_var('calendar_display_categories', 'char');
+		$calendar_display_all_info = check_var('calendar_display_all_info', 'char');
+		$calendar_type = check_var('calendar_type', 'char');
+		$calendar_months = check_var('calendar_months', 'int');
+		$calendar_order = check_var('calendar_order', 'char');
+
+		if($calendar_feeds != '')
+		{
+			$calendar_feeds = explode(",", $calendar_feeds);
+		}
+
+		$this->get_events(array(
+			'feeds' => $calendar_feeds,
+			'display_filter' => $calendar_display_filter,
+			'display_categories' => $calendar_display_categories,
+			'display_all_info' => $calendar_display_all_info,
+			'type' => $calendar_type,
+			'months' => $calendar_months,
+			'order' => $calendar_order,
+		));
+
+		if(count($this->arr_events) > 0)
+		{
+			$json_output['response_data'] = $this->arr_data;
+		}
+
+		$json_output['response_events'] = $this->arr_events;
+		$json_output['success'] = true;
+
+		if(IS_SUPER_ADMIN)
+		{
+			$json_output['debug'] = $this->debug;
+		}
+
+		header("Content-Type: application/json");
 		echo json_encode($json_output);
 		die();
 	}

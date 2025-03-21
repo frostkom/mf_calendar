@@ -21,7 +21,9 @@ var CalendarView = Backbone.View.extend(
 	loadEvents: function()
 	{
 		var dom_obj = jQuery(this.el).find(".section"),
-			action_type = "type=events";
+			arr_data = {
+				action: 'api_calendar_events'
+			};
 
 		this.calendar_display_filter = (dom_obj.attr('data-calendar_display_filter') || 'no');
 		this.calendar_display_categories = (dom_obj.attr('data-calendar_display_categories') || 'no');
@@ -30,47 +32,20 @@ var CalendarView = Backbone.View.extend(
 		this.calendar_order = (dom_obj.attr('data-calendar_order') || '');
 		this.calendar_type = (dom_obj.attr('data-calendar_type') || '');
 
-		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined')
-		{
-			action_type += "&calendar_feeds=" + dom_obj.attr('data-calendar_feeds');
-		}
+		if(typeof dom_obj.attr('data-calendar_feeds') != 'undefined'){	arr_data.calendar_feeds = dom_obj.attr('data-calendar_feeds');}
+		if(this.calendar_display_filter == 'yes'){						arr_data.calendar_display_filter = this.calendar_display_filter;}
+		if(this.calendar_display_categories == 'yes'){					arr_data.calendar_display_categories = this.calendar_display_categories;}
+		if(this.calendar_display_all_info == 'yes'){					arr_data.calendar_display_all_info = this.calendar_display_all_info;}
+		if(this.calendar_type != ''){									arr_data.calendar_type = this.calendar_type;}
+		if(this.calendar_months != ''){									arr_data.calendar_months = this.calendar_months;}
+		if(this.calendar_order != ''){									arr_data.calendar_order = this.calendar_order;}
 
-		if(this.calendar_display_filter == 'yes')
-		{
-			action_type += "&calendar_display_filter=" + this.calendar_display_filter;
-		}
-
-		if(this.calendar_display_categories == 'yes')
-		{
-			action_type += "&calendar_display_categories=" + this.calendar_display_categories;
-		}
-
-		if(this.calendar_display_all_info == 'yes')
-		{
-			action_type += "&calendar_display_all_info=" + this.calendar_display_all_info;
-		}
-
-		if(this.calendar_type != '')
-		{
-			action_type += "&calendar_type=" + this.calendar_type;
-		}
-
-		if(this.calendar_months != '')
-		{
-			action_type += "&calendar_months=" + this.calendar_months;
-		}
-
-		if(this.calendar_order != '')
-		{
-			action_type += "&calendar_order=" + this.calendar_order;
-		}
-
-		this.loadPage(action_type);
+		this.loadPage(arr_data);
 	},
 
-	loadPage: function(tab_active)
+	loadPage: function(arr_data)
 	{
-		this.model.getPage(tab_active);
+		this.model.getPage(arr_data);
 	},
 
 	get_max_weeks: function(type)

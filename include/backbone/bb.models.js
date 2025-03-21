@@ -1,15 +1,14 @@
 var CalendarModel = Backbone.Model.extend(
 {
-	getPage: function(dom_href)
+	getPage: function(arr_data)
 	{
-		var self = this,
-			url = (dom_href ? '?' + dom_href.replace('#', '') : "") + "&timestamp=" + Date.now();
+		var self = this;
 
 		jQuery().callAPI(
 		{
-			base_url: script_calendar_models.plugin_url + 'api/',
-			url: url,
-			send_type: 'get',
+			base_url: script_calendar_models.ajax_url,
+			send_type: 'post',
+			data: arr_data,
 			onSuccess: function(data)
 			{
 				self.set(data);
