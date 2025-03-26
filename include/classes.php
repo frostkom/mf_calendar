@@ -789,7 +789,7 @@ class mf_calendar
 
 	function wp_head()
 	{
-		if((int)apply_filters('get_block_search', 'mf/calendar') > 0 || (int)apply_filters('get_widget_search', 'gcal-widget') > 0)
+		if(apply_filters('get_block_search', 0, 'mf/calendar') > 0 || (int)apply_filters('get_widget_search', 'gcal-widget') > 0)
 		{
 			$plugin_base_include_url = plugins_url()."/mf_base/include/";
 			$plugin_include_url = plugin_dir_url(__FILE__);
