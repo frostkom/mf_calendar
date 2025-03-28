@@ -136,8 +136,8 @@ class mf_calendar
 
 		register_post_type($this->post_type, array(
 			'labels' => array(
-				'name' => _x(__("Calendar", 'lang_calendar'), 'post type general name'),
-				'singular_name' => _x(__("Calendar", 'lang_calendar'), 'post type singular name'),
+				'name' => __("Calendar", 'lang_calendar'),
+				'singular_name' => __("Calendar", 'lang_calendar'),
 				'menu_name' => __("Calendar", 'lang_calendar')
 			),
 			'public' => false, // Previously true but changed to hide in sitemap.xml
@@ -152,8 +152,8 @@ class mf_calendar
 
 		register_post_type($this->post_type_event, array(
 			'labels' => array(
-				'name' => _x(__("Events", 'lang_calendar'), 'post type general name'),
-				'singular_name' => _x(__("Event", 'lang_calendar'), 'post type singular name'),
+				'name' => __("Events", 'lang_calendar'),
+				'singular_name' => __("Event", 'lang_calendar'),
 				'menu_name' => __("Event", 'lang_calendar')
 			),
 			'public' => (is_plugin_active("mf_webshop/index.php")), // Has to be true so that events are reachable with widget_webshop_events()
@@ -1108,7 +1108,7 @@ class mf_calendar
 						'post_title' => $post_title,
 						'post_status' => 'publish',
 						'post_modified' => date("Y-m-d H:i:s"),
-						'meta_input' => array(
+						'meta_input' => apply_filters('filter_meta_input', array(
 							//$obj_group->meta_prefix.'api' => $this->api,
 							//$obj_group->meta_prefix.'api_filter' => $this->api_filter,
 							//$obj_group->meta_prefix.'acceptance_email' => $this->acceptance_email,
@@ -1124,7 +1124,7 @@ class mf_calendar
 							//$obj_group->meta_prefix.'owner_email' => $this->owner_email,
 							//$obj_group->meta_prefix.'help_page' => $this->help_page,
 							//$obj_group->meta_prefix.'archive_page' => $this->archive_page,
-						),
+						)),
 					);
 
 					if($registration_groups_id > 0)
@@ -2525,10 +2525,9 @@ class mf_calendar
 						wp_update_post(array(
 							'ID' => $this->id,
 							'post_status' => 'publish',
-							'meta_input' => array(
-								$this->meta_prefix.'error' => '',
-							),
 						));
+
+						delete_post_meta($this->id, $this->meta_prefix.'error');
 
 						if(count($arr_json['items']) == 250)
 						{
@@ -2545,9 +2544,9 @@ class mf_calendar
 							wp_update_post(array(
 								'ID' => $this->id,
 								'post_status' => 'draft',
-								'meta_input' => array(
+								'meta_input' => apply_filters('filter_meta_input', array(
 									$this->meta_prefix.'error' => __("The calendar was not found", 'lang_calendar'),
-								),
+								)),
 							));
 						}
 					}
@@ -2555,19 +2554,18 @@ class mf_calendar
 					wp_update_post(array(
 						'ID' => $this->id,
 						'post_status' => 'publish',
-						'meta_input' => array(
-							$this->meta_prefix.'error' => '',
-						),
 					));
+
+					delete_post_meta($this->id, $this->meta_prefix.'error');
 				break;
 
 				default:
 					/*wp_update_post(array(
 						'ID' => $this->id,
 						'post_status' => 'draft',
-						'meta_input' => array(
+						'meta_input' => apply_filters('filter_meta_input', array(
 							$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
-						),
+						)),
 					));*/
 
 					update_post_meta($this->id, $this->meta_prefix.'error', sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']));
@@ -2679,7 +2677,7 @@ class mf_calendar
 										case 'DTSTART':
 										case 'DTEND':
 											$row_value_orig = $row_value;
-											
+
 											//$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
 
 											$utc_date = new DateTime($row_value_orig);
@@ -2939,7 +2937,7 @@ class mf_calendar
 							'post_content' => $post['content'],
 							'guid' => (isset($post['link']) ? $post['link'] : ''),
 							'post_parent' => $this->id,
-							'meta_input' => array(
+							'meta_input' => apply_filters('filter_meta_input', array(
 								$this->meta_prefix.'calendar' => $this->id,
 								$this->meta_prefix.'uid' => $post['uid'],
 								$this->meta_prefix.'location' => (isset($post['location']) ? $post['location'] : ''),
@@ -2947,7 +2945,7 @@ class mf_calendar
 								$this->meta_prefix.'latitude' => (isset($post['latitude']) ? $post['latitude'] : ''),
 								$this->meta_prefix.'start' => $post['start'],
 								$this->meta_prefix.'end' => $post['end'],
-							),
+							)),
 						);
 
 						if($wpdb->num_rows == 0)
