@@ -58,6 +58,27 @@ class mf_calendar
 
 		if(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0)
 		{
+			$plugin_base_include_url = plugins_url()."/mf_base/include/";
+			$plugin_include_url = plugin_dir_url(__FILE__);
+
+			mf_enqueue_style('style_calendar', $plugin_include_url."style.php");
+
+			mf_enqueue_script('underscore');
+			mf_enqueue_script('backbone');
+			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js");
+			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('ajax_url' => admin_url('admin-ajax.php')));
+			mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
+				'last_week' => date("W", strtotime("-1 week")),
+				'last_week_text' => __("Previous Week", 'lang_calendar'),
+				'current_year' => date("Y"),
+				'current_week' => date("W"),
+				'current_week_text' => __("Current Week", 'lang_calendar'),
+				'next_week' => date("W", strtotime("+1 week")),
+				'next_week_text' => __("Next Week", 'lang_calendar'),
+				'week_text' => __("w", 'lang_calendar')
+			));
+			mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js");
+
 			add_action('wp_footer', array($this, 'get_footer'), 0);
 
 			$out .= "<div".parse_block_attributes(array('class' => "widget calendar", 'attributes' => $attributes)).">
@@ -140,7 +161,7 @@ class mf_calendar
 				'singular_name' => __("Calendar", 'lang_calendar'),
 				'menu_name' => __("Calendar", 'lang_calendar')
 			),
-			'public' => false, // Previously true but changed to hide in sitemap.xml
+			'public' => false,
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
@@ -268,7 +289,7 @@ class mf_calendar
 			$option = get_option($setting_key);
 
 			$description = "<ol>"
-				."<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.cloud.google.com'>Google Cloud Console</a>")."</li>" //console.developers.google.com/flows/enableapi?apiid=calendar&pli=1
+				."<li>".sprintf(__("Go to %s and log in", 'lang_calendar'), "<a href='//console.cloud.google.com'>Google Cloud Console</a>")."</li>"
 				."<li>".__("Create a new project", 'lang_calendar')."</li>"
 				."<li>".sprintf(__("Choose %s, %s, %s and %s", 'lang_calendar'), "Google Calendar API", "Web server", "Application data", "No")."</li>"
 			."</ol>";
@@ -787,33 +808,6 @@ class mf_calendar
 		}
 	}
 
-	function wp_head()
-	{
-		if(apply_filters('get_block_search', 0, 'mf/calendar') > 0 || (int)apply_filters('get_widget_search', 'gcal-widget') > 0)
-		{
-			$plugin_base_include_url = plugins_url()."/mf_base/include/";
-			$plugin_include_url = plugin_dir_url(__FILE__);
-
-			mf_enqueue_style('style_calendar', $plugin_include_url."style.php");
-
-			mf_enqueue_script('underscore');
-			mf_enqueue_script('backbone');
-			mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js");
-			mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('ajax_url' => admin_url('admin-ajax.php')));
-			mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
-				'last_week' => date("W", strtotime("-1 week")),
-				'last_week_text' => __("Previous Week", 'lang_calendar'),
-				'current_year' => date("Y"),
-				'current_week' => date("W"),
-				'current_week_text' => __("Current Week", 'lang_calendar'),
-				'next_week' => date("W", strtotime("+1 week")),
-				'next_week_text' => __("Next Week", 'lang_calendar'),
-				'week_text' => __("w", 'lang_calendar')
-			));
-			mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js");
-		}
-	}
-
 	function widgets_init()
 	{
 		register_widget('widget_calendar');
@@ -861,7 +855,6 @@ class mf_calendar
 				'id' => $this->meta_prefix.'google',
 				'title' => "Google Calendar",
 				'post_types' => array($this->post_type),
-				//'context' => 'side',
 				'priority' => 'low',
 				'fields' => array(
 					array(
@@ -879,7 +872,6 @@ class mf_calendar
 				'id' => $this->meta_prefix.'custom',
 				'title' => __("Custom", 'lang_calendar'),
 				'post_types' => array($this->post_type),
-				//'context' => 'side',
 				'priority' => 'low',
 				'fields' => array(
 					array(
@@ -1221,7 +1213,6 @@ class mf_calendar
 			'id' => $this->meta_prefix.'settings_normal',
 			'title' => __("Settings", 'lang_calendar'),
 			'post_types' => array($this->post_type_event),
-			//'context' => 'side',
 			'priority' => 'low',
 			'fields' => $arr_fields_normal,
 		);
@@ -1295,7 +1286,6 @@ class mf_calendar
 
 		if($post_type == $this->post_type_event)
 		{
-			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar', 'save' => true));
 			$strFilterCalendar = check_var('strFilterCalendar');
 
 			$arr_data = array();
@@ -1314,7 +1304,6 @@ class mf_calendar
 
 		if($pagenow == 'edit.php' && $post_type == $this->post_type_event)
 		{
-			//$strFilterCalendar = get_or_set_table_filter(array('key' => 'strFilterCalendar'));
 			$strFilterCalendar = check_var('strFilterCalendar');
 
 			if($strFilterCalendar != '')
@@ -1812,7 +1801,6 @@ class mf_calendar
 					{
 						$content_class .= " toggler";
 						$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon'></i>";
-						//$more_icon .= "<i class='fa fa-caret-down fa-lg toggle_icon_open'></i>";
 					}
 
 					$more_content = "<div class='more_content".($data['display_all_info'] != 'yes' ? " toggle_container" : "")."' rel='".$post_id."'>"
@@ -2103,6 +2091,8 @@ class mf_calendar
 
 		if($obj_cron->is_running == false)
 		{
+			replace_option(array('old' => 'setting_google_calendar_api_key', 'new' => 'setting_calendar_google_api_key'));
+
 			$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()", $this->post_type, 'publish'));
@@ -2560,14 +2550,6 @@ class mf_calendar
 				break;
 
 				default:
-					/*wp_update_post(array(
-						'ID' => $this->id,
-						'post_status' => 'draft',
-						'meta_input' => apply_filters('filter_meta_input', array(
-							$this->meta_prefix.'error' => sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']),
-						)),
-					));*/
-
 					update_post_meta($this->id, $this->meta_prefix.'error', sprintf(__("The calendar returned error %d", 'lang_calendar'), $headers['http_code']));
 				break;
 			}
@@ -2676,17 +2658,9 @@ class mf_calendar
 										case 'CREATED':
 										case 'DTSTART':
 										case 'DTEND':
-											$row_value_orig = $row_value;
-
-											//$row_value_utc = date("Y-m-d H:i:s", strtotime($row_value));
-
-											$utc_date = new DateTime($row_value_orig);
+											$utc_date = new DateTime($row_value);
 											$utc_date->setTimezone(new DateTimeZone(wp_timezone_string()));
-											$row_value_utc = $utc_date->format('Y-m-d H:i:s');
-
-											$row_value = $row_value_utc;
-
-											$data_temp[strtolower($row_key)] = $row_value;
+											$data_temp[strtolower($row_key)] = $utc_date->format('Y-m-d H:i:s');
 										break;
 
 										case 'DTSTAMP':
@@ -3115,6 +3089,27 @@ class widget_calendar extends WP_Widget
 	function widget($args, $instance)
 	{
 		do_log(__CLASS__."->".__FUNCTION__."(): Add a block instead", 'publish', false);
+
+		$plugin_base_include_url = plugins_url()."/mf_base/include/";
+		$plugin_include_url = plugin_dir_url(__FILE__);
+
+		mf_enqueue_style('style_calendar', $plugin_include_url."style.php");
+
+		mf_enqueue_script('underscore');
+		mf_enqueue_script('backbone');
+		mf_enqueue_script('script_base_plugins', $plugin_base_include_url."backbone/bb.plugins.js");
+		mf_enqueue_script('script_calendar_models', $plugin_include_url."backbone/bb.models.js", array('ajax_url' => admin_url('admin-ajax.php')));
+		mf_enqueue_script('script_calendar_views', $plugin_include_url."backbone/bb.views.js", array(
+			'last_week' => date("W", strtotime("-1 week")),
+			'last_week_text' => __("Previous Week", 'lang_calendar'),
+			'current_year' => date("Y"),
+			'current_week' => date("W"),
+			'current_week_text' => __("Current Week", 'lang_calendar'),
+			'next_week' => date("W", strtotime("+1 week")),
+			'next_week_text' => __("Next Week", 'lang_calendar'),
+			'week_text' => __("w", 'lang_calendar')
+		));
+		mf_enqueue_script('script_base_init', $plugin_base_include_url."backbone/bb.init.js");
 
 		extract($args);
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
