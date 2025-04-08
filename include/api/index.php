@@ -24,14 +24,14 @@ switch($type)
 		$calendar_display_all_info = check_var('calendar_display_all_info', 'char');
 		$calendar_type = check_var('calendar_type', 'char');
 		$calendar_months = check_var('calendar_months', 'int');
-		$calendar_order = check_var('calendar_order', 'char');
+		//$calendar_order = check_var('calendar_order', 'char');
 
 		if($calendar_feeds != '')
 		{
 			$calendar_feeds = explode(",", $calendar_feeds);
 		}
 
-		$obj_calendar->get_events(array('feeds' => $calendar_feeds, 'display_filter' => $calendar_display_filter, 'display_categories' => $calendar_display_categories, 'display_all_info' => $calendar_display_all_info, 'type' => $calendar_type, 'months' => $calendar_months, 'order' => $calendar_order));
+		$obj_calendar->get_events(array('feeds' => $calendar_feeds, 'display_filter' => $calendar_display_filter, 'display_categories' => $calendar_display_categories, 'display_all_info' => $calendar_display_all_info, 'type' => $calendar_type, 'months' => $calendar_months)); //, 'order' => $calendar_order
 
 		if(count($obj_calendar->arr_events) > 0)
 		{

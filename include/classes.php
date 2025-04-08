@@ -50,7 +50,7 @@ class mf_calendar
 		if(!isset($attributes['calendar_display_all_info'])){	$attributes['calendar_display_all_info'] = 'no';}
 		if(!isset($attributes['calendar_type'])){				$attributes['calendar_type'] = '';}
 		if(!isset($attributes['calendar_months'])){				$attributes['calendar_months'] = 6;}
-		if(!isset($attributes['calendar_order'])){				$attributes['calendar_order'] = 'ASC';}
+		//if(!isset($attributes['calendar_order'])){				$attributes['calendar_order'] = 'ASC';}
 		if(!isset($attributes['calendar_page'])){				$attributes['calendar_page'] = 0;}
 		if(!isset($attributes['calendar_page_title'])){			$attributes['calendar_page_title'] = '';}
 
@@ -89,7 +89,7 @@ class mf_calendar
 					.($attributes['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$attributes['calendar_display_all_info']."'" : '')
 					.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
 					.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
-					.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
+					//.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
 				.">
 					<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
@@ -214,8 +214,8 @@ class mf_calendar
 			'calendar_type_label' => __("Design", 'lang_calendar'),
 			'calendar_type' => $this->get_type_for_select(),
 			'calendar_months_label' => __("Months", 'lang_calendar'),
-			'calendar_order_label' => __("Order", 'lang_calendar'),
-			'calendar_order' => $this->get_order_for_select(),
+			//'calendar_order_label' => __("Order", 'lang_calendar'),
+			//'calendar_order' => $this->get_order_for_select(),
 			'calendar_page_label' => __("Read More", 'lang_calendar'),
 			'calendar_page' => $arr_data_pages,
 			'calendar_page_title_label' => __("Title", 'lang_calendar'),
@@ -1391,7 +1391,7 @@ class mf_calendar
 		$calendar_display_all_info = check_var('calendar_display_all_info', 'char');
 		$calendar_type = check_var('calendar_type', 'char');
 		$calendar_months = check_var('calendar_months', 'int');
-		$calendar_order = check_var('calendar_order', 'char');
+		//$calendar_order = check_var('calendar_order', 'char');
 
 		if($calendar_feeds != '')
 		{
@@ -1405,7 +1405,7 @@ class mf_calendar
 			'display_all_info' => $calendar_display_all_info,
 			'type' => $calendar_type,
 			'months' => $calendar_months,
-			'order' => $calendar_order,
+			//'order' => $calendar_order,
 		));
 
 		if(count($this->arr_events) > 0)
@@ -3069,7 +3069,7 @@ class widget_calendar extends WP_Widget
 		'calendar_display_all_info' => 'no',
 		'calendar_type' => '',
 		'calendar_months' => 6,
-		'calendar_order' => "ASC",
+		//'calendar_order' => "ASC",
 		'calendar_page' => 0,
 		'calendar_page_title' => "",
 	);
@@ -3134,7 +3134,7 @@ class widget_calendar extends WP_Widget
 				.($instance['calendar_display_all_info'] == 'yes' ? " data-calendar_display_all_info='".$instance['calendar_display_all_info']."'" : '')
 				.($instance['calendar_type'] != '' ? " data-calendar_type='".$instance['calendar_type']."'" : '')
 				.($instance['calendar_months'] != 0 ? " data-calendar_months='".$instance['calendar_months']."'" : '')
-				.($instance['calendar_order'] != '' ? " data-calendar_order='".$instance['calendar_order']."'" : '')
+				//.($instance['calendar_order'] != '' ? " data-calendar_order='".$instance['calendar_order']."'" : '')
 			.">
 				<i class='fa fa-spinner fa-spin fa-3x'></i>";
 
@@ -3186,7 +3186,7 @@ class widget_calendar extends WP_Widget
 		$instance['calendar_display_all_info'] = sanitize_text_field($new_instance['calendar_display_all_info']);
 		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
 		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
-		$instance['calendar_order'] = sanitize_text_field($new_instance['calendar_order']);
+		//$instance['calendar_order'] = sanitize_text_field($new_instance['calendar_order']);
 		$instance['calendar_page'] = sanitize_text_field($new_instance['calendar_page']);
 		$instance['calendar_page_title'] = sanitize_text_field($new_instance['calendar_page_title']);
 
@@ -3257,7 +3257,7 @@ class widget_calendar extends WP_Widget
 			."<div class='flex_flow'>"
 				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
 				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-36' max='36'"))
-				.show_select(array('data' => $this->get_order_for_select(), 'name' => $this->get_field_name('calendar_order'), 'text' => __("Order", 'lang_calendar'), 'value' => $instance['calendar_order']))
+				//.show_select(array('data' => $this->get_order_for_select(), 'name' => $this->get_field_name('calendar_order'), 'text' => __("Order", 'lang_calendar'), 'value' => $instance['calendar_order']))
 			."</div>
 			<div class='flex_flow'>"
 				.show_select(array('data' => $arr_data_pages, 'name' => $this->get_field_name('calendar_page'), 'text' => __("Read More", 'lang_calendar'), 'value' => $instance['calendar_page']));

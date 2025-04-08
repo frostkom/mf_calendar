@@ -57,11 +57,11 @@
                 'type': 'string',
                 'default': ''
             },
-			'calendar_order':
+			/*'calendar_order':
 			{
                 'type': 'string',
                 'default': ''
-            },
+            },*/
 			'calendar_page':
 			{
                 'type': 'string',
@@ -194,7 +194,7 @@
 								}
 							}
 						),
-						el(
+						/*el(
 							SelectControl,
 							{
 								label: script_calendar_block_wp.calendar_order_label,
@@ -205,7 +205,7 @@
 									props.setAttributes({calendar_order: value});
 								}
 							}
-						),
+						),*/
 						el(
 							SelectControl,
 							{
