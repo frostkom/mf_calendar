@@ -810,7 +810,10 @@ class mf_calendar
 
 	function widgets_init()
 	{
-		register_widget('widget_calendar');
+		if(wp_is_block_theme() == false)
+		{
+			register_widget('widget_calendar');
+		}
 	}
 
 	function is_birthday_active()
