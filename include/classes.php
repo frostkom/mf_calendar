@@ -1934,7 +1934,7 @@ class mf_calendar
 			$out['spots_left'] = ($out['limit_group_participants'] - $registration_amount);
 		}
 
-		if($out['registration'] > 0 && $out['limit_participants'] > 0)
+		/*if($out['registration'] > 0 && $out['limit_participants'] > 0)
 		{
 			global $obj_form;
 
@@ -1947,7 +1947,7 @@ class mf_calendar
 			$registration_amount = $obj_form->get_answer_amount(array('form_id' => $obj_form->id, 'meta_key' => 'calendar_id', 'meta_value' => $post_id));
 
 			$out['spots_left'] = ($out['limit_participants'] - $registration_amount);
-		}
+		}*/
 
 		return $out;
 	}
@@ -1989,7 +1989,7 @@ class mf_calendar
 		return apply_filters('the_content', $out);
 	}
 
-	function filter_form_on_submit($data)
+	/*function filter_form_on_submit($data)
 	{
 		global $obj_form;
 
@@ -2006,7 +2006,7 @@ class mf_calendar
 		}
 
 		return $data;
-	}
+	}*/
 
 	function get_footer()
 	{
