@@ -319,7 +319,7 @@ class mf_calendar
 	{
 		$menu_root = 'mf_calendar/';
 		$menu_start_orig = $menu_start = "edit.php?post_type=".$this->post_type;
-		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_pages'));
+		$menu_capability = 'edit_pages';
 
 		$calendar_amount = $this->get_calendar_amount(array('post_status' => ''));
 
