@@ -360,32 +360,32 @@ class mf_calendar
 		return $arr_pages;
 	}
 
-	function column_header($cols)
+	function column_header($columns)
 	{
 		global $post_type;
 
-		unset($cols['date']);
+		unset($columns['date']);
 
 		switch($post_type)
 		{
 			case $this->post_type:
-				$cols['color'] = __("Color", 'lang_calendar');
-				$cols['account'] = __("Account", 'lang_calendar');
-				$cols['amount_of_posts'] = __("Amount", 'lang_calendar');
+				$columns['color'] = __("Color", 'lang_calendar');
+				$columns['account'] = __("Account", 'lang_calendar');
+				$columns['amount_of_posts'] = __("Amount", 'lang_calendar');
 			break;
 
 			case $this->post_type_event:
-				unset($cols['title']);
+				unset($columns['title']);
 
-				$cols['event_title'] = __("Title", 'lang_calendar');
-				$cols['location'] = __("Location", 'lang_calendar');
-				$cols['datetime'] = __("Date", 'lang_calendar');
-				$cols['registration'] = __("Registration", 'lang_calendar');
-				$cols['calendar'] = __("Calendar", 'lang_calendar');
+				$columns['event_title'] = __("Title", 'lang_calendar');
+				$columns['location'] = __("Location", 'lang_calendar');
+				$columns['datetime'] = __("Date", 'lang_calendar');
+				$columns['registration'] = __("Registration", 'lang_calendar');
+				$columns['calendar'] = __("Calendar", 'lang_calendar');
 			break;
 		}
 
-		return $cols;
+		return $columns;
 	}
 
 	function get_amount_of_posts_for_td($id)
@@ -419,17 +419,17 @@ class mf_calendar
 		return $out;
 	}
 
-	function column_cell($col, $post_id)
+	function column_cell($column, $post_id)
 	{
 		global $wpdb, $post;
 
 		switch($post->post_type)
 		{
 			case $this->post_type:
-				switch($col)
+				switch($column)
 				{
 					case 'color':
-						$post_color = get_post_meta($post_id, $this->meta_prefix.$col, true);
+						$post_color = get_post_meta($post_id, $this->meta_prefix.$column, true);
 
 						if($post_color != '')
 						{
@@ -525,7 +525,7 @@ class mf_calendar
 			case $this->post_type_event:
 				global $done_text, $error_text;
 
-				switch($col)
+				switch($column)
 				{
 					case 'event_title':
 						$post_title = get_the_title($post_id);
@@ -637,7 +637,7 @@ class mf_calendar
 					break;
 
 					case 'calendar':
-						$post_meta = get_post_meta($post_id, $this->meta_prefix.$col, true);
+						$post_meta = get_post_meta($post_id, $this->meta_prefix.$column, true);
 
 						$post_parent = $post_meta > 0 ? get_the_title($post_meta) : "";
 
@@ -941,7 +941,7 @@ class mf_calendar
 			);
 		}
 
-		$fields_settings = array(
+		$arr_fields_settings = array(
 			array(
 				'name' => __("Color", 'lang_calendar'),
 				'id' => $this->meta_prefix.'color',
@@ -951,7 +951,7 @@ class mf_calendar
 
 		if($this->is_birthday_active())
 		{
-			$fields_settings[] = array(
+			$arr_fields_settings[] = array(
 				'name' => __("Display Birthdays", 'lang_calendar'),
 				'id' => $this->meta_prefix.'display_birthdays',
 				'type' => 'select',
@@ -966,7 +966,7 @@ class mf_calendar
 			'post_types' => array($this->post_type),
 			'context' => 'side',
 			'priority' => 'low',
-			'fields' => $fields_settings
+			'fields' => $arr_fields_settings,
 		);
 		###############################
 
