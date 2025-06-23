@@ -57,11 +57,11 @@
                 'type': 'string',
                 'default': ''
             },
-			/*'calendar_order':
+			'calendar_filter_hook':
 			{
                 'type': 'string',
                 'default': ''
-            },*/
+            }/*,
 			'calendar_page':
 			{
                 'type': 'string',
@@ -71,7 +71,7 @@
 			{
                 'type': 'string',
                 'default': ''
-            }
+            }*/
 		},
 		'supports':
 		{
@@ -186,7 +186,7 @@
 							TextControl,
 							{
 								label: script_calendar_block_wp.calendar_months_label,
-								type: 'text',
+								type: 'number',
 								value: props.attributes.calendar_months,
 								onChange: function(value)
 								{
@@ -194,18 +194,18 @@
 								}
 							}
 						),
-						/*el(
-							SelectControl,
+						el(
+							TextControl,
 							{
-								label: script_calendar_block_wp.calendar_order_label,
-								value: props.attributes.calendar_order,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_order),
+								label: script_calendar_block_wp.calendar_filter_hook_label,
+								type: 'text',
+								value: props.attributes.calendar_filter_hook,
 								onChange: function(value)
 								{
-									props.setAttributes({calendar_order: value});
+									props.setAttributes({calendar_filter_hook: value});
 								}
 							}
-						),*/
+						)/*,
 						el(
 							SelectControl,
 							{
@@ -229,7 +229,7 @@
 									props.setAttributes({calendar_page_title: value});
 								}
 							}
-						)
+						)*/
 					),
 					el(
 						'strong',
