@@ -2680,7 +2680,7 @@ class mf_calendar
 										break;
 
 										default:
-											do_log("Unkown Event Key: ".$row_key);
+											do_log("Unkown Event Key: ".$this->custom_url." -> ".$row_key);
 										break;
 									}
 								}
