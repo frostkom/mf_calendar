@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.9.21
+Version: 4.9.22
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se

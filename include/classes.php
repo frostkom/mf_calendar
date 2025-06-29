@@ -169,7 +169,8 @@ class mf_calendar
 				'singular_name' => __("Event", 'lang_calendar'),
 				'menu_name' => __("Event", 'lang_calendar')
 			),
-			'public' => (is_plugin_active("mf_webshop/index.php")), // Has to be true so that events are reachable with widget_webshop_events()
+			//'public' => (is_plugin_active("mf_webshop/index.php")), // Has to be true so that events are reachable with widget_webshop_events()
+			'public' => false,
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
@@ -2664,7 +2665,11 @@ class mf_calendar
 
 										case 'CREATED':
 										case 'DTSTART':
+										case 'DTSTART;VALUE=DATE':
 										case 'DTEND':
+										case 'DTEND;VALUE=DATE':
+											$row_key = str_replace(";VALUE=DATE", "", $row_key);
+
 											$utc_date = new DateTime($row_value);
 											$utc_date->setTimezone(new DateTimeZone(wp_timezone_string()));
 											$data_temp[strtolower($row_key)] = $utc_date->format('Y-m-d H:i:s');
@@ -2680,7 +2685,7 @@ class mf_calendar
 										break;
 
 										default:
-											do_log("Unkown Event Key: ".$this->custom_url." -> ".$row_key);
+											do_log("Unkown Event Key: ".$this->custom_url." -> ".$content." -> ".$event." -> ".$row_key);
 										break;
 									}
 								}
@@ -2783,7 +2788,7 @@ class mf_calendar
 
 							else
 							{
-								$item_start = date("Y-m-d H:i:s", strtotime($item[$custom_url_start]));
+								$item_start = (isset($item[$custom_url_start]) ? date("Y-m-d H:i:s", strtotime($item[$custom_url_start])) : "");
 							}
 						}
 
@@ -2798,7 +2803,7 @@ class mf_calendar
 
 							else
 							{
-								$item_end = date("Y-m-d H:i:s", strtotime($item[$custom_url_end]));
+								$item_end = (isset($item[$custom_url_end]) ? date("Y-m-d H:i:s", strtotime($item[$custom_url_end])) : '');
 							}
 						}
 
