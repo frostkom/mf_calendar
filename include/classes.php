@@ -174,6 +174,7 @@ class mf_calendar
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
+			'show_in_rest' => true,
 			'exclude_from_search' => ($setting_calendar_events_searchable == 'no'),
 			'supports' => array('title', 'editor', 'excerpt'),
 			'hierarchical' => true,
