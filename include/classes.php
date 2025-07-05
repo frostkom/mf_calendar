@@ -10,9 +10,9 @@ class mf_calendar
 	var $post_type = 'mf_calendar';
 	var $post_type_event = 'mf_calendar_event';
 	var $meta_prefix;
-	var $arr_events = array();
+	var $arr_events = [];
 	var $feed_was_updated = false;
-	var $arr_data = array();
+	var $arr_data = [];
 	var $debug;
 	var $arr_json_temp;
 
@@ -23,12 +23,12 @@ class mf_calendar
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
-	function get_calendar_amount($data = array())
+	function get_calendar_amount($data = [])
 	{
 		if(!isset($data['post_type'])){			$data['post_type'] = $this->post_type;}
 		if(!isset($data['add_choose_here'])){	$data['add_choose_here'] = false;}
 
-		$arr_data = array();
+		$arr_data = [];
 		get_post_children($data, $arr_data);
 
 		return count($arr_data);
@@ -43,7 +43,7 @@ class mf_calendar
 
 	function block_render_callback($attributes)
 	{
-		if(!isset($attributes['calendar_feeds'])){				$attributes['calendar_feeds'] = array();}
+		if(!isset($attributes['calendar_feeds'])){				$attributes['calendar_feeds'] = [];}
 		if(!isset($attributes['calendar_display_filter'])){		$attributes['calendar_display_filter'] = 'no';}
 		if(!isset($attributes['calendar_filter_label'])){		$attributes['calendar_filter_label'] = '';}
 		if(!isset($attributes['calendar_display_categories'])){	$attributes['calendar_display_categories'] = 'no';}
@@ -104,7 +104,7 @@ class mf_calendar
 
 					if($attributes['calendar_display_filter'] == 'yes')
 					{
-						$arr_data_feeds = array();
+						$arr_data_feeds = [];
 						get_post_children(array('post_type' => $this->post_type, 'include' => $attributes['calendar_feeds']), $arr_data_feeds);
 
 						if(count($arr_data_feeds) > 1)
@@ -189,10 +189,10 @@ class mf_calendar
 
 		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version, true);
 
-		$arr_data_feeds = array();
+		$arr_data_feeds = [];
 		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data_feeds);
 
-		/*$arr_data_pages = array();
+		/*$arr_data_pages = [];
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);*/
 
 		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array(
@@ -229,7 +229,7 @@ class mf_calendar
 
 		add_settings_section($options_area, "", array($this, $options_area."_callback"), BASE_OPTIONS_PAGE);
 
-		$arr_settings = array();
+		$arr_settings = [];
 		$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
 		$arr_settings['setting_calendar_date_bg'] = __("Date Background", 'lang_calendar');
 		$arr_settings['setting_calendar_image_fallback'] = __("Fallback Image", 'lang_calendar');
@@ -648,14 +648,14 @@ class mf_calendar
 		}
 	}
 
-	function row_actions($actions, $post)
+	function row_actions($arr_actions, $post)
 	{
 		if($post->post_type == $this->post_type_event)
 		{
-			$actions = array();
+			$arr_actions = [];
 		}
 
-		return $actions;
+		return $arr_actions;
 	}
 
 	// Because gCal displays whole-day-events with the end date the day after start date
@@ -973,7 +973,7 @@ class mf_calendar
 			)
 		);
 
-		$arr_data = array();
+		$arr_data = [];
 		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => true), $arr_data);
 
 		$default_calendar = '';
@@ -1157,7 +1157,7 @@ class mf_calendar
 				$obj_form = new mf_form();
 			}
 
-			$arr_data_forms = array();
+			$arr_data_forms = [];
 			get_post_children(array('add_choose_here' => true, 'post_type' => $obj_form->post_type), $arr_data_forms);
 
 			if(count($arr_data_forms) > 1)
@@ -1284,7 +1284,7 @@ class mf_calendar
 		{
 			$strFilterCalendar = check_var('strFilterCalendar');
 
-			$arr_data = array();
+			$arr_data = [];
 			get_post_children(array('post_type' => $this->post_type, 'post_status' => '', 'add_choose_here' => true), $arr_data);
 
 			if(count($arr_data) > 2)
@@ -1380,7 +1380,7 @@ class mf_calendar
 		global $wpdb;
 
 		if(!isset($data['id'])){								$data['id'] = 0;}
-		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = array();}
+		if(!isset($data['feeds']) || $data['feeds'] == ''){		$data['feeds'] = [];}
 		if(!isset($data['display_filter'])){					$data['display_filter'] = 'no';}
 		if(!isset($data['display_categories'])){				$data['display_categories'] = 'no';}
 		if(!isset($data['display_all_info'])){					$data['display_all_info'] = 'no';}
@@ -1406,7 +1406,7 @@ class mf_calendar
 			'date_end' => '',
 			'week_end' => '',
 			'year_end' => '',
-			'week_dates' => array(),
+			'week_dates' => [],
 		);
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
@@ -2310,7 +2310,7 @@ class mf_calendar
 											{
 												$repeating_rule = explode(";", $recurrence_value);
 
-												$arr_repeat = array();
+												$arr_repeat = [];
 
 												foreach($repeating_rule as $row)
 												{
@@ -2626,7 +2626,7 @@ class mf_calendar
 					$custom_url_start = 'dtstart';
 					$custom_url_end = 'dtend';
 
-					$arr_json = array($custom_url_container => array());
+					$arr_json = array($custom_url_container => []);
 
 					$arr_events = explode("BEGIN:VEVENT", $content);
 
@@ -2636,7 +2636,7 @@ class mf_calendar
 					{
 						if($i > 0)
 						{
-							$data_temp = array();
+							$data_temp = [];
 
 							foreach(explode("\r", $event) as $event_row)
 							{
@@ -2721,7 +2721,7 @@ class mf_calendar
 
 					if(!isset($arr_json[$custom_url_container]))
 					{
-						$this->arr_json_temp = array();
+						$this->arr_json_temp = [];
 
 						$this->get_json_child($arr_json, $custom_url_container, $print);
 
@@ -3032,7 +3032,7 @@ class mf_calendar
 
 		if(count($this->arr_events) > 0)
 		{
-			$arr_titles = array();
+			$arr_titles = [];
 
 			foreach($this->arr_events as $post)
 			{
@@ -3075,7 +3075,7 @@ class widget_calendar extends WP_Widget
 	var $widget_ops;
 	var $arr_default = array(
 		'calendar_heading' => "",
-		'calendar_feeds' => array(),
+		'calendar_feeds' => [],
 		'calendar_display_filter' => 'no',
 		'calendar_filter_label' => "",
 		'calendar_display_categories' => 'no',
@@ -3107,7 +3107,7 @@ class widget_calendar extends WP_Widget
 		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
 
 		$instance['calendar_heading'] = sanitize_text_field($new_instance['calendar_heading']);
-		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : array();
+		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : [];
 		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
 		$instance['calendar_filter_label'] = sanitize_text_field($new_instance['calendar_filter_label']);
 		$instance['calendar_display_categories'] = sanitize_text_field($new_instance['calendar_display_categories']);
@@ -3130,10 +3130,10 @@ class widget_calendar extends WP_Widget
 	{
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
-		$arr_data_feeds = array();
+		$arr_data_feeds = [];
 		get_post_children(array('post_type' => $this->obj_calendar->post_type), $arr_data_feeds);
 
-		$arr_data_pages = array();
+		$arr_data_pages = [];
 		get_post_children(array('add_choose_here' => true), $arr_data_pages);
 
 		echo "<div class='mf_form'>"
