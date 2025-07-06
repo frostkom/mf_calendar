@@ -1718,8 +1718,12 @@ class mf_calendar
 					{
 						if($data['display_all_info'] != 'yes')
 						{
-							$content_class .= " toggler";
-							$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon'></i>";
+							$content_class .= " toggler icon_last";
+							//$more_icon = "<i class='fa fa-caret-right fa-lg toggle_icon'></i>";
+							$more_icon = "<div class='toggle_icon'>
+								<span class='line'></span>
+								<span class='line'></span>
+							</div>";
 						}
 
 						$more_content = "<div class='more_content".($data['display_all_info'] != 'yes' ? " toggle_container" : "")."' rel='".$post_id."'>"
