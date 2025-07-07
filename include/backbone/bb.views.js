@@ -134,7 +134,7 @@ var CalendarView = Backbone.View.extend(
 
 	show_events: function()
 	{
-		jQuery(this.el).find(".section .fa-spinner").addClass('hide');
+		jQuery(this.el).find(".section .loading_animation").addClass('hide');
 
 		this.show_filter();
 

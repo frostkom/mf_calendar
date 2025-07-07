@@ -90,8 +90,8 @@ class mf_calendar
 					.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
 					.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
 					.($attributes['calendar_filter_hook'] != '' ? " data-calendar_filter_hook='".$attributes['calendar_filter_hook']."'" : '')
-				.">
-					<i class='fa fa-spinner fa-spin fa-3x'></i>";
+				.">"
+					.apply_filters('get_loading_animation', '', ['class' => "fa-3x"]);
 
 					if($attributes['calendar_type'] == 'week')
 					{
@@ -797,7 +797,10 @@ class mf_calendar
 		{
 			$plugin_include_url = plugin_dir_url(__FILE__);
 
-			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array('ajax_url' => admin_url('admin-ajax.php')));
+			mf_enqueue_script('script_calendar', $plugin_include_url."script_wp.js", array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'loading_animation' => apply_filters('get_loading_animation', ''),
+			));
 		}
 	}
 
@@ -2029,7 +2032,7 @@ class mf_calendar
 
 		$out = $obj_base->get_templates(array('lost_connection'));
 
-		$obj_base->get_toggler_includes();
+		do_action('get_toggler_includes');
 
 		echo "<script type='text/template' id='template_calendar_message'>
 			<li>".__("There are no events to display", 'lang_calendar')."</li>

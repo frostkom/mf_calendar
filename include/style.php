@@ -195,7 +195,9 @@ echo "@media all
 
 						.widget.calendar .section .calendar_feed_item .more_content
 						{
-							margin: .5em 0;
+							background: none;
+							border: none;
+							margin: 0;
 							padding: 0;
 						}
 
