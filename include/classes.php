@@ -139,12 +139,43 @@ class mf_calendar
 		);
 	}
 
+	function enqueue_block_editor_assets()
+	{
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version, true);
+
+		$arr_data_feeds = [];
+		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data_feeds);
+
+		/*$arr_data_pages = [];
+		get_post_children(array('add_choose_here' => true), $arr_data_pages);*/
+
+		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array(
+			'block_title' => __("Calendar", 'lang_calendar'),
+			'block_description' => __("Display a Calendar", 'lang_calendar'),
+			'calendar_feeds_label' => __("Feeds", 'lang_calendar'),
+			'calendar_feeds' => $arr_data_feeds,
+			'calendar_display_filter_label' => __("Display Filter", 'lang_calendar'),
+			'yes_no_for_select' => get_yes_no_for_select(),
+			'calendar_filter_label' => __("Label", 'lang_calendar'),
+			'calendar_display_categories_label' => __("Display Categories", 'lang_calendar'),
+			'calendar_display_all_info_label' => __("Display All Info", 'lang_calendar'),
+			'calendar_type_label' => __("Design", 'lang_calendar'),
+			'calendar_type' => $this->get_type_for_select(),
+			'calendar_months_label' => __("Months", 'lang_calendar'),
+			'calendar_filter_hook_label' => __("Filter Hook", 'lang_calendar'),
+			/*'calendar_page_label' => __("Read More", 'lang_calendar'),
+			'calendar_page' => $arr_data_pages,
+			'calendar_page_title_label' => __("Title", 'lang_calendar'),*/
+		));
+	}
+
 	function init()
 	{
 		load_plugin_textdomain('lang_calendar', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
 
-		// Post types
-		#######################
 		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
 
 		register_post_type($this->post_type, array(
@@ -180,39 +211,6 @@ class mf_calendar
 			'hierarchical' => true,
 			'has_archive' => false,
 		));
-		#######################
-
-		// Blocks
-		#######################
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
-
-		wp_register_script('script_calendar_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version, true);
-
-		$arr_data_feeds = [];
-		get_post_children(array('post_type' => $this->post_type, 'add_choose_here' => false), $arr_data_feeds);
-
-		/*$arr_data_pages = [];
-		get_post_children(array('add_choose_here' => true), $arr_data_pages);*/
-
-		wp_localize_script('script_calendar_block_wp', 'script_calendar_block_wp', array(
-			'block_title' => __("Calendar", 'lang_calendar'),
-			'block_description' => __("Display a Calendar", 'lang_calendar'),
-			'calendar_feeds_label' => __("Feeds", 'lang_calendar'),
-			'calendar_feeds' => $arr_data_feeds,
-			'calendar_display_filter_label' => __("Display Filter", 'lang_calendar'),
-			'yes_no_for_select' => get_yes_no_for_select(),
-			'calendar_filter_label' => __("Label", 'lang_calendar'),
-			'calendar_display_categories_label' => __("Display Categories", 'lang_calendar'),
-			'calendar_display_all_info_label' => __("Display All Info", 'lang_calendar'),
-			'calendar_type_label' => __("Design", 'lang_calendar'),
-			'calendar_type' => $this->get_type_for_select(),
-			'calendar_months_label' => __("Months", 'lang_calendar'),
-			'calendar_filter_hook_label' => __("Filter Hook", 'lang_calendar'),
-			/*'calendar_page_label' => __("Read More", 'lang_calendar'),
-			'calendar_page' => $arr_data_pages,
-			'calendar_page_title_label' => __("Title", 'lang_calendar'),*/
-		));
 
 		register_block_type('mf/calendar', array(
 			'editor_script' => 'script_calendar_block_wp',
@@ -220,7 +218,6 @@ class mf_calendar
 			'render_callback' => array($this, 'block_render_callback'),
 			//'style' => 'style_base_block_wp',
 		));
-		#######################
 	}
 
 	function settings_calendar()
