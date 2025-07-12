@@ -164,6 +164,7 @@ echo "@media all
 						.widget.calendar .section .calendar_feed_item .meta
 						{
 							padding: 0;
+							position: relative;
 						}
 
 							.widget.calendar .section .heading
