@@ -109,6 +109,8 @@ class mf_calendar
 
 						if(count($arr_data_feeds) > 1)
 						{
+							do_action('init_multiselect');
+
 							$out .= "<form action='' method='post' class='mf_form hide'>"
 								.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
 							."</form>";
