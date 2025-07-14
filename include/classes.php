@@ -5,6 +5,7 @@ class mf_calendar
 	var $id;
 	var $calendar_id;
 	var $calendar_url;
+	var $calendar_url_clean;
 	var $custom_url;
 	var $display_birthdays;
 	var $post_type = 'mf_calendar';
