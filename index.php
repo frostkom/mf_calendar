@@ -3,12 +3,14 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.10.4
+Version: 4.10.5
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
 Text Domain: lang_calendar
 Domain Path: /lang
+
+Requires Plugins: meta-box
 */
 
 if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php"))
@@ -17,7 +19,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	$obj_calendar = new mf_calendar();
 
-	add_action('cron_base', 'activate_calendar', mt_rand(1, 10));
 	add_action('cron_base', array($obj_calendar, 'cron_base'), mt_rand(1, 10));
 
 	add_action('enqueue_block_editor_assets', array($obj_calendar, 'enqueue_block_editor_assets'));
@@ -25,7 +26,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	if(is_admin())
 	{
-		register_activation_hook(__FILE__, 'activate_calendar');
 		register_uninstall_hook(__FILE__, 'uninstall_calendar');
 
 		add_action('admin_init', array($obj_calendar, 'settings_calendar'));
@@ -70,11 +70,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	add_action('wp_ajax_api_calendar_events', array($obj_calendar, 'api_calendar_events'));
 	add_action('wp_ajax_nopriv_api_calendar_events', array($obj_calendar, 'api_calendar_events'));
-
-	function activate_calendar()
-	{
-		require_plugin("meta-box/meta-box.php", "Meta Box");
-	}
 
 	function uninstall_calendar()
 	{
