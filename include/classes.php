@@ -1721,7 +1721,7 @@ class mf_calendar
 					{
 						if($data['display_all_info'] != 'yes')
 						{
-							$content_class .= " toggler icon_last";
+							$content_class .= " toggler";
 							$more_icon = "<div class='toggle_icon'><div></div><div></div></div>";
 						}
 
