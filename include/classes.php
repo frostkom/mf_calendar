@@ -179,7 +179,7 @@ class mf_calendar
 	{
 		load_plugin_textdomain('lang_calendar', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
 
-		$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
+		//$setting_calendar_events_searchable = get_option_or_default('setting_calendar_events_searchable', 'no');
 
 		register_post_type($this->post_type, array(
 			'labels' => array(
@@ -209,7 +209,7 @@ class mf_calendar
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
 			'show_in_rest' => true,
-			'exclude_from_search' => ($setting_calendar_events_searchable == 'no'),
+			//'exclude_from_search' => ($setting_calendar_events_searchable == 'no'),
 			'supports' => array('title', 'editor', 'excerpt'),
 			'hierarchical' => true,
 			'has_archive' => false,
@@ -219,7 +219,6 @@ class mf_calendar
 			'editor_script' => 'script_calendar_block_wp',
 			'editor_style' => 'style_base_block_wp',
 			'render_callback' => array($this, 'block_render_callback'),
-			//'style' => 'style_base_block_wp',
 		));
 	}
 
@@ -230,15 +229,15 @@ class mf_calendar
 		add_settings_section($options_area, "", array($this, $options_area."_callback"), BASE_OPTIONS_PAGE);
 
 		$arr_settings = [];
-		$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
+		//$arr_settings['setting_calendar_events_searchable'] = __("Make Events Searchable", 'lang_calendar');
 		$arr_settings['setting_calendar_date_bg'] = __("Date Background", 'lang_calendar');
 		$arr_settings['setting_calendar_image_fallback'] = __("Fallback Image", 'lang_calendar');
 		$arr_settings['setting_calendar_google_api_key'] = __("API Key", 'lang_calendar');
 
-		if(get_option('setting_calendar_google_api_key') != '')
+		/*if(get_option('setting_calendar_google_api_key') != '')
 		{
 			$arr_settings['setting_calendar_time_limit'] = __("Time Limit", 'lang_calendar');
-		}
+		}*/
 
 		$arr_settings['setting_calendar_debug'] = __("Debug", 'lang_calendar');
 
@@ -252,13 +251,13 @@ class mf_calendar
 		echo settings_header($setting_key, __("Calendar", 'lang_calendar'));
 	}
 
-		function setting_calendar_events_searchable_callback()
+		/*function setting_calendar_events_searchable_callback()
 		{
 			$setting_key = get_setting_key(__FUNCTION__);
 			$option = get_option($setting_key, 'no');
 
 			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
-		}
+		}*/
 
 		function setting_calendar_date_bg_callback()
 		{
@@ -290,13 +289,13 @@ class mf_calendar
 			echo show_textfield(array('name' => $setting_key, 'value' => $option, 'description' => $description));
 		}
 
-		function setting_calendar_time_limit_callback()
+		/*function setting_calendar_time_limit_callback()
 		{
 			$setting_key = get_setting_key(__FUNCTION__);
 			$option = get_option_or_default($setting_key, 30);
 
 			echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'xtra' => "min='10' max='1440'", 'suffix' => __("minutes between each API request", 'lang_calendar')));
-		}
+		}*/
 
 		function setting_calendar_debug_callback()
 		{
@@ -1725,7 +1724,7 @@ class mf_calendar
 							$more_icon = "<div class='toggle_icon'><div></div><div></div></div>";
 						}
 
-						$more_content = "<div class='more_content".($data['display_all_info'] != 'yes' ? " toggle_container" : "")."' rel='".$post_id."'>"
+						$more_content = "<div class='more_content".($data['display_all_info'] != 'yes' ? " toggle_container" : "")."'>" // rel='".$post_id."'
 							.$more_content
 						."</div>";
 					}
@@ -2104,10 +2103,15 @@ class mf_calendar
 		if($obj_cron->is_running == false)
 		{
 			replace_option(array('old' => 'setting_google_calendar_api_key', 'new' => 'setting_calendar_google_api_key'));
+			replace_option(array('old' => 'setting_calendar_events_exclude_from_search', 'new' => 'setting_calendar_events_searchable'));
 
-			$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
+			mf_uninstall_plugin(array(
+				'options' => array('setting_calendar_events_searchable', 'setting_calendar_events_exclude_from_search', 'setting_calendar_image_fallback'),
+			));
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()", $this->post_type, 'publish'));
+			//$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY RAND()", $this->post_type, 'publish')); // AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE)
 
 			foreach($result as $r)
 			{
