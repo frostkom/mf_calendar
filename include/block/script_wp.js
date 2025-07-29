@@ -61,17 +61,7 @@
 			{
                 'type': 'string',
                 'default': ''
-            }/*,
-			'calendar_page':
-			{
-                'type': 'string',
-                'default': ''
-            },
-			'calendar_page_title':
-			{
-                'type': 'string',
-                'default': ''
-            }*/
+            }
 		},
 		'supports':
 		{
@@ -205,31 +195,7 @@
 									props.setAttributes({calendar_filter_hook: value});
 								}
 							}
-						)/*,
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_page_label,
-								value: props.attributes.calendar_page,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_page),
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_page: value});
-								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_calendar_block_wp.calendar_page_title_label,
-								type: 'text',
-								value: props.attributes.calendar_page_title,
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_page_title: value});
-								}
-							}
-						)*/
+						)
 					),
 					el(
 						'strong',
