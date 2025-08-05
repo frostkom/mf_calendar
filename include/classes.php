@@ -11,9 +11,9 @@ class mf_calendar
 	var $post_type = 'mf_calendar';
 	var $post_type_event = 'mf_calendar_event';
 	var $meta_prefix;
-	var $arr_events = [];
+	var $arr_events;
 	var $feed_was_updated = false;
-	var $arr_data = [];
+	var $arr_data;
 	var $debug;
 	var $arr_json_temp;
 
@@ -421,9 +421,10 @@ class mf_calendar
 
 						if($post_meta != '')
 						{
+							// This should not be done here, but in My Settings
 							$fetch_link = "";
 
-							$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $post_id, $this->post_type));
+							/*$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $post_id, $this->post_type));
 
 							if($wpdb->num_rows > 0)
 							{
@@ -439,7 +440,7 @@ class mf_calendar
 								{
 									$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$post_id), 'calendar_fetch_'.$post_id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
 								}
-							}
+							}*/
 
 							$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $post_id, $this->post_type));
 
@@ -1423,11 +1424,11 @@ class mf_calendar
 		$rows = $wpdb->num_rows;
 
 		$this->debug = $wpdb->last_query;
+		$this->arr_events = [];
 
 		if($rows > 0)
 		{
 			$year_temp = $yearmonth_temp = $week_temp = $date_temp = "";
-			//$i = 0;
 
 			foreach($result as $r)
 			{
@@ -1696,7 +1697,6 @@ class mf_calendar
 						$this->arr_events[] = array(
 							'feed' => $post_feed,
 							'feed_name' => $feed_name,
-
 							'heading' => $post_heading,
 						);
 					}
@@ -1704,25 +1704,19 @@ class mf_calendar
 					$this->arr_events[] = array(
 						'feed' => $post_feed,
 						'feed_name' => $feed_name,
-
 						'heading' => "",
-
 						'image' => $post_image,
 						'id' => $post_id,
 						'title' => $post_title,
-
 						'date_end' => $date_end,
 						'content_class' => $content_class,
 						'more_icon' => $more_icon,
 						'more_content' => $more_content,
-
 						//type == week
 						'start_week' => $post_start_week,
-
 						//default
 						'start_year' => $post_start_year,
 						'start_day' => $post_start_day,
-
 						//microformats
 						'start_date_c' => date("c", strtotime($post_start)),
 						'end_date_c' => date("c", strtotime($post_end)),
@@ -1734,8 +1728,6 @@ class mf_calendar
 
 					//week
 					$date_temp = $post_start_date;
-
-					//$i++;
 				}
 			}
 		}
@@ -1986,7 +1978,7 @@ class mf_calendar
 							<i class='fas fa-link'></i>
 						</a>
 					</div>
-					<div class='content<%= content_class %>' rel='<%= id %>'>
+					<div class='content<%= content_class %>'>
 						<div class='meta'>";
 
 							$setting_calendar_image_fallback = get_option('setting_calendar_image_fallback');
@@ -2047,7 +2039,7 @@ class mf_calendar
 
 			//$setting_calendar_time_limit = get_option_or_default('setting_calendar_time_limit', 30);
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s ORDER BY RAND()", $this->post_type, 'publish')); // AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE)
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s", $this->post_type, 'publish')); // AND post_modified < DATE_SUB(NOW(), INTERVAL ".$setting_calendar_time_limit." MINUTE) ORDER BY RAND()
 
 			foreach($result as $r)
 			{
@@ -2100,6 +2092,8 @@ class mf_calendar
 
 	function fetch_source($id, $print = false)
 	{
+		$this->arr_events = [];
+
 		$this->set_id($id);
 		$this->get_calendar_id();
 
@@ -2148,7 +2142,7 @@ class mf_calendar
 
 			if($setting_calendar_debug == 'yes')
 			{
-				do_log(__FUNCTION__." - URL: ".$this->calendar_url); //." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content
+				do_log(__FUNCTION__." - URL: ".$this->calendar_url." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content);
 			}
 
 			switch($headers['http_code'])
@@ -2545,7 +2539,7 @@ class mf_calendar
 
 		if($setting_calendar_debug == 'yes')
 		{
-			do_log(__FUNCTION__." - URL: ".$this->custom_url);
+			do_log(__FUNCTION__." - URL: ".$this->custom_url." -> ".var_export($headers, true)." -> ".$headers['http_code']." -> ".$content);
 		}
 
 		switch($headers['http_code'])
@@ -2553,11 +2547,6 @@ class mf_calendar
 			case 200:
 				if(basename($this->custom_url) == "basic.ics")
 				{
-					if($setting_calendar_debug == 'yes')
-					{
-						do_log(__FUNCTION__." - ical");
-					}
-
 					$custom_url_container = 'ical';
 					$custom_url_id = 'uid';
 					$custom_url_image = '';
@@ -2581,9 +2570,11 @@ class mf_calendar
 						{
 							$data_temp = [];
 
+							$event = preg_replace("/(\r\n|\n|\r)[ \t]/", '', $event);
+
 							foreach(explode("\r", $event) as $event_row)
 							{
-								@list($row_key, $row_value) = explode(":", trim($event_row));
+								@list($row_key, $row_value) = explode(":", trim($event_row), 2);
 
 								if($row_value != '')
 								{
