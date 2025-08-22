@@ -14,13 +14,13 @@ var CalendarView = Backbone.View.extend(
 
 	events:
 	{
-		"click .section .controls.fa:not(.is_disabled)" : 'change_week',
+		"click .controls.fa:not(.is_disabled)" : 'change_week',
 		"change #calendar_feeds" : 'change_feeds'
 	},
 
 	loadEvents: function()
 	{
-		var dom_obj = jQuery(this.el).find(".section"),
+		var dom_obj = jQuery(this.el).children("div"),
 			arr_data = {
 				action: 'api_calendar_events'
 			};
@@ -134,7 +134,7 @@ var CalendarView = Backbone.View.extend(
 
 	show_events: function()
 	{
-		jQuery(this.el).find(".section .loading_animation").addClass('hide');
+		jQuery(this.el).find(".loading_animation").addClass('hide');
 
 		this.show_filter();
 
@@ -146,7 +146,7 @@ var CalendarView = Backbone.View.extend(
 		var response = this.model.get('response_events'),
 			amount = response.length,
 			html = "",
-			dom_obj = jQuery(this.el).find(".section > ul");
+			dom_obj = jQuery(this.el).find("div > ul");
 
 		if(amount > 0)
 		{
@@ -203,7 +203,7 @@ var CalendarView = Backbone.View.extend(
 				this.chosen_feeds = jQuery(this.el).find("#calendar_feeds").val() || [];
 			}
 
-			jQuery(this.el).find(".section .mf_form").removeClass('hide');
+			jQuery(this.el).find("div .mf_form").removeClass('hide');
 		}
 	},
 
@@ -249,7 +249,7 @@ var CalendarView = Backbone.View.extend(
 
 			if(week_disabled == false)
 			{
-				jQuery(this.el).find(".section > h4").removeClass('hide');
+				jQuery(this.el).find("div > h4").removeClass('hide');
 			}
 		}
 	}

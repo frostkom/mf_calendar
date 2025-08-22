@@ -81,7 +81,7 @@ class mf_calendar
 			add_action('wp_footer', array($this, 'get_footer'), 0);
 
 			$out .= "<div".parse_block_attributes(array('class' => "widget calendar", 'attributes' => $attributes)).">
-				<div class='section'"
+				<div" // class='section'
 					.(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0 ? " data-calendar_feeds='".implode(",", $attributes['calendar_feeds'])."'" : '')
 					.($attributes['calendar_display_filter'] == 'yes' ? " data-calendar_display_filter='".$attributes['calendar_display_filter']."'" : '')
 					.($attributes['calendar_display_categories'] == 'yes' ? " data-calendar_display_categories='".$attributes['calendar_display_categories']."'" : '')
@@ -1827,8 +1827,8 @@ class mf_calendar
 	function get_next_event($data)
 	{
 		$out = "<div class='widget calendar'>
-			<div class='section'>
-				<ul>";
+			<div>" // class='section'
+				."<ul>";
 
 					foreach($data['array']['meta'] as $event)
 					{
