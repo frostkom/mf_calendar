@@ -1415,7 +1415,7 @@ class mf_calendar
 
 		else
 		{
-			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs($data['months'])." MONTH)";
+			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs((int)$data['months'])." MONTH)";
 		}
 
 		$arr_post_statuses = apply_filters('filter_calendar_post_statuses', array('publish', 'future'));
@@ -1606,9 +1606,16 @@ class mf_calendar
 
 					else
 					{
-						$date_end .= "<i class='fa fa-arrow-right'></i> ".$post_end_date;
+						$date_end .= $post_start_date;
 
-						if($post_end_time != '' && $post_end_time != '00:00')
+						if($post_start_time > "00:00")
+						{
+							$date_end .= "&nbsp;".$post_start_time;
+						}
+
+						$date_end .= "&nbsp;-&nbsp;".$post_end_date;
+
+						if($post_end_time > '00:00')
 						{
 							$date_end .= "&nbsp;".$post_end_time;
 						}
@@ -2008,7 +2015,7 @@ class mf_calendar
 
 							<% if(date_end != '')
 							{ %>
-								<p class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></p>
+								<p><span class='end_date' itemprop='endDate' content='<%= end_date_c %>'><%= date_end %></span></p>
 							<% } %>
 						</div>
 						<%= more_content %>
