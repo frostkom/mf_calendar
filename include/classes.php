@@ -1064,7 +1064,7 @@ class mf_calendar
 						'post_title' => $post_title,
 						'post_status' => 'publish',
 						'post_modified' => date("Y-m-d H:i:s"),
-						'meta_input' => apply_filters('filter_meta_input', array(
+						'meta_input' => array(
 							//$obj_group->meta_prefix.'api' => $this->api,
 							//$obj_group->meta_prefix.'api_filter' => $this->api_filter,
 							//$obj_group->meta_prefix.'acceptance_email' => $this->acceptance_email,
@@ -1080,12 +1080,13 @@ class mf_calendar
 							//$obj_group->meta_prefix.'owner_email' => $this->owner_email,
 							//$obj_group->meta_prefix.'help_page' => $this->help_page,
 							//$obj_group->meta_prefix.'archive_page' => $this->archive_page,
-						)),
+						),
 					);
 
 					if($registration_groups_id > 0)
 					{
 						$post_data['ID'] = $registration_groups_id;
+						$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input'], $post_data['ID']);
 
 						wp_update_post($post_data);
 					}
@@ -1101,6 +1102,8 @@ class mf_calendar
 
 						else
 						{
+							$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input']);
+
 							wp_insert_post($post_data);
 						}
 					}
@@ -2487,9 +2490,9 @@ class mf_calendar
 							wp_update_post(array(
 								'ID' => $this->id,
 								'post_status' => 'draft',
-								'meta_input' => apply_filters('filter_meta_input', array(
+								'meta_input' => array(
 									$this->meta_prefix.'error' => __("The calendar was not found", 'lang_calendar'),
-								)),
+								),
 							));
 						}
 					}
@@ -2854,7 +2857,7 @@ class mf_calendar
 							'post_content' => $post['content'],
 							'guid' => (isset($post['link']) ? $post['link'] : ''),
 							'post_parent' => $this->id,
-							'meta_input' => apply_filters('filter_meta_input', array(
+							'meta_input' => array(
 								$this->meta_prefix.'calendar' => $this->id,
 								$this->meta_prefix.'uid' => $post['uid'],
 								$this->meta_prefix.'location' => (isset($post['location']) ? $post['location'] : ''),
@@ -2862,7 +2865,7 @@ class mf_calendar
 								$this->meta_prefix.'latitude' => (isset($post['latitude']) ? $post['latitude'] : ''),
 								$this->meta_prefix.'start' => $post['start'],
 								$this->meta_prefix.'end' => $post['end'],
-							)),
+							),
 						);
 
 						if($wpdb->num_rows == 0)
@@ -2870,6 +2873,7 @@ class mf_calendar
 							if($this->check_before_insert($post))
 							{
 								$post_data['post_date'] = $post['created'];
+								$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input']);
 
 								$post_id = wp_insert_post($post_data);
 
@@ -2916,6 +2920,7 @@ class mf_calendar
 									if($update_needed == true)
 									{
 										$post_data['ID'] = $r->ID;
+										$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input'], $post_data['ID']);
 
 										wp_update_post($post_data);
 
