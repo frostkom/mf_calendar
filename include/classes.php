@@ -39,7 +39,7 @@ class mf_calendar
 	{
 		global $wpdb;
 
-		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != ''", $this->post_type, $this->meta_prefix.'color'));
+		return $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value != '' GROUP BY ID", $this->post_type, $this->meta_prefix.'color'));
 	}
 
 	function block_render_callback($attributes)
@@ -356,15 +356,15 @@ class mf_calendar
 
 		$out = "";
 
-		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, $this->meta_prefix.'calendar', $id));
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID", $this->post_type_event, $this->meta_prefix.'calendar', $id));
 		$rows = $wpdb->num_rows;
 
 		if($rows > 0)
 		{
-			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d'", $this->post_type_event, 'draft', $this->meta_prefix.'calendar', $id));
+			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID", $this->post_type_event, 'draft', $this->meta_prefix.'calendar', $id));
 			$rows_draft = $wpdb->num_rows;
 
-			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, $this->meta_prefix.'calendar', $id));
+			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, $this->meta_prefix.'calendar', $id));
 
 			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$rows."</a>"
 			.($rows_draft > 0 ? "<span class='grey' title='".__("Draft", 'lang_calendar')."'>+".$rows_draft."</span>" : "")
@@ -1184,7 +1184,7 @@ class mf_calendar
 			'fields' => $arr_fields_normal,
 		);
 
-		$arr_fields_side = apply_filters('before_meta_box_fields', $arr_fields_side);
+		//$arr_fields_side = apply_filters('before_meta_box_fields', $arr_fields_side);
 
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings_side',
@@ -1292,7 +1292,7 @@ class mf_calendar
 
 		if(get_post_type($post_id) == $this->post_type)
 		{
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = '%d'", $this->post_type_event, $this->meta_prefix.'calendar', $post_id));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = '%d' GROUP BY ID", $this->post_type_event, $this->meta_prefix.'calendar', $post_id));
 
 			foreach($result as $r)
 			{
@@ -2816,7 +2816,7 @@ class mf_calendar
 		{
 			$post['uid_temp'] = $post['type']." ".$post['recurringEventId'];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_parent = '%d' AND meta_key = %s AND meta_value = %s", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid_temp']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_parent = '%d' AND meta_key = %s AND meta_value = %s GROUP BY ID", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid_temp']));
 
 			foreach($result as $r)
 			{
@@ -2845,7 +2845,7 @@ class mf_calendar
 			{
 				$post['uid'] = $post['type']." ".$post['id'];
 
-				$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN ('draft', 'publish') AND post_parent = '%d' AND meta_key = %s AND meta_value = %s", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid']));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN ('draft', 'publish') AND post_parent = '%d' AND meta_key = %s AND meta_value = %s GROUP BY ID", $this->post_type_event, $this->id, $this->meta_prefix.'uid', $post['uid']));
 
 				switch($post['status'])
 				{
@@ -2976,7 +2976,7 @@ class mf_calendar
 
 			$query_where .= " AND meta_value NOT IN ('".implode("','", $arr_titles)."')";
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND post_parent = '%d' AND meta_key = %s".$query_where, $this->post_type_event, 'publish', $this->id, $this->meta_prefix.'uid'));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, post_content FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND post_parent = '%d' AND meta_key = %s".$query_where." GROUP BY ID", $this->post_type_event, 'publish', $this->id, $this->meta_prefix.'uid'));
 
 			foreach($result as $r)
 			{
