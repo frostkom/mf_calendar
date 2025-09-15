@@ -586,7 +586,7 @@ class mf_calendar
 							}
 
 							echo "<div class='row-actions'>
-								<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$arr_registration_meta['registration_groups_id'])."'>".__("Edit", 'lang_calendar')."</a>"
+								<a href='".admin_url("post.php?post=".$arr_registration_meta['registration_groups_id']."&action=edit")."'>".__("Edit", 'lang_calendar')."</a>"
 								." | <a href='".get_permalink($arr_registration_meta['registration_groups_id'])."'>".__("View", 'lang_calendar')."</a>
 							</div>";
 						}
@@ -621,7 +621,7 @@ class mf_calendar
 		}
 	}
 
-	function row_actions($arr_actions, $post)
+	function post_row_actions($arr_actions, $post)
 	{
 		if($post->post_type == $this->post_type_event)
 		{
