@@ -111,7 +111,7 @@ class mf_calendar
 							do_action('init_multiselect');
 
 							$out .= "<form action='' method='post' class='mf_form hide'>"
-								.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
+								.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='mf_form_field multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
 							."</form>";
 						}
 					}
@@ -774,14 +774,6 @@ class mf_calendar
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'loading_animation' => apply_filters('get_loading_animation', ''),
 			));
-		}
-	}
-
-	function widgets_init()
-	{
-		if(wp_is_block_theme() == false)
-		{
-			register_widget('widget_calendar');
 		}
 	}
 
@@ -3009,115 +3001,5 @@ class mf_calendar
 		{
 			return "&nbsp;<a href='//google.com/maps?q=".$location."'><i class='fa fa-globe fa-lg green'></i></a>";
 		}
-	}
-}
-
-class widget_calendar extends WP_Widget
-{
-	var $obj_calendar;
-	var $widget_ops;
-	var $arr_default = array(
-		'calendar_heading' => "",
-		'calendar_feeds' => [],
-		'calendar_display_filter' => 'no',
-		'calendar_filter_label' => "",
-		'calendar_display_categories' => 'no',
-		'calendar_display_all_info' => 'no',
-		'calendar_type' => '',
-		'calendar_months' => 6,
-	);
-
-	function __construct()
-	{
-		$this->obj_calendar = new mf_calendar();
-
-		$this->widget_ops = array(
-			'classname' => 'calendar',
-			'description' => __("Display Calendar", 'lang_calendar'),
-		);
-
-		parent::__construct('gcal-widget', __("Calendar", 'lang_calendar'), $this->widget_ops);
-	}
-
-	function widget($args, $instance)
-	{
-		do_log(__CLASS__."->".__FUNCTION__."(): Add a block instead", 'publish', false);
-	}
-
-	function update($new_instance, $old_instance)
-	{
-		$instance = $old_instance;
-		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
-
-		$instance['calendar_heading'] = sanitize_text_field($new_instance['calendar_heading']);
-		$instance['calendar_feeds'] = is_array($new_instance['calendar_feeds']) ? $new_instance['calendar_feeds'] : [];
-		$instance['calendar_display_filter'] = sanitize_text_field($new_instance['calendar_display_filter']);
-		$instance['calendar_filter_label'] = sanitize_text_field($new_instance['calendar_filter_label']);
-		$instance['calendar_display_categories'] = sanitize_text_field($new_instance['calendar_display_categories']);
-		$instance['calendar_display_all_info'] = sanitize_text_field($new_instance['calendar_display_all_info']);
-		$instance['calendar_type'] = sanitize_text_field($new_instance['calendar_type']);
-		$instance['calendar_months'] = sanitize_text_field($new_instance['calendar_months']);
-
-		return $instance;
-	}
-
-	function get_type_for_select()
-	{
-		return array(
-			'' => __("Normal", 'lang_calendar'),
-			'week' => __("Weekly", 'lang_calendar'),
-		);
-	}
-
-	function form($instance)
-	{
-		$instance = wp_parse_args((array)$instance, $this->arr_default);
-
-		$arr_data_feeds = [];
-		get_post_children(array('post_type' => $this->obj_calendar->post_type), $arr_data_feeds);
-
-		$arr_data_pages = [];
-		get_post_children(array('add_choose_here' => true), $arr_data_pages);
-
-		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('calendar_heading'), 'text' => __("Heading", 'lang_calendar'), 'value' => $instance['calendar_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"));
-
-			if(count($arr_data_feeds) > 0)
-			{
-				echo "<div class='flex_flow'>"
-					.show_select(array('data' => $arr_data_feeds, 'name' => $this->get_field_name('calendar_feeds')."[]", 'text' => __("Feeds", 'lang_calendar'), 'value' => $instance['calendar_feeds']));
-
-					if(is_array($instance['calendar_feeds']) && count($instance['calendar_feeds']) != 1)
-					{
-						echo "<div>"
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_filter'), 'text' => __("Display Filter", 'lang_calendar'), 'value' => $instance['calendar_display_filter']));
-
-							if($instance['calendar_display_filter'] == 'yes' && is_plugin_active("mf_multiselect/index.php"))
-							{
-								echo show_textfield(array('name' => $this->get_field_name('calendar_filter_label'), 'text' => __("Label", 'lang_calendar'), 'value' => $instance['calendar_filter_label'], 'placeholder' => __("Choose Here", 'lang_calendar')));
-							}
-
-							else
-							{
-								echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_categories'), 'text' => __("Display Categories", 'lang_calendar'), 'value' => $instance['calendar_display_categories']));
-							}
-
-						echo "</div>";
-					}
-
-				echo "</div>";
-			}
-
-			else
-			{
-				echo "<em>".__("There are no available calendars", 'lang_calendar')."</em>";
-			}
-
-			echo show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('calendar_display_all_info'), 'text' => __("Display All Info", 'lang_calendar'), 'value' => $instance['calendar_display_all_info']))
-			."<div class='flex_flow'>"
-				.show_select(array('data' => $this->get_type_for_select(), 'name' => $this->get_field_name('calendar_type'), 'text' => __("Design", 'lang_calendar'), 'value' => $instance['calendar_type']))
-				.show_textfield(array('type' => 'number', 'name' => $this->get_field_name('calendar_months'), 'text' => __("Months", 'lang_calendar'), 'value' => $instance['calendar_months'], 'xtra' => "min='-36' max='36'"))
-			."</div>"
-		."</div>";
 	}
 }
