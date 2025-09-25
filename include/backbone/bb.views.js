@@ -187,7 +187,7 @@ var CalendarView = Backbone.View.extend(
 
 			if(dom_obj_event.length > 0)
 			{
-				jQuery("html, body").animate({scrollTop: (dom_obj_event.offset().top - 30)}, 800);
+				jQuery("html, body").animate({scrollTop: (dom_obj_event.offset().top - 100)}, 800);
 
 				dom_obj_event.find(".toggler").addClass('is_open');
 			}
