@@ -186,7 +186,7 @@ class mf_calendar
 			'labels' => array(
 				'name' => __("Events", 'lang_calendar'),
 				'singular_name' => __("Event", 'lang_calendar'),
-				'menu_name' => __("Event", 'lang_calendar'),
+				'menu_name' => __("Events", 'lang_calendar'),
 				'all_items' => __('List', 'lang_calendar'),
 				'edit_item' => __('Edit', 'lang_calendar'),
 				'view_item' => __('View', 'lang_calendar'),
