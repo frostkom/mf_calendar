@@ -1184,8 +1184,6 @@ class mf_calendar
 			'fields' => $arr_fields_normal,
 		);
 
-		//$arr_fields_side = apply_filters('before_meta_box_fields', $arr_fields_side);
-
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings_side',
 			'title' => __("Settings", 'lang_calendar'),
