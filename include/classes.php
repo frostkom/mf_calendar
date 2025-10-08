@@ -419,7 +419,7 @@ class mf_calendar
 
 						else if($post_custom_url != '')
 						{
-							$post_meta = "<a href='".$post_custom_url."' rel='external'><i class='fa fa-link fa-lg'></i></a>";
+							$post_meta = "<a href='".$post_custom_url."'><i class='fa fa-link fa-lg'></i></a>";
 						}
 
 						else if($post_display_birthdays == 'yes')
