@@ -330,27 +330,85 @@ class mf_calendar
 		return $arr_pages;
 	}
 
+	/*function posts_join($join, $query)
+	{
+		global $wpdb;
+
+		if($query->is_main_query())
+		{
+			switch($query->get('post_type'))
+			{
+				case $this->post_type_event:
+					$join .= " LEFT JOIN ".$wpdb->postmeta." AS calendar_start ON (".$wpdb->posts.".ID = calendar_start.post_id AND calendar_start.meta_key = '".$this->meta_prefix."start') ";
+				break;
+			}
+		}
+
+	    return $join;
+	}
+
+	function posts_orderby($orderby_statement, $query)
+	{
+		global $wpdb;
+
+		if($query->is_main_query())
+		{
+			switch($query->get('post_type'))
+			{
+				case $this->post_type_event:
+					$orderby_statement = "calendar_start.meta_value+0 ASC";
+				break;
+			}
+		}
+
+		return $orderby_statement;
+	}*/
+
 	function column_header($columns)
 	{
-		global $post_type;
+		global $wpdb, $post_type;
 
 		unset($columns['date']);
 
 		switch($post_type)
 		{
 			case $this->post_type:
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'account', $this->post_type, 'trash'));
+				$rows_with_account = $wpdb->num_rows;
+
 				$columns['color'] = __("Color", 'lang_calendar');
-				$columns['account'] = __("Account", 'lang_calendar');
+
+				if($rows_with_account > 0)
+				{
+					$columns['account'] = __("Account", 'lang_calendar');
+				}
+
 				$columns['amount_of_posts'] = __("Amount", 'lang_calendar');
 			break;
 
 			case $this->post_type_event:
 				unset($columns['title']);
 
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'location', $this->post_type_event, 'trash'));
+				$rows_with_location = $wpdb->num_rows;
+
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'registration', $this->post_type_event, 'trash'));
+				$rows_with_registration = $wpdb->num_rows;
+
 				$columns['event_title'] = __("Title", 'lang_calendar');
-				$columns['location'] = __("Location", 'lang_calendar');
+
+				if($rows_with_location > 0)
+				{
+					$columns['location'] = __("Location", 'lang_calendar');
+				}
+
 				$columns['datetime'] = __("Date", 'lang_calendar');
-				$columns['registration'] = __("Registration", 'lang_calendar');
+
+				if($rows_with_registration > 0)
+				{
+					$columns['registration'] = __("Registration", 'lang_calendar');
+				}
+
 				$columns['calendar'] = __("Calendar", 'lang_calendar');
 			break;
 		}
@@ -364,15 +422,15 @@ class mf_calendar
 
 		$out = "";
 
-		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID", $this->post_type_event, $this->meta_prefix.'calendar', $id));
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND meta_value = '%d' GROUP BY ID", $this->meta_prefix.'calendar', $this->post_type_event, $id));
 		$rows = $wpdb->num_rows;
 
 		if($rows > 0)
 		{
-			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID", $this->post_type_event, 'draft', $this->meta_prefix.'calendar', $id));
+			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND meta_value = '%d' GROUP BY ID", $this->meta_prefix.'calendar', $this->post_type_event, 'draft', $id));
 			$rows_draft = $wpdb->num_rows;
 
-			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = '%d' GROUP BY ID ORDER BY post_date DESC LIMIT 0, 1", $this->post_type_event, $this->meta_prefix.'calendar', $id));
+			$post_latest = $wpdb->get_var($wpdb->prepare("SELECT post_date FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status IN('".implode("','", array('publish', 'future'))."') AND meta_value = '%d' GROUP BY ID ORDER BY post_date DESC LIMIT 0, 1", $this->meta_prefix.'calendar', $this->post_type_event, $id));
 
 			$out .= "<a href='".admin_url("edit.php?post_type=".$this->post_type_event."&strFilterCalendar=".$id)."'>".$rows."</a>"
 			.($rows_draft > 0 ? "<span class='grey' title='".__("Draft", 'lang_calendar')."'>+".$rows_draft."</span>" : "")
@@ -621,7 +679,7 @@ class mf_calendar
 		}
 	}
 
-	function post_row_actions($arr_actions, $post)
+	/*function post_row_actions($arr_actions, $post)
 	{
 		if($post->post_type == $this->post_type_event)
 		{
@@ -629,7 +687,7 @@ class mf_calendar
 		}
 
 		return $arr_actions;
-	}
+	}*/
 
 	// Because gCal displays whole-day-events with the end date the day after start date
 	function filter_end_date($post_start, $post_end)

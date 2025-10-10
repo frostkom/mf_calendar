@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.10.22
+Version: 4.10.23
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -34,10 +34,14 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		add_filter('filter_sites_table_pages', array($obj_calendar, 'filter_sites_table_pages'));
 
+		// Does not work so the final query needs to be debugged
+		//add_filter('posts_join', array($obj_calendar, 'posts_join'), 10, 2);
+		//add_filter('posts_orderby', array($obj_calendar, 'posts_orderby'), 10, 2);
+
 		add_filter('manage_'.$obj_calendar->post_type.'_posts_columns', array($obj_calendar, 'column_header'), 5);
 		add_action('manage_'.$obj_calendar->post_type.'_posts_custom_column', array($obj_calendar, 'column_cell'), 5, 2);
 
-		add_filter('post_row_actions', array($obj_calendar, 'post_row_actions'), 10, 2);
+		//add_filter('post_row_actions', array($obj_calendar, 'post_row_actions'), 10, 2);
 
 		add_filter('manage_'.$obj_calendar->post_type_event.'_posts_columns', array($obj_calendar, 'column_header'), 5);
 		add_action('manage_'.$obj_calendar->post_type_event.'_posts_custom_column', array($obj_calendar, 'column_cell'), 5, 2);
