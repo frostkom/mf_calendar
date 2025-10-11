@@ -1115,7 +1115,7 @@ class mf_calendar
 
 				if($registration_groups == 'yes')
 				{
-					$post_title = mf_get_post_content($post_id, 'post_title');
+					$post_title = get_the_title($post_id);
 
 					$post_data = array(
 						'post_type' => $obj_group->post_type,
