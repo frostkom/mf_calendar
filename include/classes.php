@@ -110,7 +110,7 @@ class mf_calendar
 						{
 							do_action('init_multiselect');
 
-							$out .= "<form action='' method='post' class='mf_form hide'>"
+							$out .= "<form".apply_filters('get_form_attr', "", ['class' => ["hide"]]).">"
 								.show_select(array('data' => $arr_data_feeds, 'name' => 'calendar_feeds[]', 'xtra' => "class='mf_form_field multiselect'".($attributes['calendar_filter_label'] != '' ? " data-choose-here='".$attributes['calendar_filter_label']."'" : "")))
 							."</form>";
 						}
