@@ -242,7 +242,8 @@ class mf_calendar
 			$setting_key = get_setting_key(__FUNCTION__);
 			$option = get_option($setting_key, '#019cdb');
 
-			echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
+			echo get_form_accents(array('name' => $setting_key, 'value' => $option));
+			//echo show_textfield(array('type' => 'color', 'name' => $setting_key, 'value' => $option));
 		}
 
 		function setting_calendar_image_fallback_callback()
