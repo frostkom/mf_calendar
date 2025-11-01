@@ -8,8 +8,8 @@ class mf_calendar
 	var $calendar_url_clean;
 	var $custom_url;
 	var $display_birthdays;
-	var $post_type = 'mf_calendar';
-	var $post_type_event = 'mf_calendar_event';
+	var $post_type = __CLASS__;
+	var $post_type_event = __CLASS__.'_event';
 	var $meta_prefix;
 	var $arr_events;
 	var $feed_was_updated = false;
@@ -57,6 +57,8 @@ class mf_calendar
 
 		if(is_array($attributes['calendar_feeds']) && count($attributes['calendar_feeds']) > 0)
 		{
+			do_action('load_font_awesome');
+
 			$plugin_base_include_url = plugins_url()."/mf_base/include/";
 			$plugin_include_url = plugin_dir_url(__FILE__);
 
@@ -446,6 +448,8 @@ class mf_calendar
 	function column_cell($column, $post_id)
 	{
 		global $wpdb, $post;
+
+		do_action('load_font_awesome');
 
 		switch($post->post_type)
 		{
