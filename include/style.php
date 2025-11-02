@@ -182,6 +182,11 @@ echo ".widget.calendar
 							margin: 0 !important;
 						}
 
+							.widget.calendar .calendar_feed_item .content.toggler .meta > p
+							{
+								padding-right: 2.5em;
+							}
+
 						.widget.calendar .calendar_feed_item .end_date
 						{
 							margin-bottom: 0;
