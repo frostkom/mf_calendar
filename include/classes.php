@@ -347,7 +347,7 @@ class mf_calendar
 			}
 		}
 
-	    return $join;
+		return $join;
 	}
 
 	function posts_orderby($orderby_statement, $query)

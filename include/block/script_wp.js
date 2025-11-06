@@ -5,7 +5,7 @@
 		SelectControl = wp.components.SelectControl,
 		TextControl = wp.components.TextControl,
 		MediaUpload = wp.blockEditor.MediaUpload,
-	    Button = wp.components.Button,
+		Button = wp.components.Button,
 		MediaUploadCheck = wp.blockEditor.MediaUploadCheck,
 		InspectorControls = wp.blockEditor.InspectorControls;
 
@@ -24,44 +24,44 @@
 			},
 			'calendar_feeds':
 			{
-                'type': 'array',
-                'default': ''
-            },
+				'type': 'array',
+				'default': ''
+			},
 			'calendar_display_filter':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_filter_label':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_display_categories':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_display_all_info':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_type':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_months':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'calendar_filter_hook':
 			{
-                'type': 'string',
-                'default': ''
-            }
+				'type': 'string',
+				'default': ''
+			}
 		},
 		'supports':
 		{
