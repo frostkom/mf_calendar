@@ -1139,7 +1139,6 @@ class mf_calendar
 							//$obj_group->meta_prefix.'contact_page' => $this->contact_page,
 							//$obj_group->meta_prefix.'registration_fields' => $this->registration_fields,
 							//$obj_group->meta_prefix.'verify_link' => $this->verify_link,
-							//$obj_group->meta_prefix.'sync_users' => $this->sync_users,
 							//$obj_group->meta_prefix.'owner_email' => $this->owner_email,
 							//$obj_group->meta_prefix.'help_page' => $this->help_page,
 							//$obj_group->meta_prefix.'archive_page' => $this->archive_page,
@@ -1754,7 +1753,7 @@ class mf_calendar
 					{
 						if($data['display_all_info'] != 'yes')
 						{
-							$content_class .= " toggler";
+							$content_class .= " toggler is_toggleable has_memory";
 							$more_icon = "<div class='toggle_icon'><div></div><div></div></div>";
 						}
 
