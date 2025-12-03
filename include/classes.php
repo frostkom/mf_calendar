@@ -1128,20 +1128,8 @@ class mf_calendar
 						'post_status' => 'publish',
 						'post_modified' => date("Y-m-d H:i:s"),
 						'meta_input' => array(
-							//$obj_group->meta_prefix.'api' => $this->api,
-							//$obj_group->meta_prefix.'api_filter' => $this->api_filter,
-							//$obj_group->meta_prefix.'acceptance_email' => $this->acceptance_email,
-							//$obj_group->meta_prefix.'acceptance_subject' => $this->acceptance_subject,
-							//$obj_group->meta_prefix.'acceptance_text' => $this->acceptance_text,
 							$obj_group->meta_prefix.'group_type' => 'normal',
 							$obj_group->meta_prefix.'allow_registration' => 'yes',
-							//$obj_group->meta_prefix.'verify_address' => $this->verify_address,
-							//$obj_group->meta_prefix.'contact_page' => $this->contact_page,
-							//$obj_group->meta_prefix.'registration_fields' => $this->registration_fields,
-							//$obj_group->meta_prefix.'verify_link' => $this->verify_link,
-							//$obj_group->meta_prefix.'owner_email' => $this->owner_email,
-							//$obj_group->meta_prefix.'help_page' => $this->help_page,
-							//$obj_group->meta_prefix.'archive_page' => $this->archive_page,
 						),
 					);
 
