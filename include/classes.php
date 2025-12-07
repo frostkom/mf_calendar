@@ -392,10 +392,10 @@ class mf_calendar
 			case $this->post_type_event:
 				unset($columns['title']);
 
-				$result = $obj_base->cache_query($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'location', $this->post_type_event, 'trash'));
+				$result = $obj_base->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'location', $this->post_type_event, 'trash'));
 				$rows_with_location = count($result);
 
-				$result = $obj_base->cache_query($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'registration', $this->post_type_event, 'trash'));
+				$result = $obj_base->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'registration', $this->post_type_event, 'trash'));
 				$rows_with_registration = count($result);
 
 				$columns['event_title'] = __("Title", 'lang_calendar');
