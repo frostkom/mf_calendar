@@ -369,7 +369,7 @@ class mf_calendar
 
 	function column_header($columns)
 	{
-		global $wpdb, $post_type;
+		global $wpdb, $post_type, $obj_base;
 
 		unset($columns['date']);
 
@@ -392,11 +392,11 @@ class mf_calendar
 			case $this->post_type_event:
 				unset($columns['title']);
 
-				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'location', $this->post_type_event, 'trash'));
-				$rows_with_location = $wpdb->num_rows;
+				$result = $obj_base->cache_query($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'location', $this->post_type_event, 'trash'));
+				$rows_with_location = count($result);
 
-				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'registration', $this->post_type_event, 'trash'));
-				$rows_with_registration = $wpdb->num_rows;
+				$result = $obj_base->cache_query($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status != %s AND meta_value != '' GROUP BY ID LIMIT 0, 1", $this->meta_prefix.'registration', $this->post_type_event, 'trash'));
+				$rows_with_registration = count($result);
 
 				$columns['event_title'] = __("Title", 'lang_calendar');
 
@@ -449,11 +449,11 @@ class mf_calendar
 	{
 		global $wpdb, $post;
 
-		do_action('load_font_awesome');
-
 		switch($post->post_type)
 		{
 			case $this->post_type:
+				do_action('load_font_awesome');
+
 				switch($column)
 				{
 					case 'color':
@@ -494,24 +494,6 @@ class mf_calendar
 						{
 							// This should not be done here, but in My Settings
 							$fetch_link = "";
-
-							/*$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s AND post_modified < DATE_SUB(NOW(), INTERVAL 1 MINUTE) LIMIT 0, 1", $post_id, $this->post_type));
-
-							if($wpdb->num_rows > 0)
-							{
-								$intCalendarID = check_var('intCalendarID');
-
-								if(isset($_REQUEST['btnCalendarFetch']) && $intCalendarID > 0 && $intCalendarID == $post_id && wp_verify_nonce($_REQUEST['_wpnonce_calendar_fetch'], 'calendar_fetch_'.$post_id))
-								{
-									$obj_calendar = new mf_calendar($post_id);
-									$obj_calendar->fetch_source($post_id, true);
-								}
-
-								else
-								{
-									$fetch_link = "<a href='".wp_nonce_url(admin_url("edit.php?post_type=".$this->post_type."&btnCalendarFetch&intCalendarID=".$post_id), 'calendar_fetch_'.$post_id, '_wpnonce_calendar_fetch')."'>".__("Fetch", 'lang_calendar')."</a> | ";
-								}
-							}*/
 
 							$post_modified = $wpdb->get_var($wpdb->prepare("SELECT post_modified FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = %s", $post_id, $this->post_type));
 
