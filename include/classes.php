@@ -824,7 +824,7 @@ class mf_calendar
 
 	function is_birthday_active()
 	{
-		$setting_users_add_profile_fields = get_option('setting_users_add_profile_fields');
+		$setting_users_add_profile_fields = get_site_option('setting_users_add_profile_fields');
 
 		return is_plugin_active("mf_users/index.php") && is_array($setting_users_add_profile_fields) && in_array('profile_birthday', $setting_users_add_profile_fields);
 	}
