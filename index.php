@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description:
-Version: 4.10.40
+Version: 4.10.41
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -60,7 +60,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_action('wp_trash_post', array($obj_calendar, 'wp_trash_post'));
 
 		add_filter('filter_last_updated_post_types', array($obj_calendar, 'filter_last_updated_post_types'), 10, 2);
-		
+
 		if(wp_doing_ajax())
 		{
 			add_action('wp_ajax_api_calendar_action_hide', array($obj_calendar, 'api_calendar_action_hide'));
@@ -71,7 +71,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 	{
 		add_filter('filter_form_after_fields', array($obj_calendar, 'filter_form_after_fields'));
 	}
-	
+
 	if(wp_doing_ajax())
 	{
 		add_action('wp_ajax_api_calendar_events', array($obj_calendar, 'api_calendar_events'));

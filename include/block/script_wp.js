@@ -92,6 +92,115 @@
 		},
 		edit: function(props)
 		{
+			var inspectorControlsChildren = [
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_feeds_label,
+						value: props.attributes.calendar_feeds,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_feeds),
+						multiple: true,
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_feeds: value});
+						}
+					}
+				),
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_display_filter_label,
+						value: props.attributes.calendar_display_filter,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_display_filter: value});
+						}
+					}
+				)
+			];
+
+			if(props.attributes.calendar_display_filter == 'yes')
+			{
+				inspectorControlsChildren.push(
+					el(
+						TextControl,
+						{
+							label: script_calendar_block_wp.calendar_filter_label,
+							type: 'text',
+							value: props.attributes.calendar_filter_label,
+							onChange: function(value)
+							{
+								props.setAttributes({calendar_filter_label: value});
+							}
+						}
+					),
+				);
+			}
+
+			inspectorControlsChildren.push(
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_display_categories_label,
+						value: props.attributes.calendar_display_categories,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_display_categories: value});
+						}
+					}
+				),
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_display_all_info_label,
+						value: props.attributes.calendar_display_all_info,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_display_all_info: value});
+						}
+					}
+				),
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_type_label,
+						value: props.attributes.calendar_type,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_type),
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_type: value});
+						}
+					}
+				),
+				el(
+					TextControl,
+					{
+						label: script_calendar_block_wp.calendar_months_label,
+						type: 'number',
+						value: props.attributes.calendar_months,
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_months: value});
+						}
+					}
+				),
+				el(
+					TextControl,
+					{
+						label: script_calendar_block_wp.calendar_filter_hook_label,
+						type: 'text',
+						value: props.attributes.calendar_filter_hook,
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_filter_hook: value});
+						}
+					}
+				)
+			);
+
 			return el(
 				'div',
 				{className: 'wp_mf_block_container'},
@@ -99,103 +208,7 @@
 					el(
 						InspectorControls,
 						'div',
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_feeds_label,
-								value: props.attributes.calendar_feeds,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_feeds),
-								multiple: true,
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_feeds: value});
-								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_display_filter_label,
-								value: props.attributes.calendar_display_filter,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_display_filter: value});
-								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_calendar_block_wp.calendar_filter_label,
-								type: 'text',
-								value: props.attributes.calendar_filter_label,
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_filter_label: value});
-								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_display_categories_label,
-								value: props.attributes.calendar_display_categories,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_display_categories: value});
-								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_display_all_info_label,
-								value: props.attributes.calendar_display_all_info,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.yes_no_for_select),
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_display_all_info: value});
-								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_calendar_block_wp.calendar_type_label,
-								value: props.attributes.calendar_type,
-								options: convert_php_array_to_block_js(script_calendar_block_wp.calendar_type),
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_type: value});
-								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_calendar_block_wp.calendar_months_label,
-								type: 'number',
-								value: props.attributes.calendar_months,
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_months: value});
-								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_calendar_block_wp.calendar_filter_hook_label,
-								type: 'text',
-								value: props.attributes.calendar_filter_hook,
-								onChange: function(value)
-								{
-									props.setAttributes({calendar_filter_hook: value});
-								}
-							}
-						)
+						inspectorControlsChildren
 					),
 					el(
 						'strong',
