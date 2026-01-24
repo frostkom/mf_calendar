@@ -2800,20 +2800,20 @@ class mf_calendar
 
 	function fetch_birthdays()
 	{
-		$users = get_users(array('fields' => 'all'));
+		$arr_users = get_users(array('fields' => 'ID'));
 
-		foreach($users as $user)
+		foreach($arr_users as $user_id)
 		{
-			$user_data = get_userdata($user->ID);
+			$user_data = get_userdata($user_id);
 
 			if(isset($user_data->roles[0]) && $user_data->roles[0] != '')
 			{
-				$user_birthday = get_the_author_meta('profile_birthday', $user->ID);
+				$user_birthday = get_the_author_meta('profile_birthday', $user_data->ID);
 
 				if($user_birthday != '')
 				{
-					$item_id = $user->ID;
-					$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user->display_name);
+					$item_id = $user_data->ID;
+					$item_title = sprintf(__("%s has birthday", 'lang_calendar'), $user_data->display_name);
 					$item_birthday = date("Y")."-".date("m-d", strtotime($user_birthday));
 
 					if($item_birthday < date("Y-m-d", strtotime("-1 month")))
