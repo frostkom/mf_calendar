@@ -1108,7 +1108,7 @@ class mf_calendar
 						'post_type' => $obj_group->post_type,
 						'post_title' => $post_title,
 						'post_status' => 'publish',
-						'post_modified' => date("Y-m-d H:i:s"),
+						'post_modified' => current_time('mysql'),
 						'meta_input' => array(
 							$obj_group->meta_prefix.'group_type' => 'normal',
 							$obj_group->meta_prefix.'allow_registration' => 'yes',
@@ -2829,7 +2829,7 @@ class mf_calendar
 						'content' => '',
 						'start' => $item_birthday,
 						'end' => $item_birthday,
-						'created' => date("Y-m-d H:i:s"),
+						'created' => current_time('mysql'),
 					);
 				}
 			}
