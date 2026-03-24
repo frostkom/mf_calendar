@@ -92,7 +92,7 @@ echo ".widget.calendar
 
 			.widget.calendar .calendar_feed_item:nth-child(2n + 1)
 			{
-				background-color: rgba(255, 255, 255, .4);
+				background-color: rgba(255, 255, 255, .2);
 			}
 
 			.widget.calendar .calendar_feed_item + li

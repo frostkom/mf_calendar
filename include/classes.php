@@ -1409,6 +1409,8 @@ class mf_calendar
 
 		$query_join .= " INNER JOIN ".$wpdb->postmeta." AS meta_date ON ".$wpdb->posts.".ID = meta_date.post_id";
 
+		$date_limit_past = "";
+
 		switch($data['type'])
 		{
 			case 'week':
@@ -1421,10 +1423,10 @@ class mf_calendar
 					$date_limit_past = " AND SUBSTRING(meta_date.meta_value, 1, 10) >= SUBSTRING(NOW(), 1, 10)";
 				}
 
-				else
+				/*else
 				{
 					$date_limit_past = " AND SUBSTRING(meta_date.meta_value, 1, 10) <= SUBSTRING(NOW(), 1, 10)";
-				}
+				}*/
 			break;
 		}
 
@@ -1446,10 +1448,10 @@ class mf_calendar
 			$query_where .= " AND meta_date.meta_value < DATE_ADD(NOW(), INTERVAL ".($data['months'] != 0 ? $data['months'] : 6)." MONTH)";
 		}
 
-		else
+		/*else
 		{
 			$query_where .= " AND meta_date.meta_value > DATE_SUB(NOW(), INTERVAL ".abs((int)$data['months'])." MONTH)";
-		}
+		}*/
 
 		$arr_post_statuses = apply_filters('filter_calendar_post_statuses', array('publish', 'future'));
 
