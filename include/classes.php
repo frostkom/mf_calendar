@@ -179,7 +179,7 @@ class mf_calendar
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
-			'supports' => array('title'),
+			'supports' => array('title', 'revisions'),
 			'hierarchical' => true,
 			'has_archive' => false,
 		));
@@ -199,7 +199,7 @@ class mf_calendar
 			'show_in_menu' => false,
 			'show_in_nav_menus' => false,
 			'show_in_rest' => true,
-			'supports' => array('title', 'editor', 'excerpt'),
+			'supports' => array('title', 'editor', 'excerpt', 'revisions'),
 			'hierarchical' => true,
 			'has_archive' => false,
 		));
