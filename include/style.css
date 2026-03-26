@@ -1,30 +1,4 @@
-<?php
-
-if(!defined('ABSPATH'))
-{
-	header("Content-Type: text/css; charset=utf-8");
-
-	$folder = str_replace("/wp-content/plugins/mf_calendar/include", "/", dirname(__FILE__));
-
-	require_once($folder."wp-load.php");
-}
-
-if(!isset($obj_base))
-{
-	$obj_base = new mf_base();
-}
-
-if(!isset($obj_calendar))
-{
-	$obj_calendar = new mf_calendar();
-}
-
-$setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
-$setting_calendar_date_text_color = $obj_base->get_text_color_from_background($setting_calendar_date_bg);
-
-$setting_calendar_calendar_colors_result = $obj_calendar->get_calendar_colors();
-
-echo ".widget.calendar
+.widget.calendar
 {
 	text-align: left;
 }
@@ -102,9 +76,9 @@ echo ".widget.calendar
 
 				.widget.calendar .calendar_feed_item .start_date a
 				{
-					background: ".$setting_calendar_date_bg.";
+					background: var(--calendar-date-bg);
 					border-radius: .3em;
-					color: ".$setting_calendar_date_text_color.";
+					color: var(--calendar-date-text-color);
 					display: block;
 					font-size: 1.5em;
 					margin: 0;
@@ -113,20 +87,9 @@ echo ".widget.calendar
 					text-align: center;
 					text-decoration: none;
 					min-width: 2.5em;
-				}";
+				}
 
-					foreach($setting_calendar_calendar_colors_result as $r)
-					{
-						$post_id = $r->ID;
-						$post_color = $r->meta_value;
-
-						echo ".widget.calendar .calendar_feed_".$post_id." .start_date a
-						{
-							background: ".$post_color.";
-						}";
-					}
-
-					echo ".widget.calendar .calendar_feed_item .start_date span
+					.widget.calendar .calendar_feed_item .start_date span
 					{
 						opacity: 1;
 					}
@@ -208,4 +171,4 @@ echo ".widget.calendar
 						.widget.calendar .calendar_feed_item .more_content p
 						{
 							margin-bottom: 0;
-						}";
+						}

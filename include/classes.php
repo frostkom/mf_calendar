@@ -44,6 +44,8 @@ class mf_calendar
 
 	function block_render_callback($attributes)
 	{
+		global $obj_base;
+
 		if(!isset($attributes['calendar_feeds'])){				$attributes['calendar_feeds'] = [];}
 		if(!isset($attributes['calendar_display_filter'])){		$attributes['calendar_display_filter'] = 'no';}
 		if(!isset($attributes['calendar_filter_label'])){		$attributes['calendar_filter_label'] = '';}
@@ -59,10 +61,34 @@ class mf_calendar
 		{
 			do_action('load_font_awesome');
 
+			$setting_calendar_date_bg = get_option_or_default('setting_calendar_date_bg', "#019cdb");
+			$setting_calendar_date_text_color = $obj_base->get_text_color_from_background($setting_calendar_date_bg);
+
+			$setting_calendar_calendar_colors_result = $this->get_calendar_colors();
+
+			$out .= "<style>
+				:root
+				{
+					--calendar-date-bg: ".$setting_calendar_date_bg.";
+					--calendar-date-text-color: ".$setting_calendar_date_text_color.";
+				}";
+
+					foreach($setting_calendar_calendar_colors_result as $r)
+					{
+						$post_id = $r->ID;
+						$post_color = $r->meta_value;
+
+						$out .= ".widget.calendar .calendar_feed_".$post_id." .start_date a
+						{
+							background: ".$post_color.";
+						}";
+					}
+
+			$out .= "</style>";
+
 			$plugin_base_include_url = plugins_url()."/mf_base/include/";
 			$plugin_include_url = plugin_dir_url(__FILE__);
-
-			mf_enqueue_style('style_calendar', $plugin_include_url."style.php");
+			mf_enqueue_style('style_calendar', $plugin_include_url."style.css");
 
 			mf_enqueue_script('underscore');
 			mf_enqueue_script('backbone');
@@ -1668,7 +1694,7 @@ class mf_calendar
 
 					if($post_location != '')
 					{
-						if(is_plugin_active("mf_maps/index.php"))
+						/*if(is_plugin_active("mf_maps/index.php"))
 						{
 							$data_temp = array(
 								'id' => $post_id,
@@ -1688,9 +1714,9 @@ class mf_calendar
 						}
 
 						else
-						{
+						{*/
 							$more_content .= $this->get_map_link($post_location);
-						}
+						//}
 
 						$more_content .= "<div class='hide' itemprop='location' itemscope itemtype='//schema.org/Place'>
 							<meta itemprop='address' content='".$post_location."'>
