@@ -2102,9 +2102,6 @@ class mf_calendar
 
 		if($obj_cron->is_running == false)
 		{
-			replace_option(array('old' => 'setting_google_calendar_api_key', 'new' => 'setting_calendar_google_api_key'));
-			replace_option(array('old' => 'setting_calendar_events_exclude_from_search', 'new' => 'setting_calendar_events_searchable'));
-
 			mf_uninstall_plugin(array(
 				'options' => array('setting_calendar_events_searchable', 'setting_calendar_events_exclude_from_search', 'setting_calendar_image_fallback'),
 			));
