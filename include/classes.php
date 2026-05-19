@@ -341,7 +341,7 @@ class mf_calendar
 			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_event);
 		}
 
-		if(IS_EDITOR)
+		if(IS_ADMINISTRATOR)
 		{
 			$menu_title = __("Settings", 'lang_calendar');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_calendar"));
