@@ -54,6 +54,7 @@ class mf_calendar
 		if(!isset($attributes['calendar_type'])){				$attributes['calendar_type'] = '';}
 		if(!isset($attributes['calendar_months'])){				$attributes['calendar_months'] = 6;}
 		if(!isset($attributes['calendar_filter_hook'])){		$attributes['calendar_filter_hook'] = '';}
+		if(!isset($attributes['calendar_order'])){				$attributes['calendar_order'] = '';}
 
 		$out = "";
 
@@ -121,6 +122,7 @@ class mf_calendar
 					.($attributes['calendar_type'] != '' ? " data-calendar_type='".$attributes['calendar_type']."'" : '')
 					.($attributes['calendar_months'] != 0 ? " data-calendar_months='".$attributes['calendar_months']."'" : '')
 					.($attributes['calendar_filter_hook'] != '' ? " data-calendar_filter_hook='".$attributes['calendar_filter_hook']."'" : '')
+					.($attributes['calendar_order'] != '' ? " data-calendar_order='".$attributes['calendar_order']."'" : '')
 				.">"
 					.apply_filters('get_loading_animation', '', ['class' => "fa-3x"]);
 
@@ -188,6 +190,11 @@ class mf_calendar
 			'calendar_type' => $this->get_type_for_select(),
 			'calendar_months_label' => __("Months", 'lang_calendar'),
 			'calendar_filter_hook_label' => __("Filter Hook", 'lang_calendar'),
+			'calendar_order_label' => __("Order", 'lang_calendar'),
+			'arr_calendar_order' => [
+				'ASC' => __("Ascending", 'lang_calendar'),
+				'DESC' => __("Descending", 'lang_calendar'),
+			],
 		));
 	}
 
@@ -1418,6 +1425,7 @@ class mf_calendar
 		if(!isset($data['type'])){								$data['type'] = '';}
 		if(!isset($data['months'])){							$data['months'] = 6;}
 		if(!isset($data['calendar_filter_hook'])){				$data['calendar_filter_hook'] = '';}
+		if(!isset($data['calendar_order'])){				$data['calendar_order'] = 'ASC';}
 		if(!isset($data['display_registration'])){				$data['display_registration'] = true;}
 		if(!isset($data['date'])){								$data['date'] = date("Y-m-d");}
 
@@ -1485,7 +1493,7 @@ class mf_calendar
 
 		$arr_post_statuses = apply_filters('filter_calendar_post_statuses', array('publish', 'future'));
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", $arr_post_statuses)."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ASC", $this->post_type_event));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_calendar.meta_value AS post_feed, post_title, post_content FROM ".$wpdb->posts.$query_join." WHERE post_type = %s AND post_status IN('".implode("','", $arr_post_statuses)."') AND post_title != ''".$query_where." GROUP BY ID ORDER BY meta_date.meta_value ".$data['calendar_order'], $this->post_type_event));
 		$rows = $wpdb->num_rows;
 
 		$this->debug = $wpdb->last_query;
@@ -1820,6 +1828,7 @@ class mf_calendar
 		$calendar_type = check_var('calendar_type', 'char');
 		$calendar_months = check_var('calendar_months', 'int');
 		$calendar_filter_hook = check_var('calendar_filter_hook', 'char');
+		$calendar_order = check_var('calendar_order', 'char');
 
 		if($calendar_feeds != '')
 		{
@@ -1834,6 +1843,7 @@ class mf_calendar
 			'type' => $calendar_type,
 			'months' => $calendar_months,
 			'calendar_filter_hook' => $calendar_filter_hook,
+			'calendar_order' => $calendar_order,
 		));
 
 		if(count($this->arr_events) > 0)

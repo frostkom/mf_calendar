@@ -61,6 +61,11 @@
 			{
 				'type': 'string',
 				'default': ''
+			},
+			'calendar_order':
+			{
+				'type': 'string',
+				'default': ''
 			}
 		},
 		'supports':
@@ -196,6 +201,18 @@
 						onChange: function(value)
 						{
 							props.setAttributes({calendar_filter_hook: value});
+						}
+					}
+				),
+				el(
+					SelectControl,
+					{
+						label: script_calendar_block_wp.calendar_order_label,
+						value: props.attributes.calendar_order,
+						options: convert_php_array_to_block_js(script_calendar_block_wp.arr_calendar_order),
+						onChange: function(value)
+						{
+							props.setAttributes({calendar_order: value});
 						}
 					}
 				)
