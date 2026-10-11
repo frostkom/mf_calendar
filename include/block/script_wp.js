@@ -7,6 +7,7 @@
 		MediaUpload = wp.blockEditor.MediaUpload,
 		Button = wp.components.Button,
 		MediaUploadCheck = wp.blockEditor.MediaUploadCheck,
+		PanelBody = wp.components.PanelBody,
 		InspectorControls = wp.blockEditor.InspectorControls;
 
 	registerBlockType('mf/calendar',
@@ -224,8 +225,12 @@
 				[
 					el(
 						InspectorControls,
-						'div',
-						inspectorControlsChildren
+						{key: 'inspector'},
+						el(
+							PanelBody,
+							{title: script_calendar_block_wp.block_title, initialOpen: true},
+							inspectorControlsChildren
+						)
 					),
 					el(
 						'strong',
