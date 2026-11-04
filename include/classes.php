@@ -687,7 +687,7 @@ class mf_calendar
 					case 'calendar':
 						$post_meta = get_post_meta($post_id, $this->meta_prefix.$column, true);
 
-						$post_parent = $post_meta > 0 ? get_the_title($post_meta) : "";
+						$post_parent = ($post_meta > 0 ? get_the_title($post_meta) : "");
 
 						echo "<a href='post.php?post=".$post_meta."&action=edit'>".$post_parent."</a>";
 
@@ -2169,6 +2169,13 @@ class mf_calendar
 		}
 	}
 
+	function set_date_modified()
+	{
+		global $wpdb;
+
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_modified = NOW() WHERE ID = '%d' AND post_type = %s", $this->id, $this->post_type));
+	}
+
 	function fetch_source($id, $print = false)
 	{
 		$this->arr_events = [];
@@ -3054,13 +3061,6 @@ class mf_calendar
 				$this->feed_was_updated = true;
 			}
 		}
-	}
-
-	function set_date_modified()
-	{
-		global $wpdb;
-
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_modified = NOW() WHERE ID = '%d' AND post_type = %s", $this->id, $this->post_type));
 	}
 	##############################
 
