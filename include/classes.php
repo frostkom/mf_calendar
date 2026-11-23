@@ -2053,9 +2053,9 @@ class mf_calendar
 
 			else
 			{ %>
-				<li itemscope itemtype='//schema.org/Event' id='calendar_event_<%= id %>' class='calendar_feed_item calendar_feed_<%= feed %>'>
+				<li itemscope itemtype='//schema.org/Event' id='calendar_event_<%- id %>' class='calendar_feed_item calendar_feed_<%- feed %>'>
 					<div class='start_date' itemprop='startDate' content='<%= start_date_c %>'>
-						<a href='#calendar_event_<%= id %>'>
+						<a href='#calendar_event_<%- id %>'>
 							<span><%= start_day %></span>
 							<i class='fas fa-link'></i>
 						</a>
