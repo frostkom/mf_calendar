@@ -3,7 +3,7 @@
 Plugin Name: MF Calendar
 Plugin URI: https://github.com/frostkom/mf_calendar
 Description: Add functionality to handle calendars
-Version: 4.11.7
+Version: 4.11.8
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -31,6 +31,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_action('admin_init', array($obj_calendar, 'settings_calendar'));
 		add_action('admin_init', array($obj_calendar, 'admin_init'), 0);
 		add_action('admin_menu', array($obj_calendar, 'admin_menu'));
+
+		add_filter('posts_orderby', array($obj_calendar, 'posts_orderby'), 10, 2);
 
 		add_filter('filter_sites_table_pages', array($obj_calendar, 'filter_sites_table_pages'));
 

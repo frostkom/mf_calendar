@@ -355,6 +355,26 @@ class mf_calendar
 		}
 	}
 
+	function posts_orderby($orderby_statement, $wp_query)
+	{
+		global $wpdb;
+
+		if($wp_query->is_main_query() && check_var('orderby') == '')
+		{
+			switch($wp_query->get('post_type'))
+			{
+				case $this->post_type_event:
+					$orderby_statement = $wpdb->prepare(
+						"(SELECT meta_value FROM ".$wpdb->postmeta." WHERE ".$wpdb->postmeta.".post_id = ".$wpdb->posts.".ID AND meta_key = %s LIMIT 1) ASC, ".$wpdb->posts.".post_title ASC",
+						$this->meta_prefix.'start'
+					);
+				break;
+			}
+		}
+
+		return $orderby_statement;
+	}
+
 	function filter_sites_table_pages($arr_pages)
 	{
 		$arr_pages[$this->post_type] = array(
@@ -477,6 +497,123 @@ class mf_calendar
 			."<div class='row-actions'>"
 				.__("Latest", 'lang_calendar').": ".format_date($post_latest)
 			."</div>";
+		}
+
+		return $out;
+	}
+
+	function format_date($data)
+	{
+		$out = "";
+
+		if(!isset($data['post_id'])){		$data['post_id'] = 0;}
+		if(!isset($data['post_start'])){	$data['post_start'] = get_post_meta($data['post_id'], $this->meta_prefix.'start', true);}
+		if(!isset($data['post_end'])){		$data['post_end'] = get_post_meta($data['post_id'], $this->meta_prefix.'end', true);}
+
+		if(!($data['post_end'] > $data['post_start']))
+		{
+			$data['post_end'] = $data['post_start'];
+		}
+
+		$post_start_date = date("Y-m-d", strtotime($data['post_start']));
+		$post_start_time = date("H:i", strtotime($data['post_start']));
+
+		$post_end_date = date("Y-m-d", strtotime($data['post_end']));
+		$post_end_time = date("H:i", strtotime($data['post_end']));
+
+		if(is_admin())
+		{
+			if($data['post_start'] > DEFAULT_DATE)
+			{
+				$post_end_date = $this->filter_end_date($data['post_start'], $data['post_end']);
+
+				if($post_start_date == $post_end_date)
+				{
+					$out .= $post_start_date;
+
+					if($post_start_time > "00:00")
+					{
+						$out .= "&nbsp;".$post_start_time;
+
+						if($post_end_time > "00:00" && $post_end_time != $post_start_time)
+						{
+							$out .= "&nbsp;-&nbsp;".$post_end_time;
+						}
+					}
+				}
+
+				else
+				{
+					$out .= $post_start_date;
+
+					if($post_start_time != '' && $post_start_time != '00:00')
+					{
+						$out .= "&nbsp;".$post_start_time;
+					}
+
+					$out .= "&nbsp;-&nbsp;".$post_end_date;
+
+					if($post_end_time != '' && $post_end_time != '00:00')
+					{
+						$out .= "&nbsp;".$post_end_time;
+					}
+				}
+			}
+		}
+
+		else
+		{
+			$post_start_year = date("Y", strtotime($data['post_start']));
+			$post_start_month_name = substr(month_name(date("m", strtotime($data['post_start']))), 0, 3);
+			$post_start_day = date("d", strtotime($data['post_start']));
+
+			$post_end_year = date("Y", strtotime($data['post_end']));
+			$post_end_month_name = substr(month_name(date("m", strtotime($data['post_end']))), 0, 3);
+			$post_end_day = date("j", strtotime($data['post_end']));
+
+			$post_start_date_format = $post_start_day." ".$post_start_month_name;
+
+			if($post_start_year != date("Y"))
+			{
+				$post_start_date_format .= " ".$post_start_year;
+			}
+
+			$post_end_date_format = $post_end_day." ".$post_end_month_name;
+
+			if($post_end_year != $post_start_year)
+			{
+				$post_end_date_format .= " ".$post_start_year;
+			}
+
+			if($post_start_time != "00:00")
+			{
+				$out .= "(".$post_start_date_format.") ".$post_start_time;
+			}
+
+			else
+			{
+				$out .= $post_start_date_format;
+			}
+
+			if($post_end_time != "00:00")
+			{
+				$out .= " - ";
+
+				if($post_end_date != $post_start_date)
+				{
+					$out .= "(".$post_end_date_format.") ";
+				}
+
+				$out .= $post_end_time;
+			}
+
+			else
+			{
+				if($post_end_date != $post_start_date)
+				{
+					$out .= " - ".$post_end_date_format;
+				}
+			}
 		}
 
 		return $out;
@@ -725,123 +862,6 @@ class mf_calendar
 		}
 
 		return $post_end_date;
-	}
-
-	function format_date($data)
-	{
-		$out = "";
-
-		if(!isset($data['post_id'])){		$data['post_id'] = 0;}
-		if(!isset($data['post_start'])){	$data['post_start'] = get_post_meta($data['post_id'], $this->meta_prefix.'start', true);}
-		if(!isset($data['post_end'])){		$data['post_end'] = get_post_meta($data['post_id'], $this->meta_prefix.'end', true);}
-
-		if(!($data['post_end'] > $data['post_start']))
-		{
-			$data['post_end'] = $data['post_start'];
-		}
-
-		$post_start_date = date("Y-m-d", strtotime($data['post_start']));
-		$post_start_time = date("H:i", strtotime($data['post_start']));
-
-		$post_end_date = date("Y-m-d", strtotime($data['post_end']));
-		$post_end_time = date("H:i", strtotime($data['post_end']));
-
-		if(is_admin())
-		{
-			if($data['post_start'] > DEFAULT_DATE)
-			{
-				$post_end_date = $this->filter_end_date($data['post_start'], $data['post_end']);
-
-				if($post_start_date == $post_end_date)
-				{
-					$out .= $post_start_date;
-
-					if($post_start_time > "00:00")
-					{
-						$out .= "&nbsp;".$post_start_time;
-
-						if($post_end_time > "00:00" && $post_end_time != $post_start_time)
-						{
-							$out .= "&nbsp;-&nbsp;".$post_end_time;
-						}
-					}
-				}
-
-				else
-				{
-					$out .= $post_start_date;
-
-					if($post_start_time != '' && $post_start_time != '00:00')
-					{
-						$out .= "&nbsp;".$post_start_time;
-					}
-
-					$out .= "&nbsp;-&nbsp;".$post_end_date;
-
-					if($post_end_time != '' && $post_end_time != '00:00')
-					{
-						$out .= "&nbsp;".$post_end_time;
-					}
-				}
-			}
-		}
-
-		else
-		{
-			$post_start_year = date("Y", strtotime($data['post_start']));
-			$post_start_month_name = substr(month_name(date("m", strtotime($data['post_start']))), 0, 3);
-			$post_start_day = date("d", strtotime($data['post_start']));
-
-			$post_end_year = date("Y", strtotime($data['post_end']));
-			$post_end_month_name = substr(month_name(date("m", strtotime($data['post_end']))), 0, 3);
-			$post_end_day = date("j", strtotime($data['post_end']));
-
-			$post_start_date_format = $post_start_day." ".$post_start_month_name;
-
-			if($post_start_year != date("Y"))
-			{
-				$post_start_date_format .= " ".$post_start_year;
-			}
-
-			$post_end_date_format = $post_end_day." ".$post_end_month_name;
-
-			if($post_end_year != $post_start_year)
-			{
-				$post_end_date_format .= " ".$post_start_year;
-			}
-
-			if($post_start_time != "00:00")
-			{
-				$out .= "(".$post_start_date_format.") ".$post_start_time;
-			}
-
-			else
-			{
-				$out .= $post_start_date_format;
-			}
-
-			if($post_end_time != "00:00")
-			{
-				$out .= " - ";
-
-				if($post_end_date != $post_start_date)
-				{
-					$out .= "(".$post_end_date_format.") ";
-				}
-
-				$out .= $post_end_time;
-			}
-
-			else
-			{
-				if($post_end_date != $post_start_date)
-				{
-					$out .= " - ".$post_end_date_format;
-				}
-			}
-		}
-
-		return $out;
 	}
 
 	function admin_init()
