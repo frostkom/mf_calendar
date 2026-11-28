@@ -77,7 +77,8 @@
 			'spacing':
 			{
 				'margin': true,
-				'padding': true
+				'padding': true,
+				'blockGap': true
 			},
 			'color':
 			{
